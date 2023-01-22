@@ -37,10 +37,6 @@ impl MAX11617 {
     pub fn new(bus: u8, address: u16) -> Self {
         Self { bus, address }
     }
-    // pub fn initialize(&self) {
-    //     self.setup().expect("cannot setup MAX11617");
-    //     self.config().expect("cannot configure MAX11617");
-    // }
     pub fn setup(&self) -> Result<(), LinuxI2CError> {
         let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", self.bus), self.address)?;
         let setup_reg = SETUP | SETUP_ER_RI_RI_OFF | SETUP_INT_CLK | SETUP_UNI | SETUP_RST;
@@ -48,7 +44,6 @@ impl MAX11617 {
         dev.smbus_write_i2c_block_data(0x00, &setup_reg.to_be_bytes())
     }
     fn config(&self, channel: u8, dev: &mut LinuxI2CDevice) -> u16 {
-        // let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", self.bus), self.address)?;
         let config_reg = CONFIG | CONFIG_SCAN_3 | self.channel_selector(channel) | CONFIG_SGL;
         dev.smbus_write_i2c_block_data(0x00, &config_reg.to_be_bytes()).expect("cannot configure MAX11617");
 
