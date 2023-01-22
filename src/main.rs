@@ -4,12 +4,14 @@ mod memory;
 mod rb_control;
 mod pb_control;
 mod ltb_control;
+mod preamp_control;
 
 use clap::{Parser, ValueEnum, command};
 
 use rb_control::*;
 use pb_control::*;
 use ltb_control::*;
+use preamp_control::*;
 
 #[derive(Debug, Parser)]
 #[command(author = "Takeru Hayashi", version, about, long_about = None)]
@@ -20,18 +22,19 @@ struct Args {
 
 #[derive(Debug, Clone, ValueEnum)]
 enum Board {
-    rb,
-    pb,
-    ltb,
-    preamp,
+    RB,
+    PB,
+    LTB,
+    Preamp,
 }
 
 fn main() {
     let args = Args::parse();
     match args.bd {
-        Board::rb => RBTemp::print_rb_temp(),
-        Board::pb => PBTemp::print_pb_temp(),
-        Board::ltb => LTBTemp::print_ltb_temp(),
+        Board::RB => RBTemp::print_rb_temp(),
+        Board::PB => PBTemp::print_pb_temp(),
+        Board::LTB => LTBTemp::print_ltb_temp(),
+        Board::Preamp => PreampTemp::print_preamp_temp(),
         _ => println!("bad argument"),
     };
 }

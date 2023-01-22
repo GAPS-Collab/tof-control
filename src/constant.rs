@@ -30,5 +30,29 @@ pub const PB_PAS_TMP1075_ADDRESS: u16 = 0x49;
 pub const PB_NAS_TMP1075_ADDRESS: u16 = 0x4A;
 pub const PB_SHV_TMP1075_ADDRESS: u16 = 0x4B;
 
+pub const PB_ADC_REF_VOLTAGE: f32 = 3.0;
+pub const PB_ADC_1_CHANNEL: u8 = 1;
+pub const PB_ADC_2_CHANNEL: u8 = 3;
+pub const PB_MAX11615_ADDRESS: u16 = 0x33;
+pub const PB_MAX11617_ADDRESS: u16 = 0x35;
+
 // I2C Options for Local Trigger Board
 pub const LTB_TMP112_ADDRESS: u16 = 0x49;
+
+// I2C Options for Preamp Board
+pub const PREAMP_TEMP_1_CHNANNEL: u8 = 7; // ADC 1, MAX11615
+pub const PREAMP_TEMP_2_CHNANNEL: u8 = 6; // ADC 1, MAX11615
+pub const PREAMP_TEMP_3_CHNANNEL: u8 = 5; // ADC 1, MAX11615
+pub const PREAMP_TEMP_4_CHNANNEL: u8 = 4; // ADC 1, MAX11615
+pub const PREAMP_TEMP_5_CHNANNEL: u8 = 4; // ADC 1, MAX11617
+pub const PREAMP_TEMP_6_CHNANNEL: u8 = 5; // ADC 1, MAX11617
+pub const PREAMP_TEMP_7_CHNANNEL: u8 = 6; // ADC 1, MAX11617
+pub const PREAMP_TEMP_8_CHNANNEL: u8 = 7; // ADC 1, MAX11617
+pub const PREAMP_TEMP_9_CHNANNEL: u8 = 7; // ADC 2, MAX11615
+pub const PREAMP_TEMP_10_CHNANNEL: u8 = 6; // ADC 2, MAX11615
+pub const PREAMP_TEMP_11_CHNANNEL: u8 = 5; // ADC 2, MAX11615
+pub const PREAMP_TEMP_12_CHNANNEL: u8 = 4; // ADC 3, MAX11615
+pub const PREAMP_TEMP_13_CHNANNEL: u8 = 4; // ADC 2, MAX11617
+pub const PREAMP_TEMP_14_CHNANNEL: u8 = 5; // ADC 2, MAX11617
+pub const PREAMP_TEMP_15_CHNANNEL: u8 = 6; // ADC 2, MAX11617
+pub const PREAMP_TEMP_16_CHNANNEL: u8 = 7; // ADC 2, MAX11617
