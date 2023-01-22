@@ -3,13 +3,13 @@ mod device;
 mod memory;
 mod rb_control;
 // mod pb_control;
-// mod ltb_control;
+mod ltb_control;
 
 use clap::{Parser, ValueEnum, command};
 
 use rb_control::*;
 // use pb_control::*;
-// use ltb_control::*;
+use ltb_control::*;
 
 #[derive(Debug, Parser)]
 #[command(author = "Takeru Hayashi", version, about, long_about = None)]
@@ -31,7 +31,7 @@ fn main() {
     match args.bd {
         Board::rb => RBTemp::print_rb_temp(),
         // Board::pb => PBTemp::print_pb_temp(),
-        // Board::ltb => LTBTemp::print_ltb_temp(),
+        Board::ltb => LTBTemp::print_ltb_temp(),
         _ => println!("bad argument"),
     };
 }
