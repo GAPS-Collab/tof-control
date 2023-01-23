@@ -75,6 +75,14 @@ impl PreampTemp {
             preamp_tmp_16,
         }
     }
+    fn voltage_to_temp(voltage: f32) -> f32 {
+        let mut temperature = (voltage - 0.5) * 100.0;
+        if -40.0 > temperature || temperature > 150.0 {
+            temperature = 500.0;
+        }
+
+        temperature
+    }
     pub fn print_preamp_temp() {
         let preamp_temp = PreampTemp::new();
         println!("Preamp Board 1 Temperature:   {:.3}[°C]", preamp_temp.preamp_tmp_1);
@@ -94,12 +102,102 @@ impl PreampTemp {
         println!("Preamp Board 15 Temperature:  {:.3}[°C]", preamp_temp.preamp_tmp_15);
         println!("Preamp Board 16 Temperature:  {:.3}[°C]", preamp_temp.preamp_tmp_16);
     }
-    fn voltage_to_temp(voltage: f32) -> f32 {
-        let mut temperature = (voltage - 0.5) * 100.0;
-        if -40.0 > temperature || temperature > 150.0 {
-            temperature = 500.0;
-        }
+}
 
-        temperature
+pub struct PreampBiasRead {
+    preamp_bias_read_1: f32,
+    preamp_bias_read_2: f32,
+    preamp_bias_read_3: f32,
+    preamp_bias_read_4: f32,
+    preamp_bias_read_5: f32,
+    preamp_bias_read_6: f32,
+    preamp_bias_read_7: f32,
+    preamp_bias_read_8: f32,
+    preamp_bias_read_9: f32,
+    preamp_bias_read_10: f32,
+    preamp_bias_read_11: f32,
+    preamp_bias_read_12: f32,
+    preamp_bias_read_13: f32,
+    preamp_bias_read_14: f32,
+    preamp_bias_read_15: f32,
+    preamp_bias_read_16: f32,
+}
+
+impl PreampBiasRead {
+    pub fn new() -> Self {
+        let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, PB_PCA9548A_ADDRESS);
+
+        i2c_mux.select(PB_ADC_1_CHANNEL).expect("cannot access to PCA9548A");
+        let max11615 = max11615::MAX11615::new(I2C_BUS, PB_MAX11615_ADDRESS);
+        max11615.setup().expect("cannot setup MAX11615");
+        let max11617 = max11617::MAX11617::new(I2C_BUS, PB_MAX11617_ADDRESS);
+        max11617.setup().expect("cannot setup MAX11617");
+
+        let preamp_bias_read_1 = Self::convert_bias_voltage(max11615.read(PREAMP_SEN_1_CHANNEL).expect("cannot read MAX11615"));
+        let preamp_bias_read_2 = Self::convert_bias_voltage(max11615.read(PREAMP_SEN_2_CHANNEL).expect("cannot read MAX11615"));
+        let preamp_bias_read_3 = Self::convert_bias_voltage(max11615.read(PREAMP_SEN_3_CHANNEL).expect("cannot read MAX11615"));
+        let preamp_bias_read_4 = Self::convert_bias_voltage(max11615.read(PREAMP_SEN_4_CHANNEL).expect("cannot read MAX11615"));
+        let preamp_bias_read_5 = Self::convert_bias_voltage(max11617.read(PREAMP_SEN_5_CHANNEL).expect("cannot read MAX11617"));
+        let preamp_bias_read_6 = Self::convert_bias_voltage(max11617.read(PREAMP_SEN_6_CHANNEL).expect("cannot read MAX11617"));
+        let preamp_bias_read_7 = Self::convert_bias_voltage(max11617.read(PREAMP_SEN_7_CHANNEL).expect("cannot read MAX11617"));
+        let preamp_bias_read_8 = Self::convert_bias_voltage(max11617.read(PREAMP_SEN_8_CHANNEL).expect("cannot read MAX11617"));
+
+        i2c_mux.select(PB_ADC_2_CHANNEL).expect("cannot access to PCA9548A");
+        let max11615 = max11615::MAX11615::new(I2C_BUS, PB_MAX11615_ADDRESS);
+        max11615.setup().expect("cannot setup MAX11615");
+        let max11617 = max11617::MAX11617::new(I2C_BUS, PB_MAX11617_ADDRESS);
+        max11617.setup().expect("cannot setup MAX11617");
+
+        let preamp_bias_read_9 = Self::convert_bias_voltage(max11615.read(PREAMP_SEN_9_CHANNEL).expect("cannot read MAX11615"));
+        let preamp_bias_read_10 = Self::convert_bias_voltage(max11615.read(PREAMP_SEN_10_CHANNEL).expect("cannot read MAX11615"));
+        let preamp_bias_read_11 = Self::convert_bias_voltage(max11615.read(PREAMP_SEN_11_CHANNEL).expect("cannot read MAX11615"));
+        let preamp_bias_read_12 = Self::convert_bias_voltage(max11615.read(PREAMP_SEN_12_CHANNEL).expect("cannot read MAX11615"));
+        let preamp_bias_read_13 = Self::convert_bias_voltage(max11617.read(PREAMP_SEN_13_CHANNEL).expect("cannot read MAX11617"));
+        let preamp_bias_read_14 = Self::convert_bias_voltage(max11617.read(PREAMP_SEN_14_CHANNEL).expect("cannot read MAX11617"));
+        let preamp_bias_read_15 = Self::convert_bias_voltage(max11617.read(PREAMP_SEN_15_CHANNEL).expect("cannot read MAX11617"));
+        let preamp_bias_read_16 = Self::convert_bias_voltage(max11617.read(PREAMP_SEN_16_CHANNEL).expect("cannot read MAX11617"));
+
+        i2c_mux.reset().expect("cannot reset PCA9548A");
+
+        Self {
+            preamp_bias_read_1,
+            preamp_bias_read_2,
+            preamp_bias_read_3,
+            preamp_bias_read_4,
+            preamp_bias_read_5,
+            preamp_bias_read_6,
+            preamp_bias_read_7,
+            preamp_bias_read_8,
+            preamp_bias_read_9,
+            preamp_bias_read_10,
+            preamp_bias_read_11,
+            preamp_bias_read_12,
+            preamp_bias_read_13,
+            preamp_bias_read_14,
+            preamp_bias_read_15,
+            preamp_bias_read_16,
+        }
+    }
+    fn convert_bias_voltage(voltage: f32) -> f32 {
+        22.27659574468085 * voltage
+    }
+    pub fn print_preamp_bias() {
+        let preamp_bias_read = PreampBiasRead::new();
+        println!("Preamp Board 1 Bias Voltage:  {:.3}[V]", preamp_bias_read.preamp_bias_read_1);
+        println!("Preamp Board 2 Bias Voltage:  {:.3}[V]", preamp_bias_read.preamp_bias_read_2);
+        println!("Preamp Board 3 Bias Voltage:  {:.3}[V]", preamp_bias_read.preamp_bias_read_3);
+        println!("Preamp Board 4 Bias Voltage:  {:.3}[V]", preamp_bias_read.preamp_bias_read_4);
+        println!("Preamp Board 5 Bias Voltage:  {:.3}[V]", preamp_bias_read.preamp_bias_read_5);
+        println!("Preamp Board 6 Bias Voltage:  {:.3}[V]", preamp_bias_read.preamp_bias_read_6);
+        println!("Preamp Board 7 Bias Voltage:  {:.3}[V]", preamp_bias_read.preamp_bias_read_7);
+        println!("Preamp Board 8 Bias Voltage:  {:.3}[V]", preamp_bias_read.preamp_bias_read_8);
+        println!("Preamp Board 9 Bias Voltage:  {:.3}[V]", preamp_bias_read.preamp_bias_read_9);
+        println!("Preamp Board 10 Bias Voltage: {:.3}[V]", preamp_bias_read.preamp_bias_read_10);
+        println!("Preamp Board 11 Bias Voltage: {:.3}[V]", preamp_bias_read.preamp_bias_read_11);
+        println!("Preamp Board 12 Bias Voltage: {:.3}[V]", preamp_bias_read.preamp_bias_read_12);
+        println!("Preamp Board 13 Bias Voltage: {:.3}[V]", preamp_bias_read.preamp_bias_read_13);
+        println!("Preamp Board 14 Bias Voltage: {:.3}[V]", preamp_bias_read.preamp_bias_read_14);
+        println!("Preamp Board 15 Bias Voltage: {:.3}[V]", preamp_bias_read.preamp_bias_read_15);
+        println!("Preamp Board 16 Bias Voltage: {:.3}[V]", preamp_bias_read.preamp_bias_read_16);
     }
 }

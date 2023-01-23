@@ -6,7 +6,7 @@ mod pb_control;
 mod ltb_control;
 mod preamp_control;
 
-use clap::{Parser, ValueEnum, command};
+use clap::{Parser, ArgGroup, ValueEnum, Subcommand, command};
 
 use rb_control::*;
 use pb_control::*;
@@ -15,9 +15,13 @@ use preamp_control::*;
 
 #[derive(Debug, Parser)]
 #[command(author = "Takeru Hayashi", version, about, long_about = None)]
-struct Args {
-    #[arg(short = 'b', long = "bd", help = "Board to operate (rb, pb, ltb, or preamp)")]
-    bd: Board,
+struct Cli {
+    #[arg(short = 'b', long = "board", help = "Board to operate (rb, pb, ltb, or preamp)")]
+    board: Board,
+    #[clap(subcommand)]
+    action: Action,
+    #[arg(short = 'p', long = "print", action = clap::ArgAction::SetFalse, help = "Print the operation")]
+    print: bool,
 }
 
 #[derive(Debug, Clone, ValueEnum)]
@@ -28,13 +32,94 @@ enum Board {
     Preamp,
 }
 
+#[derive(Debug, Subcommand)]
+enum Action {
+    Read {
+        #[arg(short = 's', long = "sensor", required = true, ignore_case = true, help = "read sensor of the board")]
+        sensor: Sensor,
+    },
+}
+
+#[derive(Debug, Clone, ValueEnum)]
+enum Sensor {
+    TS,
+    MS,
+    BIAS,
+}
+
 fn main() {
-    let args = Args::parse();
-    match args.bd {
-        Board::RB => RBTemp::print_rb_temp(),
-        Board::PB => PBTemp::print_pb_temp(),
-        Board::LTB => LTBTemp::print_ltb_temp(),
-        Board::Preamp => PreampTemp::print_preamp_temp(),
-        _ => println!("bad argument"),
+    let cli = Cli::parse();
+
+    match cli.board {
+        Board::RB => {
+            match cli.action {
+                Action::Read { sensor } => {
+                    match sensor {
+                        Sensor::TS => {
+                            if cli.print {
+                                RBTemp::print_rb_temp();
+                            }
+                        },
+                        Sensor::MS => {
+                            if cli.print {
+                                RBMagnetic::print_rb_magnetic();
+                            }
+                        }
+                        _ => println!("bad argument"),
+                    }
+                }
+            }
+        },
+        Board::PB => {
+            match cli.action {
+                Action::Read { sensor } => {
+                    match sensor {
+                        Sensor::TS => {
+                            if cli.print {
+                                PBTemp::print_pb_temp();
+                            }
+                        },
+                        _ => println!("bad argument"),
+                    }
+                }
+            }
+        },
+        Board::LTB => {
+            match cli.action {
+                Action::Read { sensor } => {
+                    match sensor {
+                        Sensor::TS => {
+                            if cli.print {
+                                LTBTemp::print_ltb_temp();
+                            }
+                        },
+                        _ => println!("bad argument"),
+                    }
+                }
+            }
+        },
+        Board::Preamp => {
+            match cli.action {
+                Action::Read { sensor } => {
+                    match sensor {
+                        Sensor::TS => {
+                            if cli.print {
+                                PreampTemp::print_preamp_temp();
+                            }
+                        },
+                        Sensor::BIAS => {
+                            if cli.print {
+                                PreampBiasRead::print_preamp_bias();
+                            }
+                        },
+                        _ => println!("bad argument"),
+                    }
+                }
+            }
+        }
+        // Board::PB => PBTemp::print_pb_temp(),
+        // Board::LTB => LTBTemp::print_ltb_temp(),
+        // Board::Preamp => PreampTemp::print_preamp_temp(),
+        // _ => println!("bad argument"),
     };
 }

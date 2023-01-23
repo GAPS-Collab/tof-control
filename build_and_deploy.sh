@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
  
 # first delete everything, since there might be remains of a previously issued cargo check
 rm -rf target/armv7-unknown*
