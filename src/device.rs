@@ -4,3 +4,4 @@ pub mod tmp1075;
 pub mod max11615;
 pub mod max11617;
 pub mod lis3mdltr;
+pub mod bme280;

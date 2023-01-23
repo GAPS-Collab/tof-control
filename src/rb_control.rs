@@ -1,12 +1,13 @@
 use crate::constant::*;
 use crate::memory::*;
-use crate::device::{pca9548a, tmp112, lis3mdltr};
+use crate::device::{pca9548a, tmp112, lis3mdltr, bme280};
 
 pub struct RBTemp {
     drs_temp: f32,
     clk_temp: f32,
     adc_temp: f32,
     lis3mdltr_temp: f32,
+    bme280_temp: f32,
     zynq_temp: f32,
 }
 
@@ -35,6 +36,11 @@ impl RBTemp {
         lis3mdltr.configure();
         let lis3mdltr_temp = lis3mdltr.read_temperature().expect("cannot read LIS3MDLTR");
 
+        i2c_mux_1.select(RB_BME280_CHANNEL).expect("cannot accesss to PCA9548A");
+        let bme280 = bme280::BME280::new(I2C_BUS, RB_BME280_ADDRESS);
+        bme280.configure().expect("cannot configure BME280");
+        let bme280_temp = bme280.read_data().expect("cannot read BME280");
+
         i2c_mux_1.reset().expect("cannot reset PCA9548A");
         i2c_mux_2.reset().expect("cannot reset PCA9548A");
 
@@ -46,6 +52,7 @@ impl RBTemp {
             clk_temp,
             adc_temp,
             lis3mdltr_temp,
+            bme280_temp,
             zynq_temp,
         }
     }
@@ -55,6 +62,7 @@ impl RBTemp {
         println!("CLK Temperature:          {:.3}[°C]", rb_temp.clk_temp);
         println!("DRS Temperature:          {:.3}[°C]", rb_temp.adc_temp);
         println!("LIS3MDLTR Temperature:    {:.3}[°C]", rb_temp.lis3mdltr_temp);
+        println!("BME280 Temperature:       {:.3}[°C]", rb_temp.bme280_temp);
         println!("ZYNQ Temperature:         {:.3}[°C]", rb_temp.zynq_temp);
     }
 }

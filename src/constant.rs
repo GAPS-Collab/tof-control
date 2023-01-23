@@ -19,6 +19,10 @@ pub const RB_ADC_TMP112_CHANNEL: u8 = 4;
 pub const RB_LIS3MDLTR_ADDRESS: u16 = 0x1E;
 pub const RB_LIS3MDLTR_CHANNEL: u8 = 1;
 
+// PCA9548A_ADDRESS_1
+pub const RB_BME280_ADDRESS: u16 = 0x76;
+pub const RB_BME280_CHANNEL: u8 = 0;
+
 pub const RB_UIO0: &'static str = "/dev/uio0";
 
 pub const RB_TEMP: u32 = 0xA0;
