@@ -39,7 +39,7 @@ impl RBTemp {
         i2c_mux_1.select(RB_BME280_CHANNEL).expect("cannot accesss to PCA9548A");
         let bme280 = bme280::BME280::new(I2C_BUS, RB_BME280_ADDRESS);
         bme280.configure().expect("cannot configure BME280");
-        let bme280_temp = bme280.read_data().expect("cannot read BME280");
+        let bme280_temp = bme280.read_data().expect("cannot read BME280").0;
 
         i2c_mux_1.reset().expect("cannot reset PCA9548A");
         i2c_mux_2.reset().expect("cannot reset PCA9548A");
@@ -64,6 +64,56 @@ impl RBTemp {
         println!("LIS3MDLTR Temperature:    {:.3}[°C]", rb_temp.lis3mdltr_temp);
         println!("BME280 Temperature:       {:.3}[°C]", rb_temp.bme280_temp);
         println!("ZYNQ Temperature:         {:.3}[°C]", rb_temp.zynq_temp);
+    }
+}
+
+pub struct RBPress {
+    pressure: f32,
+}
+
+impl RBPress {
+    pub fn new() -> Self {
+        let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_1);
+
+        i2c_mux.select(RB_BME280_CHANNEL).expect("cannot accesss to PCA9548A");
+        let bme280 = bme280::BME280::new(I2C_BUS, RB_BME280_ADDRESS);
+        bme280.configure().expect("cannot configure BME280");
+        let pressure = bme280.read_data().expect("cannot read BME280").1;
+
+        i2c_mux.reset().expect("cannot reset PCA9548A");
+
+        Self {
+            pressure,
+        }
+    }
+    pub fn print_rb_press() {
+        let rb_press = RBPress::new();
+        println!("DRS Pressure:          {:.3}[hPa]", rb_press.pressure);
+    }
+}
+
+pub struct RBHum {
+    humidity: f32,
+}
+
+impl RBHum {
+    pub fn new() -> Self {
+        let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_1);
+
+        i2c_mux.select(RB_BME280_CHANNEL).expect("cannot accesss to PCA9548A");
+        let bme280 = bme280::BME280::new(I2C_BUS, RB_BME280_ADDRESS);
+        bme280.configure().expect("cannot configure BME280");
+        let humidity = bme280.read_data().expect("cannot read BME280").2;
+
+        i2c_mux.reset().expect("cannot reset PCA9548A");
+
+        Self {
+            humidity,
+        }
+    }
+    pub fn print_rb_hum() {
+        let rb_hum = RBHum::new();
+        println!("DRS Humidity:          {:.3}[%]", rb_hum.humidity);
     }
 }
 
