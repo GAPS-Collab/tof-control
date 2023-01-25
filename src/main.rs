@@ -43,6 +43,7 @@ enum Action {
 #[derive(Debug, Clone, ValueEnum)]
 enum Sensor {
     TS,
+    CS,
     PS,
     HS,
     MS,
@@ -62,6 +63,11 @@ fn main() {
                                 RBTemp::print_rb_temp();
                             }
                         },
+                        Sensor::CS => {
+                            if cli.print {
+                                RBvcp::print_rb_vcp();
+                            }
+                        }
                         Sensor::PS => {
                             if cli.print {
                                 RBPress::print_rb_press();

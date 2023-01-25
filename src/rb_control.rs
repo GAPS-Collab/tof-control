@@ -1,6 +1,6 @@
 use crate::constant::*;
 use crate::memory::*;
-use crate::device::{pca9548a, tmp112, lis3mdltr, bme280};
+use crate::device::{pca9548a, tmp112, ina226, lis3mdltr, bme280};
 
 pub struct RBTemp {
     drs_temp: f32,
@@ -64,6 +64,40 @@ impl RBTemp {
         println!("LIS3MDLTR Temperature:    {:.3}[°C]", rb_temp.lis3mdltr_temp);
         println!("BME280 Temperature:       {:.3}[°C]", rb_temp.bme280_temp);
         println!("ZYNQ Temperature:         {:.3}[°C]", rb_temp.zynq_temp);
+    }
+}
+
+// vcp = voltage, current and power
+pub struct RBvcp {
+    p3v3_voltage: f32,
+    p3v3_current: f32,
+    p3v3_power: f32,
+}
+
+impl RBvcp {
+    pub fn new() -> Self {
+        let i2c_mux_1 = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_1);
+        let i2c_mux_2 = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
+
+        i2c_mux_1.select(RB_P3V3_INA226_CHANNEL).expect("cannot accesss to PCA9548A");
+        let p3v3_ina226 = ina226::INA226::new(I2C_BUS, RB_P3V3_INA226_ADDRESS, RB_P3V3_INA226_RSHUNT, RB_P3V3_INA226_MEC);
+        p3v3_ina226.configure().expect("cannot configure INA226 (P3V3)");
+        let (p3v3_voltage, p3v3_current, p3v3_power) = p3v3_ina226.read_data().expect("cannot read INA226 (P3V3)");
+
+        i2c_mux_1.reset().expect("cannot reset PCA9548A");
+        i2c_mux_2.reset().expect("cannot reset PCA9548A");
+
+        Self {
+            p3v3_voltage,
+            p3v3_current,
+            p3v3_power
+        }
+    }
+    pub fn print_rb_vcp() {
+        let rb_vcp = RBvcp::new();
+        println!("P3V3 Voltage:         {:.3}[V]", rb_vcp.p3v3_voltage);
+        println!("P3V3 Current:         {:.3}[A]", rb_vcp.p3v3_current);
+        println!("P3V3 Power:           {:.3}[W]", rb_vcp.p3v3_power);
     }
 }
 
