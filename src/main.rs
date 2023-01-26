@@ -38,6 +38,9 @@ enum Action {
         #[arg(short = 's', long = "sensor", required = true, ignore_case = true, help = "read sensor of the board")]
         sensor: Sensor,
     },
+    Initialize {
+
+    },
 }
 
 #[derive(Debug, Clone, ValueEnum)]
@@ -85,6 +88,9 @@ fn main() {
                         }
                         _ => println!("bad argument"),
                     }
+                },
+                Action::Initialize {  } => {
+                    rb_control::initialize();
                 }
             }
         },
@@ -99,6 +105,9 @@ fn main() {
                         },
                         _ => println!("bad argument"),
                     }
+                },
+                Action::Initialize {  } => {
+                    todo!();
                 }
             }
         },
@@ -113,6 +122,9 @@ fn main() {
                         },
                         _ => println!("bad argument"),
                     }
+                },
+                Action::Initialize {  } => {
+                    todo!();
                 }
             }
         },
@@ -132,6 +144,9 @@ fn main() {
                         },
                         _ => println!("bad argument"),
                     }
+                },
+                Action::Initialize {  } => {
+                    todo!();
                 }
             }
         }

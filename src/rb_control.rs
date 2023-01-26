@@ -2,6 +2,14 @@ use crate::constant::*;
 use crate::memory::*;
 use crate::device::{pca9548a, tmp112, ina226, lis3mdltr, bme280};
 
+
+pub fn initialize() {
+    RBvcp::new();
+    RBvcp::new();
+    RBvcp::new();
+    RBvcp::new();
+    RBvcp::new();
+}
 pub struct RBTemp {
     drs_temp: f32,
     clk_temp: f32,
@@ -69,9 +77,27 @@ impl RBTemp {
 
 // vcp = voltage, current and power
 pub struct RBvcp {
+    drs_dvdd_voltage: f32,
+    drs_dvdd_current: f32,
+    drs_dvdd_power: f32,
     p3v3_voltage: f32,
     p3v3_current: f32,
     p3v3_power: f32,
+    zynq_voltage: f32,
+    zynq_current: f32,
+    zynq_power: f32,
+    p3v5_voltage: f32,
+    p3v5_current: f32,
+    p3v5_power: f32,
+    adc_dvdd_voltage: f32,
+    adc_dvdd_current: f32,
+    adc_dvdd_power: f32,
+    adc_avdd_voltage: f32,
+    adc_avdd_current: f32,
+    adc_avdd_power: f32,
+    drs_avdd_voltage: f32,
+    drs_avdd_current: f32,
+    drs_avdd_power: f32,
 }
 
 impl RBvcp {
@@ -79,25 +105,91 @@ impl RBvcp {
         let i2c_mux_1 = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_1);
         let i2c_mux_2 = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
 
+        i2c_mux_1.select(RB_DRS_DVDD_INA226_CHANNEL).expect("cannot accesss to PCA9548A");
+        let drs_dvdd_ina226 = ina226::INA226::new(I2C_BUS, RB_DRS_DVDD_INA226_ADDRESS, RB_DRS_DVDD_INA226_RSHUNT, RB_DRS_DVDD_INA226_MEC);
+        drs_dvdd_ina226.configure().expect("cannot configure INA226 (DRS DVDD)");
+        let (drs_dvdd_voltage, drs_dvdd_current, drs_dvdd_power) = drs_dvdd_ina226.read_data().expect("cannot read INA226 (DRS DVDD)");
+
         i2c_mux_1.select(RB_P3V3_INA226_CHANNEL).expect("cannot accesss to PCA9548A");
         let p3v3_ina226 = ina226::INA226::new(I2C_BUS, RB_P3V3_INA226_ADDRESS, RB_P3V3_INA226_RSHUNT, RB_P3V3_INA226_MEC);
         p3v3_ina226.configure().expect("cannot configure INA226 (P3V3)");
         let (p3v3_voltage, p3v3_current, p3v3_power) = p3v3_ina226.read_data().expect("cannot read INA226 (P3V3)");
 
+        i2c_mux_1.select(RB_ZYNQ_INA226_CHANNEL).expect("cannot accesss to PCA9548A");
+        let zynq_ina226 = ina226::INA226::new(I2C_BUS, RB_ZYNQ_INA226_ADDRESS, RB_ZYNQ_INA226_RSHUNT, RB_ZYNQ_INA226_MEC);
+        zynq_ina226.configure().expect("cannot configure INA226 (ZYNQ)");
+        let (zynq_voltage, zynq_current, zynq_power) = zynq_ina226.read_data().expect("cannot read INA226 (ZYNQ)");
+
+        i2c_mux_1.select(RB_P3V5_INA226_CHANNEL).expect("cannot accesss to PCA9548A");
+        let p3v5_ina226 = ina226::INA226::new(I2C_BUS, RB_P3V5_INA226_ADDRESS, RB_P3V5_INA226_RSHUNT, RB_P3V5_INA226_MEC);
+        p3v5_ina226.configure().expect("cannot configure INA226 (P3V5)");
+        let (p3v5_voltage, p3v5_current, p3v5_power) = p3v5_ina226.read_data().expect("cannot read INA226 (P3V5)");
+
+        i2c_mux_2.select(RB_ADC_DVDD_INA226_CHANNEL).expect("cannot accesss to PCA9548A");
+        let adc_dvdd_ina226 = ina226::INA226::new(I2C_BUS, RB_ADC_DVDD_INA226_ADDRESS, RB_ADC_DVDD_INA226_RSHUNT, RB_ADC_DVDD_INA226_MEC);
+        adc_dvdd_ina226.configure().expect("cannot configure INA226 (ADC DVDD)");
+        let (adc_dvdd_voltage, adc_dvdd_current, adc_dvdd_power) = adc_dvdd_ina226.read_data().expect("cannot read INA226 (ADC DVDD)");
+
+        i2c_mux_2.select(RB_ADC_AVDD_INA226_CHANNEL).expect("cannot accesss to PCA9548A");
+        let adc_avdd_ina226 = ina226::INA226::new(I2C_BUS, RB_ADC_AVDD_INA226_ADDRESS, RB_ADC_AVDD_INA226_RSHUNT, RB_ADC_AVDD_INA226_MEC);
+        adc_avdd_ina226.configure().expect("cannot configure INA226 (ADC AVDD)");
+        let (adc_avdd_voltage, adc_avdd_current, adc_avdd_power) = adc_avdd_ina226.read_data().expect("cannot read INA226 (ADC AVDD)");
+
+        i2c_mux_2.select(RB_DRS_AVDD_INA226_CHANNEL).expect("cannot accesss to PCA9548A");
+        let drs_avdd_ina226 = ina226::INA226::new(I2C_BUS, RB_DRS_AVDD_INA226_ADDRESS, RB_DRS_AVDD_INA226_RSHUNT, RB_DRS_AVDD_INA226_MEC);
+        drs_avdd_ina226.configure().expect("cannot configure INA226 (DRS AVDD)");
+        let (drs_avdd_voltage, drs_avdd_current, drs_avdd_power) = drs_avdd_ina226.read_data().expect("cannot read INA226 (DRS AVDD)");
+
         i2c_mux_1.reset().expect("cannot reset PCA9548A");
         i2c_mux_2.reset().expect("cannot reset PCA9548A");
 
         Self {
+            drs_dvdd_voltage,
+            drs_dvdd_current,
+            drs_dvdd_power,
             p3v3_voltage,
             p3v3_current,
-            p3v3_power
+            p3v3_power,
+            zynq_voltage,
+            zynq_current,
+            zynq_power,
+            p3v5_voltage,
+            p3v5_current,
+            p3v5_power,
+            adc_dvdd_voltage,
+            adc_dvdd_current,
+            adc_dvdd_power,
+            adc_avdd_voltage,
+            adc_avdd_current,
+            adc_avdd_power,
+            drs_avdd_voltage,
+            drs_avdd_current,
+            drs_avdd_power,
         }
     }
     pub fn print_rb_vcp() {
         let rb_vcp = RBvcp::new();
-        println!("P3V3 Voltage:         {:.3}[V]", rb_vcp.p3v3_voltage);
-        println!("P3V3 Current:         {:.3}[A]", rb_vcp.p3v3_current);
-        println!("P3V3 Power:           {:.3}[W]", rb_vcp.p3v3_power);
+        println!("DRS4 Digital Rail Voltage:    {:.3}[V]", rb_vcp.drs_dvdd_voltage);
+        println!("DRS4 Digital Rail Current:    {:.3}[A]", rb_vcp.drs_dvdd_current);
+        println!("DRS4 Digital Rail Power:      {:.3}[W]", rb_vcp.drs_dvdd_power);
+        println!("3.3V Rail Voltage:            {:.3}[V]", rb_vcp.p3v3_voltage);
+        println!("3.3V Rail Current:            {:.3}[A]", rb_vcp.p3v3_current);
+        println!("3.3V Rail Power:              {:.3}[W]", rb_vcp.p3v3_power);
+        println!("ZYNQ Rail Voltage:            {:.3}[V]", rb_vcp.zynq_voltage);
+        println!("ZYNQ Rail Current:            {:.3}[A]", rb_vcp.zynq_current);
+        println!("ZYNQ Rail Power:              {:.3}[W]", rb_vcp.zynq_power);
+        println!("3.5V Rail Voltage:            {:.3}[V]", rb_vcp.p3v5_voltage);
+        println!("3.5V Rail Current:            {:.3}[A]", rb_vcp.p3v5_current);
+        println!("3.5V Rail Power:              {:.3}[W]", rb_vcp.p3v5_power);
+        println!("ADC Digital Rail Voltage:     {:.3}[V]", rb_vcp.adc_dvdd_voltage);
+        println!("ADC Digital Rail Current:     {:.3}[A]", rb_vcp.adc_dvdd_current);
+        println!("ADC Digital Rail Power:       {:.3}[W]", rb_vcp.adc_dvdd_power);
+        println!("ADC Analog Rail Voltage:      {:.3}[V]", rb_vcp.adc_avdd_voltage);
+        println!("ADC Analog Rail Current:      {:.3}[A]", rb_vcp.adc_avdd_current);
+        println!("ADC Analog Rail Power:        {:.3}[W]", rb_vcp.adc_avdd_power);
+        println!("DRS4 Analog Rail Voltage:     {:.3}[V]", rb_vcp.drs_avdd_voltage);
+        println!("DRS4 Analog Rail Current:     {:.3}[A]", rb_vcp.drs_avdd_current);
+        println!("DRS4 Analog Rail Power:       {:.3}[W]", rb_vcp.drs_avdd_power);
     }
 }
 
