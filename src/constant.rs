@@ -60,6 +60,14 @@ pub const RB_LIS3MDLTR_CHANNEL: u8 = 1;
 pub const RB_BME280_ADDRESS: u16 = 0x76;
 pub const RB_BME280_CHANNEL: u8 = 0;
 
+// PCA9548A_ADDRESS_1
+pub const RB_ADC_REF_VOLTAGE: f32 = 2.048;
+pub const RB_MAX11645_ADDRESS: u16 = 0x36;
+pub const RB_MAX11645_CHANNEL: u8 = 6;
+
+pub const RB_N1V5_VOLTAGE_INA200_CHANNEL: u8 = 1;
+pub const RB_N1V5_CURRENT_INA200_CHANNEL: u8 = 0;
+
 pub const RB_UIO0: &'static str = "/dev/uio0";
 
 pub const RB_TEMP: u32 = 0xA0;
@@ -73,6 +81,11 @@ pub const PB_PDS_TMP1075_ADDRESS: u16 = 0x48;
 pub const PB_PAS_TMP1075_ADDRESS: u16 = 0x49;
 pub const PB_NAS_TMP1075_ADDRESS: u16 = 0x4A;
 pub const PB_SHV_TMP1075_ADDRESS: u16 = 0x4B;
+
+pub const PB_P3V6A_PREAMP_INA226_ADDRESS: u16 = 0x46;
+pub const PB_P3V6A_PREAMP_INA226_CHANNEL: u8 = 6;
+pub const PB_P3V6A_PREAMP_INA226_RSHUNT: f32 = 0.1;
+pub const PB_P3V6A_PREAMP_INA226_MEC: f32 = 0.35;
 
 pub const PB_ADC_REF_VOLTAGE: f32 = 3.0;
 pub const PB_ADC_1_CHANNEL: u8 = 1;

@@ -1,6 +1,6 @@
 use crate::constant::*;
 use crate::memory::*;
-use crate::device::{pca9548a, tmp112, ina226, lis3mdltr, bme280};
+use crate::device::{pca9548a, tmp112, ina226, lis3mdltr, bme280, max11645};
 
 
 pub fn initialize() {
@@ -68,7 +68,7 @@ impl RBTemp {
         let rb_temp = RBTemp::new();
         println!("DRS Temperature:          {:.3}[°C]", rb_temp.drs_temp);
         println!("CLK Temperature:          {:.3}[°C]", rb_temp.clk_temp);
-        println!("DRS Temperature:          {:.3}[°C]", rb_temp.adc_temp);
+        println!("ADC Temperature:          {:.3}[°C]", rb_temp.adc_temp);
         println!("LIS3MDLTR Temperature:    {:.3}[°C]", rb_temp.lis3mdltr_temp);
         println!("BME280 Temperature:       {:.3}[°C]", rb_temp.bme280_temp);
         println!("ZYNQ Temperature:         {:.3}[°C]", rb_temp.zynq_temp);
@@ -98,6 +98,9 @@ pub struct RBvcp {
     drs_avdd_voltage: f32,
     drs_avdd_current: f32,
     drs_avdd_power: f32,
+    n1v5_voltage: f32,
+    n1v5_current: f32,
+    n1v5_power: f32,
 }
 
 impl RBvcp {
@@ -140,6 +143,13 @@ impl RBvcp {
         drs_avdd_ina226.configure().expect("cannot configure INA226 (DRS AVDD)");
         let (drs_avdd_voltage, drs_avdd_current, drs_avdd_power) = drs_avdd_ina226.read_data().expect("cannot read INA226 (DRS AVDD)");
 
+        i2c_mux_1.select(RB_MAX11645_CHANNEL).expect("cannot accesss to PCA9548A");
+        let max11645 = max11645::MAX11645::new(I2C_BUS, RB_MAX11645_ADDRESS);
+        max11645.setup().expect("cannot configure MAX11645");
+        let n1v5_voltage = max11645.read(RB_N1V5_VOLTAGE_INA200_CHANNEL).expect("cannot read INA200 (N1V5 VOLTAGE)") * -1.0;
+        let n1v5_current = max11645.read(RB_N1V5_CURRENT_INA200_CHANNEL).expect("cannot read INA200 (N1V5 CURRENT)") / 20.0 / 0.039;
+        let n1v5_power = n1v5_voltage.abs() * n1v5_current;
+
         i2c_mux_1.reset().expect("cannot reset PCA9548A");
         i2c_mux_2.reset().expect("cannot reset PCA9548A");
 
@@ -165,6 +175,9 @@ impl RBvcp {
             drs_avdd_voltage,
             drs_avdd_current,
             drs_avdd_power,
+            n1v5_voltage,
+            n1v5_current,
+            n1v5_power,
         }
     }
     pub fn print_rb_vcp() {
@@ -190,6 +203,9 @@ impl RBvcp {
         println!("DRS4 Analog Rail Voltage:     {:.3}[V]", rb_vcp.drs_avdd_voltage);
         println!("DRS4 Analog Rail Current:     {:.3}[A]", rb_vcp.drs_avdd_current);
         println!("DRS4 Analog Rail Power:       {:.3}[W]", rb_vcp.drs_avdd_power);
+        println!("-1.5V Rail Voltage:           {:.3}[V]", rb_vcp.n1v5_voltage);
+        println!("-1.5V Rail Current:           {:.3}[A]", rb_vcp.n1v5_current);
+        println!("-1.5V Rail Power:             {:.3}[W]", rb_vcp.n1v5_power);
     }
 }
 

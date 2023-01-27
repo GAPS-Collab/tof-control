@@ -70,7 +70,7 @@ fn main() {
                             if cli.print {
                                 RBvcp::print_rb_vcp();
                             }
-                        }
+                        },
                         Sensor::PS => {
                             if cli.print {
                                 RBPress::print_rb_press();
@@ -103,11 +103,16 @@ fn main() {
                                 PBTemp::print_pb_temp();
                             }
                         },
+                        Sensor::CS => {
+                            if cli.print {
+                                PBvcp::print_pb_vcp();
+                            }
+                        }
                         _ => println!("bad argument"),
                     }
                 },
                 Action::Initialize {  } => {
-                    todo!();
+                    pb_control::initialize();
                 }
             }
         },

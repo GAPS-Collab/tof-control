@@ -1,5 +1,9 @@
 use crate::constant::*;
-use crate::device::{pca9548a, tmp1075};
+use crate::device::{pca9548a, tmp1075, ina226};
+
+pub fn initialize() {
+    PBvcp::new();
+}
 
 pub struct PBTemp {
     pds_temp: f32,
@@ -45,5 +49,37 @@ impl PBTemp {
         println!("PAS Temperature:  {:.3}[°C]", pb_temp.pas_temp);
         println!("NAS Temperature:  {:.3}[°C]", pb_temp.nas_temp);
         println!("SHV Temperature:  {:.3}[°C]", pb_temp.shv_temp);
+    }
+}
+
+// vcp = voltage, current and power
+pub struct PBvcp {
+    p3v6a_preamp_voltage: f32,
+    p3v6a_preamp_current: f32,
+    p3v6a_preamp_power: f32,
+}
+
+impl PBvcp {
+    pub fn new() -> Self {
+        let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, PB_PCA9548A_ADDRESS);
+
+        i2c_mux.select(PB_P3V6A_PREAMP_INA226_CHANNEL).expect("cannot access to PCA9548A");
+        let p3v6a_preamp_ina226 = ina226::INA226::new(I2C_BUS, PB_P3V6A_PREAMP_INA226_ADDRESS, PB_P3V6A_PREAMP_INA226_RSHUNT, PB_P3V6A_PREAMP_INA226_MEC);
+        p3v6a_preamp_ina226.configure().expect("cannot configure INA226 (P3V6A PREAMP)");
+        let (p3v6a_preamp_voltage, p3v6a_preamp_current, p3v6a_preamp_power) = p3v6a_preamp_ina226.read_data().expect("cannot read INA226 (P3V6A PREAMP)");
+
+        i2c_mux.reset().expect("cannot reset PCA9548A");
+
+        Self {
+            p3v6a_preamp_voltage,
+            p3v6a_preamp_current,
+            p3v6a_preamp_power,
+        }
+    }
+    pub fn print_pb_vcp() {
+        let pb_vcp = PBvcp::new();
+        println!("Preamp 3.6V Voltage:    {:.3}[V]", pb_vcp.p3v6a_preamp_voltage);
+        println!("Preamp 3.6V Current:    {:.3}[A]", pb_vcp.p3v6a_preamp_current);
+        println!("Preamp 3.6V Power:      {:.3}[W]", pb_vcp.p3v6a_preamp_power);
     }
 }
