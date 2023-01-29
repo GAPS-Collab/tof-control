@@ -7,3 +7,4 @@ pub mod lis3mdltr;
 pub mod bme280;
 pub mod ina226;
 pub mod max11645;
+pub mod ina219;

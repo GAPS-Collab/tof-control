@@ -4,13 +4,17 @@ use crate::device::{pca9548a, tmp112, ina226, lis3mdltr, bme280, max11645};
 
 
 pub fn initialize() {
-    RBvcp::new();
-    RBvcp::new();
-    RBvcp::new();
-    RBvcp::new();
-    RBvcp::new();
+    let mut count = 0;
+    while count < 5 {
+        RBtemperature::new();
+        RBvcp::new();
+        RBpressure::new();
+        RBhumidity::new();
+        RBmagnetic::new();
+        count += 1;
+    }
 }
-pub struct RBTemp {
+pub struct RBtemperature {
     drs_temp: f32,
     clk_temp: f32,
     adc_temp: f32,
@@ -19,7 +23,7 @@ pub struct RBTemp {
     zynq_temp: f32,
 }
 
-impl RBTemp {
+impl RBtemperature {
     pub fn new() -> Self {
         let i2c_mux_1 = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_1);
         let i2c_mux_2 = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
@@ -65,7 +69,7 @@ impl RBTemp {
         }
     }
     pub fn print_rb_temp() {
-        let rb_temp = RBTemp::new();
+        let rb_temp = RBtemperature::new();
         println!("DRS Temperature:          {:.3}[°C]", rb_temp.drs_temp);
         println!("CLK Temperature:          {:.3}[°C]", rb_temp.clk_temp);
         println!("ADC Temperature:          {:.3}[°C]", rb_temp.adc_temp);
@@ -203,17 +207,17 @@ impl RBvcp {
         println!("DRS4 Analog Rail Voltage:     {:.3}[V]", rb_vcp.drs_avdd_voltage);
         println!("DRS4 Analog Rail Current:     {:.3}[A]", rb_vcp.drs_avdd_current);
         println!("DRS4 Analog Rail Power:       {:.3}[W]", rb_vcp.drs_avdd_power);
-        println!("-1.5V Rail Voltage:           {:.3}[V]", rb_vcp.n1v5_voltage);
+        println!("-1.5V Rail Voltage:          {:.3}[V]", rb_vcp.n1v5_voltage);
         println!("-1.5V Rail Current:           {:.3}[A]", rb_vcp.n1v5_current);
         println!("-1.5V Rail Power:             {:.3}[W]", rb_vcp.n1v5_power);
     }
 }
 
-pub struct RBPress {
+pub struct RBpressure {
     pressure: f32,
 }
 
-impl RBPress {
+impl RBpressure {
     pub fn new() -> Self {
         let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_1);
 
@@ -229,16 +233,16 @@ impl RBPress {
         }
     }
     pub fn print_rb_press() {
-        let rb_press = RBPress::new();
+        let rb_press = RBpressure::new();
         println!("DRS Pressure:          {:.3}[hPa]", rb_press.pressure);
     }
 }
 
-pub struct RBHum {
+pub struct RBhumidity {
     humidity: f32,
 }
 
-impl RBHum {
+impl RBhumidity {
     pub fn new() -> Self {
         let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_1);
 
@@ -254,19 +258,19 @@ impl RBHum {
         }
     }
     pub fn print_rb_hum() {
-        let rb_hum = RBHum::new();
+        let rb_hum = RBhumidity::new();
         println!("DRS Humidity:          {:.3}[%]", rb_hum.humidity);
     }
 }
 
-pub struct RBMagnetic {
+pub struct RBmagnetic {
     magnetic_x: f32,
     magnetic_y: f32,
     magnetic_z: f32,
     magnetic_t: f32,
 }
 
-impl RBMagnetic {
+impl RBmagnetic {
     pub fn new() -> Self {
         let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_1);
         i2c_mux.select(RB_LIS3MDLTR_CHANNEL).expect("cannot accesss to PCA9548A");
@@ -285,7 +289,7 @@ impl RBMagnetic {
         }
     }
     pub fn print_rb_magnetic() {
-        let rb_magnetic = RBMagnetic::new();
+        let rb_magnetic = RBmagnetic::new();
         println!("Magnetic X:  {:.3}[G]", rb_magnetic.magnetic_x);
         println!("Magnetic Y:  {:.3}[G]", rb_magnetic.magnetic_y);
         println!("Magnetic Z:  {:.3}[G]", rb_magnetic.magnetic_z);

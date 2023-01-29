@@ -63,7 +63,7 @@ fn main() {
                     match sensor {
                         Sensor::TS => {
                             if cli.print {
-                                RBTemp::print_rb_temp();
+                                RBtemperature::print_rb_temp();
                             }
                         },
                         Sensor::CS => {
@@ -73,17 +73,17 @@ fn main() {
                         },
                         Sensor::PS => {
                             if cli.print {
-                                RBPress::print_rb_press();
+                                RBpressure::print_rb_press();
                             }
                         },
                         Sensor::HS => {
                             if cli.print {
-                                RBHum::print_rb_hum();
+                                RBhumidity::print_rb_hum();
                             }
                         },
                         Sensor::MS => {
                             if cli.print {
-                                RBMagnetic::print_rb_magnetic();
+                                RBmagnetic::print_rb_magnetic();
                             }
                         }
                         _ => println!("bad argument"),
@@ -100,7 +100,7 @@ fn main() {
                     match sensor {
                         Sensor::TS => {
                             if cli.print {
-                                PBTemp::print_pb_temp();
+                                PBtemperature::print_pb_temp();
                             }
                         },
                         Sensor::CS => {
@@ -122,7 +122,7 @@ fn main() {
                     match sensor {
                         Sensor::TS => {
                             if cli.print {
-                                LTBTemp::print_ltb_temp();
+                                LTBtemperature::print_ltb_temp();
                             }
                         },
                         _ => println!("bad argument"),
