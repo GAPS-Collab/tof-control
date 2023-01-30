@@ -8,3 +8,4 @@ pub mod bme280;
 pub mod ina226;
 pub mod max11645;
 pub mod ina219;
+pub mod si5345b;

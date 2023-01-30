@@ -10,3 +10,4 @@ i2cdev = "0.5.1"
 memmap = "0.7"
 log = "0.4"
 clap = { version = "4.1", features = ["derive"] }
+csv = "1.1"

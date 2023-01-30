@@ -41,6 +41,9 @@ enum Action {
     Initialize {
 
     },
+    Clock {
+
+    },
 }
 
 #[derive(Debug, Clone, ValueEnum)]
@@ -51,6 +54,7 @@ enum Sensor {
     HS,
     MS,
     BIAS,
+    CLK,
 }
 
 fn main() {
@@ -85,13 +89,21 @@ fn main() {
                             if cli.print {
                                 RBmagnetic::print_rb_magnetic();
                             }
+                        },
+                        Sensor::CLK => {
+                            if cli.print {
+                                RBclk::print_rb_clk();
+                            }
                         }
                         _ => println!("bad argument"),
                     }
                 },
                 Action::Initialize {  } => {
                     rb_control::initialize();
-                }
+                },
+                Action::Clock {  } => {
+                    RBclk::print_config();
+                },
             }
         },
         Board::PB => {
@@ -113,7 +125,10 @@ fn main() {
                 },
                 Action::Initialize {  } => {
                     pb_control::initialize();
-                }
+                },
+                Action::Clock {  } => {
+                   todo!();
+                },
             }
         },
         Board::LTB => {
@@ -130,7 +145,10 @@ fn main() {
                 },
                 Action::Initialize {  } => {
                     todo!();
-                }
+                },
+                Action::Clock {  } => {
+                    todo!();
+                 },
             }
         },
         Board::Preamp => {
@@ -152,7 +170,10 @@ fn main() {
                 },
                 Action::Initialize {  } => {
                     todo!();
-                }
+                },
+                Action::Clock {  } => {
+                    todo!();
+                 },
             }
         }
         // Board::PB => PBTemp::print_pb_temp(),

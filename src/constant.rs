@@ -68,6 +68,12 @@ pub const RB_MAX11645_CHANNEL: u8 = 6;
 pub const RB_N1V5_VOLTAGE_INA200_CHANNEL: u8 = 1;
 pub const RB_N1V5_CURRENT_INA200_CHANNEL: u8 = 0;
 
+// Clock Synthesizer (SI5345B)
+// PCA9548A_ADDRESS_2
+pub const RB_SI5345B_ADDRESS: u16 = 0x68;
+pub const RB_SI5345B_CHANNEL: u8 = 1;
+
+
 pub const RB_UIO0: &'static str = "/dev/uio0";
 
 pub const RB_TEMP: u32 = 0xA0;
