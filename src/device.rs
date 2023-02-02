@@ -9,3 +9,8 @@ pub mod ina226;
 pub mod max11645;
 pub mod ina219;
 pub mod si5345b;
+pub mod max5815;
+pub mod max5825;
+pub mod max7320;
+pub mod cy8c9560a;
+pub mod ad5675;

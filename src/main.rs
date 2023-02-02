@@ -38,7 +38,13 @@ enum Action {
         #[arg(short = 's', long = "sensor", required = true, ignore_case = true, help = "read sensor of the board")]
         sensor: Sensor,
     },
+    Set {
+
+    },
     Initialize {
+
+    },
+    Reset {
 
     },
     Clock {
@@ -55,6 +61,10 @@ enum Sensor {
     MS,
     BIAS,
     CLK,
+    GPIOE,
+    DAC,
+    LTB_PWR_ON,
+    LTB_PWR_OFF,
 }
 
 fn main() {
@@ -94,12 +104,28 @@ fn main() {
                             if cli.print {
                                 RBclk::print_rb_clk();
                             }
+                        },
+                        Sensor::GPIOE => {
+                            if cli.print {
+                                RBgpioe::print_rb_gpioe();
+                            }
+                        },
+                        Sensor::DAC => {
+                            if cli.print {
+                                RBdac::print_rb_dac();
+                            }
                         }
                         _ => println!("bad argument"),
                     }
                 },
+                Action::Set { } => {
+                    todo!();
+                },
                 Action::Initialize {  } => {
                     rb_control::initialize();
+                },
+                Action::Reset { } => {
+                    todo!();
                 },
                 Action::Clock {  } => {
                     RBclk::print_config();
@@ -119,12 +145,33 @@ fn main() {
                             if cli.print {
                                 PBvcp::print_pb_vcp();
                             }
+                        },
+                        Sensor::DAC => {
+                            if cli.print {
+                                PBdac::print_pb_dac();
+                            }
+                        },
+                        Sensor::LTB_PWR_ON => {
+                            if cli.print {
+                                LTBpwr::power_on_ltb();
+                            }
+                        },
+                        Sensor::LTB_PWR_OFF => {
+                            if cli.print {
+                                LTBpwr::power_off_ltb();
+                            }
                         }
                         _ => println!("bad argument"),
                     }
                 },
+                Action::Set { } => {
+                    todo!();
+                },
                 Action::Initialize {  } => {
                     pb_control::initialize();
+                },
+                Action::Reset { } => {
+                    todo!();
                 },
                 Action::Clock {  } => {
                    todo!();
@@ -140,11 +187,22 @@ fn main() {
                                 LTBtemperature::print_ltb_temp();
                             }
                         },
+                        Sensor::DAC => {
+                            if cli.print {
+                                LTBdac::print_ltb_dac();
+                            }
+                        }
                         _ => println!("bad argument"),
                     }
                 },
+                Action::Set { } => {
+                    LTBdac::set_threshold();
+                },
                 Action::Initialize {  } => {
                     todo!();
+                },
+                Action::Reset { } => {
+                    LTBdac::reset_threshold();
                 },
                 Action::Clock {  } => {
                     todo!();
@@ -168,8 +226,14 @@ fn main() {
                         _ => println!("bad argument"),
                     }
                 },
+                Action::Set { } => {
+                    PreampBiasSet::set_bias();
+                },
                 Action::Initialize {  } => {
                     todo!();
+                },
+                Action::Reset { } => {
+                    PreampBiasSet::reset_bias();
                 },
                 Action::Clock {  } => {
                     todo!();

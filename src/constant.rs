@@ -73,6 +73,16 @@ pub const RB_N1V5_CURRENT_INA200_CHANNEL: u8 = 0;
 pub const RB_SI5345B_ADDRESS: u16 = 0x68;
 pub const RB_SI5345B_CHANNEL: u8 = 1;
 
+// GPIO Expander (CY8C9560A)
+// PCA9548A_ADDRESS_2
+pub const RB_CY8C9560A_ADDRESS: u16 = 0x20;
+pub const RB_CY8C9560A_CHANNEL: u8 = 7;
+
+// DAC (AD5675)
+// PCA9548A_ADDRESS_2
+pub const RB_AD5675_ADDRESS: u16 = 0x0C;
+pub const RB_AD5675_CHANNEL: u8 = 2;
+
 
 pub const RB_UIO0: &'static str = "/dev/uio0";
 
@@ -113,8 +123,25 @@ pub const PB_ADC_2_CHANNEL: u8 = 3;
 pub const PB_MAX11615_ADDRESS: u16 = 0x33;
 pub const PB_MAX11617_ADDRESS: u16 = 0x35;
 
+pub const PB_DAC_REF_VOLTAGE: f32 = 3.0;
+pub const PB_DAC_1_CHANNEL: u8 = 0;
+pub const PB_DAC_2_CHANNEL: u8 = 2;
+pub const PB_MAX5825_ADDRESS: u16 = 0x1F;
+
+// LTB Power
+pub const PB_MAX7320_CHANNEL: u8 = 7;
+pub const PB_MAX7320_ADDRESS: u16 = 0x59;
+
+
+
 // I2C Options for Local Trigger Board
 pub const LTB_TMP112_ADDRESS: u16 = 0x49;
+pub const LTB_DAC_REF_VOLTAGE: f32 = 2.5;
+pub const LTB_MAX5815_ADDRESS: u16 = 0x1A;
+
+pub const LTB_DAC_THRESHOLD_0: f32 = 50.0; // 50.0mV
+pub const LTB_DAC_THRESHOLD_1: f32 = 50.0; // 50.0mV
+pub const LTB_DAC_THRESHOLD_2: f32 = 150.0; // 150.0mV
 
 // I2C Options for Preamp Board
 pub const PREAMP_TEMP_1_CHNANNEL: u8 = 7; // ADC 1, MAX11615
@@ -150,3 +177,37 @@ pub const PREAMP_SEN_13_CHANNEL: u8 = 10; // ADC 2, MAX11617
 pub const PREAMP_SEN_14_CHANNEL: u8 = 9; // ADC 2, MAX11617
 pub const PREAMP_SEN_15_CHANNEL: u8 = 8; // ADC 2, MAX11617
 pub const PREAMP_SEN_16_CHANNEL: u8 = 0; // ADC 2, MAX11617
+
+pub const PREAMP_DAC_1_CHANNEL: u8 = 0; // DAC1, MAX5825
+pub const PREAMP_DAC_2_CHANNEL: u8 = 1; // DAC1, MAX5825
+pub const PREAMP_DAC_3_CHANNEL: u8 = 2; // DAC1, MAX5825
+pub const PREAMP_DAC_4_CHANNEL: u8 = 3; // DAC1, MAX5825
+pub const PREAMP_DAC_5_CHANNEL: u8 = 4; // DAC1, MAX5825
+pub const PREAMP_DAC_6_CHANNEL: u8 = 5; // DAC1, MAX5825
+pub const PREAMP_DAC_7_CHANNEL: u8 = 6; // DAC1, MAX5825
+pub const PREAMP_DAC_8_CHANNEL: u8 = 7; // DAC1, MAX5825
+pub const PREAMP_DAC_9_CHANNEL: u8 = 0; // DAC2, MAX5825
+pub const PREAMP_DAC_10_CHANNEL: u8 = 1; // DAC2, MAX5825
+pub const PREAMP_DAC_11_CHANNEL: u8 = 2; // DAC2, MAX5825
+pub const PREAMP_DAC_12_CHANNEL: u8 = 3; // DAC2, MAX5825
+pub const PREAMP_DAC_13_CHANNEL: u8 = 4; // DAC2, MAX5825
+pub const PREAMP_DAC_14_CHANNEL: u8 = 5; // DAC2, MAX5825
+pub const PREAMP_DAC_15_CHANNEL: u8 = 6; // DAC2, MAX5825
+pub const PREAMP_DAC_16_CHANNEL: u8 = 7; // DAC2, MAX5825
+
+pub const PREAMP_DAC_1_VOLTAGE: f32 = 58.0; // DAC1, MAX5825
+pub const PREAMP_DAC_2_VOLTAGE: f32 = 58.0; // DAC1, MAX5825
+pub const PREAMP_DAC_3_VOLTAGE: f32 = 58.0; // DAC1, MAX5825
+pub const PREAMP_DAC_4_VOLTAGE: f32 = 58.0; // DAC1, MAX5825
+pub const PREAMP_DAC_5_VOLTAGE: f32 = 58.0; // DAC1, MAX5825
+pub const PREAMP_DAC_6_VOLTAGE: f32 = 58.0; // DAC1, MAX5825
+pub const PREAMP_DAC_7_VOLTAGE: f32 = 58.0; // DAC1, MAX5825
+pub const PREAMP_DAC_8_VOLTAGE: f32 = 58.0; // DAC1, MAX5825
+pub const PREAMP_DAC_9_VOLTAGE: f32 = 58.0; // DAC2, MAX5825
+pub const PREAMP_DAC_10_VOLTAGE: f32 = 58.0; // DAC2, MAX5825
+pub const PREAMP_DAC_11_VOLTAGE: f32 = 58.0; // DAC2, MAX5825
+pub const PREAMP_DAC_12_VOLTAGE: f32 = 58.0; // DAC2, MAX5825
+pub const PREAMP_DAC_13_VOLTAGE: f32 = 58.0; // DAC2, MAX5825
+pub const PREAMP_DAC_14_VOLTAGE: f32 = 58.0; // DAC2, MAX5825
+pub const PREAMP_DAC_15_VOLTAGE: f32 = 58.0; // DAC2, MAX5825
+pub const PREAMP_DAC_16_VOLTAGE: f32 = 58.0; // DAC2, MAX5825

@@ -1,6 +1,6 @@
 use crate::constant::*;
 use crate::memory::*;
-use crate::device::{pca9548a, tmp112, ina226, lis3mdltr, bme280, max11645, si5345b};
+use crate::device::{pca9548a, tmp112, ina226, lis3mdltr, bme280, max11645, si5345b, cy8c9560a, ad5675};
 
 
 pub fn initialize() {
@@ -316,6 +316,8 @@ impl RBclk {
         let holdover_status = si5345b.read_holdover_status().expect("cannot read HOLD status from SI5345B");
         let mode_of_operation = if holdover_status {false} else {true};
 
+        i2c_mux.reset().expect("cannot reset PCA9548A");
+
         Self {
             lock_status,
             mode_of_operation,
@@ -328,6 +330,74 @@ impl RBclk {
     }
     pub fn print_config() {
         let si5345b = si5345b::SI5345B::new(I2C_BUS, RB_SI5345B_ADDRESS);
-        si5345b.configure_si5345b();
+        si5345b.configure_si5345b().expect("cannot configure SI5345B");
+    }
+}
+
+pub struct RBgpioe {
+    device_family: u8,
+    device_setting: u8,
+    port_status: Vec<u8>,
+}
+
+impl RBgpioe {
+    pub fn new() -> Self {
+        let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
+        i2c_mux.select(RB_CY8C9560A_CHANNEL).expect("cannot accesss to PCA9548A");
+
+        let cy8c9560a = cy8c9560a::CY8C9560A::new(I2C_BUS, RB_CY8C9560A_ADDRESS);
+
+        let (device_family, device_setting) = cy8c9560a.read_device_info().expect("cannot read CY8C9560A");
+
+        let mut port_status = Vec::new();
+        for i in 0..8 {
+            port_status.push(cy8c9560a.read_port_status(i).expect("cannot read CY8C9560A"));
+        }
+
+        i2c_mux.reset().expect("cannot reset PCA9548A");
+
+        Self {
+            device_family,
+            device_setting,
+            port_status,
+        }
+    }
+    pub fn print_rb_gpioe() {
+        let rb_gpioe = RBgpioe::new();
+        println!("Device Family:    {}", rb_gpioe.device_family);
+        println!("Device Setting:   {}", rb_gpioe.device_setting);
+        println!("Port 0 Status:    {:#02X}", rb_gpioe.port_status[0]);
+        println!("Port 1 Status:    {:#02X}", rb_gpioe.port_status[1]);
+        println!("Port 2 Status:    {:#02X}", rb_gpioe.port_status[2]);
+        println!("Port 3 Status:    {:#02X}", rb_gpioe.port_status[3]);
+        println!("Port 4 Status:    {:#02X}", rb_gpioe.port_status[4]);
+        println!("Port 5 Status:    {:#02X}", rb_gpioe.port_status[5]);
+        println!("Port 6 Status:    {:#02X}", rb_gpioe.port_status[6]);
+        println!("Port 7 Status:    {:#02X}", rb_gpioe.port_status[7]);
+    }
+}
+
+pub struct RBdac {
+    dac0: u16,
+}
+
+impl RBdac {
+    pub fn new() -> Self {
+        let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
+        i2c_mux.select(RB_AD5675_CHANNEL).expect("cannot accesss to PCA9548A");
+
+        let ad5675 = ad5675::AD5675::new(I2C_BUS, RB_AD5675_ADDRESS);
+
+        let dac0 = ad5675.read_dac(0).expect("cannot read AD5675");
+
+        i2c_mux.reset().expect("cannot reset PCA9548A");
+
+        Self {
+            dac0,
+        }
+    }
+    pub fn print_rb_dac() {
+        let rb_dac = RBdac::new();
+        println!("DAC0:     {}", rb_dac.dac0);
     }
 }
