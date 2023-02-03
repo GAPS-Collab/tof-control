@@ -89,22 +89,22 @@ impl PreampTemp {
     }
     pub fn print_preamp_temp() {
         let preamp_temp = PreampTemp::new();
-        println!("Preamp Board 1 Temperature:   {:.3}[°C]", preamp_temp.preamp_tmp_1);
-        println!("Preamp Board 2 Temperature:   {:.3}[°C]", preamp_temp.preamp_tmp_2);
-        println!("Preamp Board 3 Temperature:   {:.3}[°C]", preamp_temp.preamp_tmp_3);
-        println!("Preamp Board 4 Temperature:   {:.3}[°C]", preamp_temp.preamp_tmp_4);
-        println!("Preamp Board 5 Temperature:   {:.3}[°C]", preamp_temp.preamp_tmp_5);
-        println!("Preamp Board 6 Temperature:   {:.3}[°C]", preamp_temp.preamp_tmp_6);
-        println!("Preamp Board 7 Temperature:   {:.3}[°C]", preamp_temp.preamp_tmp_7);
-        println!("Preamp Board 8 Temperature:   {:.3}[°C]", preamp_temp.preamp_tmp_8);
-        println!("Preamp Board 9 Temperature:   {:.3}[°C]", preamp_temp.preamp_tmp_9);
-        println!("Preamp Board 10 Temperature:  {:.3}[°C]", preamp_temp.preamp_tmp_10);
-        println!("Preamp Board 11 Temperature:  {:.3}[°C]", preamp_temp.preamp_tmp_11);
-        println!("Preamp Board 12 Temperature:  {:.3}[°C]", preamp_temp.preamp_tmp_12);
-        println!("Preamp Board 13 Temperature:  {:.3}[°C]", preamp_temp.preamp_tmp_13);
-        println!("Preamp Board 14 Temperature:  {:.3}[°C]", preamp_temp.preamp_tmp_14);
-        println!("Preamp Board 15 Temperature:  {:.3}[°C]", preamp_temp.preamp_tmp_15);
-        println!("Preamp Board 16 Temperature:  {:.3}[°C]", preamp_temp.preamp_tmp_16);
+        println!("Preamp 1 Temperature:     {:.3}[°C]", preamp_temp.preamp_tmp_1);
+        println!("Preamp 2 Temperature:     {:.3}[°C]", preamp_temp.preamp_tmp_2);
+        println!("Preamp 3 Temperature:     {:.3}[°C]", preamp_temp.preamp_tmp_3);
+        println!("Preamp 4 Temperature:     {:.3}[°C]", preamp_temp.preamp_tmp_4);
+        println!("Preamp 5 Temperature:     {:.3}[°C]", preamp_temp.preamp_tmp_5);
+        println!("Preamp 6 Temperature:     {:.3}[°C]", preamp_temp.preamp_tmp_6);
+        println!("Preamp 7 Temperature:     {:.3}[°C]", preamp_temp.preamp_tmp_7);
+        println!("Preamp 8 Temperature:     {:.3}[°C]", preamp_temp.preamp_tmp_8);
+        println!("Preamp 9 Temperature:     {:.3}[°C]", preamp_temp.preamp_tmp_9);
+        println!("Preamp 10 Temperature:    {:.3}[°C]", preamp_temp.preamp_tmp_10);
+        println!("Preamp 11 Temperature:    {:.3}[°C]", preamp_temp.preamp_tmp_11);
+        println!("Preamp 12 Temperature:    {:.3}[°C]", preamp_temp.preamp_tmp_12);
+        println!("Preamp 13 Temperature:    {:.3}[°C]", preamp_temp.preamp_tmp_13);
+        println!("Preamp 14 Temperature:    {:.3}[°C]", preamp_temp.preamp_tmp_14);
+        println!("Preamp 15 Temperature:    {:.3}[°C]", preamp_temp.preamp_tmp_15);
+        println!("Preamp 16 Temperature:    {:.3}[°C]", preamp_temp.preamp_tmp_16);
     }
 }
 
@@ -187,22 +187,22 @@ impl PreampBiasRead {
     }
     pub fn print_preamp_bias() {
         let preamp_bias_read = PreampBiasRead::new();
-        println!("Preamp Board 1 Bias Voltage:  {:.3}[V]", preamp_bias_read.preamp_bias_read_1);
-        println!("Preamp Board 2 Bias Voltage:  {:.3}[V]", preamp_bias_read.preamp_bias_read_2);
-        println!("Preamp Board 3 Bias Voltage:  {:.3}[V]", preamp_bias_read.preamp_bias_read_3);
-        println!("Preamp Board 4 Bias Voltage:  {:.3}[V]", preamp_bias_read.preamp_bias_read_4);
-        println!("Preamp Board 5 Bias Voltage:  {:.3}[V]", preamp_bias_read.preamp_bias_read_5);
-        println!("Preamp Board 6 Bias Voltage:  {:.3}[V]", preamp_bias_read.preamp_bias_read_6);
-        println!("Preamp Board 7 Bias Voltage:  {:.3}[V]", preamp_bias_read.preamp_bias_read_7);
-        println!("Preamp Board 8 Bias Voltage:  {:.3}[V]", preamp_bias_read.preamp_bias_read_8);
-        println!("Preamp Board 9 Bias Voltage:  {:.3}[V]", preamp_bias_read.preamp_bias_read_9);
-        println!("Preamp Board 10 Bias Voltage: {:.3}[V]", preamp_bias_read.preamp_bias_read_10);
-        println!("Preamp Board 11 Bias Voltage: {:.3}[V]", preamp_bias_read.preamp_bias_read_11);
-        println!("Preamp Board 12 Bias Voltage: {:.3}[V]", preamp_bias_read.preamp_bias_read_12);
-        println!("Preamp Board 13 Bias Voltage: {:.3}[V]", preamp_bias_read.preamp_bias_read_13);
-        println!("Preamp Board 14 Bias Voltage: {:.3}[V]", preamp_bias_read.preamp_bias_read_14);
-        println!("Preamp Board 15 Bias Voltage: {:.3}[V]", preamp_bias_read.preamp_bias_read_15);
-        println!("Preamp Board 16 Bias Voltage: {:.3}[V]", preamp_bias_read.preamp_bias_read_16);
+        println!("Preamp 1 Bias Voltage:    {:.3}[V]", preamp_bias_read.preamp_bias_read_1);
+        println!("Preamp 2 Bias Voltage:    {:.3}[V]", preamp_bias_read.preamp_bias_read_2);
+        println!("Preamp 3 Bias Voltage:    {:.3}[V]", preamp_bias_read.preamp_bias_read_3);
+        println!("Preamp 4 Bias Voltage:    {:.3}[V]", preamp_bias_read.preamp_bias_read_4);
+        println!("Preamp 5 Bias Voltage:    {:.3}[V]", preamp_bias_read.preamp_bias_read_5);
+        println!("Preamp 6 Bias Voltage:    {:.3}[V]", preamp_bias_read.preamp_bias_read_6);
+        println!("Preamp 7 Bias Voltage:    {:.3}[V]", preamp_bias_read.preamp_bias_read_7);
+        println!("Preamp 8 Bias Voltage:    {:.3}[V]", preamp_bias_read.preamp_bias_read_8);
+        println!("Preamp 9 Bias Voltage:    {:.3}[V]", preamp_bias_read.preamp_bias_read_9);
+        println!("Preamp 10 Bias Voltage:   {:.3}[V]", preamp_bias_read.preamp_bias_read_10);
+        println!("Preamp 11 Bias Voltage:   {:.3}[V]", preamp_bias_read.preamp_bias_read_11);
+        println!("Preamp 12 Bias Voltage:   {:.3}[V]", preamp_bias_read.preamp_bias_read_12);
+        println!("Preamp 13 Bias Voltage:   {:.3}[V]", preamp_bias_read.preamp_bias_read_13);
+        println!("Preamp 14 Bias Voltage:   {:.3}[V]", preamp_bias_read.preamp_bias_read_14);
+        println!("Preamp 15 Bias Voltage:   {:.3}[V]", preamp_bias_read.preamp_bias_read_15);
+        println!("Preamp 16 Bias Voltage:   {:.3}[V]", preamp_bias_read.preamp_bias_read_16);
     }
 }
 

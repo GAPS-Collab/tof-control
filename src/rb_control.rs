@@ -187,30 +187,14 @@ impl RBvcp {
     }
     pub fn print_rb_vcp() {
         let rb_vcp = RBvcp::new();
-        println!("DRS4 Digital Rail Voltage:    {:.3}[V]", rb_vcp.drs_dvdd_voltage);
-        println!("DRS4 Digital Rail Current:    {:.3}[A]", rb_vcp.drs_dvdd_current);
-        println!("DRS4 Digital Rail Power:      {:.3}[W]", rb_vcp.drs_dvdd_power);
-        println!("3.3V Rail Voltage:            {:.3}[V]", rb_vcp.p3v3_voltage);
-        println!("3.3V Rail Current:            {:.3}[A]", rb_vcp.p3v3_current);
-        println!("3.3V Rail Power:              {:.3}[W]", rb_vcp.p3v3_power);
-        println!("ZYNQ Rail Voltage:            {:.3}[V]", rb_vcp.zynq_voltage);
-        println!("ZYNQ Rail Current:            {:.3}[A]", rb_vcp.zynq_current);
-        println!("ZYNQ Rail Power:              {:.3}[W]", rb_vcp.zynq_power);
-        println!("3.5V Rail Voltage:            {:.3}[V]", rb_vcp.p3v5_voltage);
-        println!("3.5V Rail Current:            {:.3}[A]", rb_vcp.p3v5_current);
-        println!("3.5V Rail Power:              {:.3}[W]", rb_vcp.p3v5_power);
-        println!("ADC Digital Rail Voltage:     {:.3}[V]", rb_vcp.adc_dvdd_voltage);
-        println!("ADC Digital Rail Current:     {:.3}[A]", rb_vcp.adc_dvdd_current);
-        println!("ADC Digital Rail Power:       {:.3}[W]", rb_vcp.adc_dvdd_power);
-        println!("ADC Analog Rail Voltage:      {:.3}[V]", rb_vcp.adc_avdd_voltage);
-        println!("ADC Analog Rail Current:      {:.3}[A]", rb_vcp.adc_avdd_current);
-        println!("ADC Analog Rail Power:        {:.3}[W]", rb_vcp.adc_avdd_power);
-        println!("DRS4 Analog Rail Voltage:     {:.3}[V]", rb_vcp.drs_avdd_voltage);
-        println!("DRS4 Analog Rail Current:     {:.3}[A]", rb_vcp.drs_avdd_current);
-        println!("DRS4 Analog Rail Power:       {:.3}[W]", rb_vcp.drs_avdd_power);
-        println!("-1.5V Rail Voltage:          {:.3}[V]", rb_vcp.n1v5_voltage);
-        println!("-1.5V Rail Current:           {:.3}[A]", rb_vcp.n1v5_current);
-        println!("-1.5V Rail Power:             {:.3}[W]", rb_vcp.n1v5_power);
+        println!("ZYNQ 3.3V Power:          {:.3}[V] | {:.3}[A] | {:.3}[W]", rb_vcp.zynq_voltage, rb_vcp.zynq_current, rb_vcp.zynq_power);
+        println!("3.3V Power:               {:.3}[V] | {:.3}[A] | {:.3}[W]", rb_vcp.p3v3_voltage, rb_vcp.p3v3_current, rb_vcp.p3v3_power);
+        println!("3.5V Power:               {:.3}[V] | {:.3}[A] | {:.3}[W]", rb_vcp.p3v5_voltage, rb_vcp.p3v5_current, rb_vcp.p3v5_power);
+        println!("-1.5V Power:             {:.3}[V] | {:.3}[A] | {:.3}[W]", rb_vcp.n1v5_voltage, rb_vcp.n1v5_current, rb_vcp.n1v5_power);
+        println!("DRS4 Digital 2.5V Power:  {:.3}[V] | {:.3}[A] | {:.3}[W]", rb_vcp.drs_dvdd_voltage, rb_vcp.drs_dvdd_current, rb_vcp.drs_dvdd_power);
+        println!("DRS4 Analog 2.5V Power:   {:.3}[V] | {:.3}[A] | {:.3}[W]", rb_vcp.drs_avdd_voltage, rb_vcp.drs_avdd_current, rb_vcp.drs_avdd_power);
+        println!("ADC Digital 2.5V Power:   {:.3}[V] | {:.3}[A] | {:.3}[W]", rb_vcp.adc_dvdd_voltage, rb_vcp.adc_dvdd_current, rb_vcp.adc_dvdd_power);
+        println!("ADC Analog 3.0V Power:    {:.3}[V] | {:.3}[A] | {:.3}[W]", rb_vcp.adc_avdd_voltage, rb_vcp.adc_avdd_current, rb_vcp.adc_avdd_power);
     }
 }
 
@@ -235,7 +219,7 @@ impl RBpressure {
     }
     pub fn print_rb_press() {
         let rb_press = RBpressure::new();
-        println!("DRS Pressure:          {:.3}[hPa]", rb_press.pressure);
+        println!("DRS Pressure:             {:.3}[hPa]", rb_press.pressure);
     }
 }
 
@@ -260,7 +244,7 @@ impl RBhumidity {
     }
     pub fn print_rb_hum() {
         let rb_hum = RBhumidity::new();
-        println!("DRS Humidity:          {:.3}[%]", rb_hum.humidity);
+        println!("DRS Humidity:             {:.3}[%]", rb_hum.humidity);
     }
 }
 
@@ -291,10 +275,10 @@ impl RBmagnetic {
     }
     pub fn print_rb_magnetic() {
         let rb_magnetic = RBmagnetic::new();
-        println!("Magnetic X:  {:.3}[G]", rb_magnetic.magnetic_x);
-        println!("Magnetic Y:  {:.3}[G]", rb_magnetic.magnetic_y);
-        println!("Magnetic Z:  {:.3}[G]", rb_magnetic.magnetic_z);
-        println!("Magnetic T:  {:.3}[G]", rb_magnetic.magnetic_t);
+        println!("Magnetic X:              {:.3}[G]", rb_magnetic.magnetic_x);
+        println!("Magnetic Y:               {:.3}[G]", rb_magnetic.magnetic_y);
+        println!("Magnetic Z:              {:.3}[G]", rb_magnetic.magnetic_z);
+        println!("Magnetic Total:           {:.3}[G]", rb_magnetic.magnetic_t);
     }
 }
 
@@ -325,8 +309,8 @@ impl RBclk {
     }
     pub fn print_rb_clk() {
         let rb_clk = RBclk::new();
-        println!("DSPLL Status:         {}", if rb_clk.lock_status {String::from("Locked")} else {String::from("Unlocked")});
-        println!("Mode of Operation:    {}", if rb_clk.mode_of_operation {String::from("Locked Mode")} else {String::from("Holdover Mode (or Freerun Mode)")});
+        println!("DSPLL Status:             {}", if rb_clk.lock_status {String::from("Locked")} else {String::from("Unlocked")});
+        println!("Mode of Operation:        {}", if rb_clk.mode_of_operation {String::from("Locked Mode")} else {String::from("Holdover Mode (or Freerun Mode)")});
     }
     pub fn print_config() {
         let si5345b = si5345b::SI5345B::new(I2C_BUS, RB_SI5345B_ADDRESS);

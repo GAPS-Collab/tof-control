@@ -50,10 +50,10 @@ impl PBtemperature {
     }
     pub fn print_pb_temp() {
         let pb_temp = PBtemperature::new();
-        println!("PDS Temperature:  {:.3}[°C]", pb_temp.pds_temp);
-        println!("PAS Temperature:  {:.3}[°C]", pb_temp.pas_temp);
-        println!("NAS Temperature:  {:.3}[°C]", pb_temp.nas_temp);
-        println!("SHV Temperature:  {:.3}[°C]", pb_temp.shv_temp);
+        println!("PDS Temperature:          {:.3}[°C]", pb_temp.pds_temp);
+        // println!("PAS Temperature:          {:.3}[°C]", pb_temp.pas_temp);
+        println!("NAS Temperature:          {:.3}[°C]", pb_temp.nas_temp);
+        println!("SHV Temperature:          {:.3}[°C]", pb_temp.shv_temp);
     }
 }
 
@@ -141,24 +141,12 @@ impl PBvcp {
     }
     pub fn print_pb_vcp() {
         let pb_vcp = PBvcp::new();
-        println!("Preamp 3.6V Voltage:      {:.3}[V]", pb_vcp.p3v6_preamp_voltage);
-        println!("Preamp 3.6V Current:      {:.3}[A]", pb_vcp.p3v6_preamp_current);
-        println!("Preamp 3.6V Power:        {:.3}[W]", pb_vcp.p3v6_preamp_power);
-        println!("Preamp -1.6V Voltage:    {:.3}[V]", pb_vcp.n1v6_preamp_voltage);
-        println!("Preamp -1.6V Current:     {:.3}[A]", pb_vcp.n1v6_preamp_current);
-        println!("Preamp -1.6V Power:       {:.3}[W]", pb_vcp.n1v6_preamp_power);
-        println!("LTB 3.4V FPGA Voltage:    {:.3}[V]", pb_vcp.p3v4f_ltb_voltage);
-        println!("LTB 3.4V FPGA Current:    {:.3}[A]", pb_vcp.p3v4f_ltb_current);
-        println!("LTB 3.4V FPGA Power:      {:.3}[W]", pb_vcp.p3v4f_ltb_power);
-        println!("LTB 3.4V DAC Voltage:     {:.3}[V]", pb_vcp.p3v4d_ltb_voltage);
-        println!("LTB 3.4V DAC Current:     {:.3}[A]", pb_vcp.p3v4d_ltb_current);
-        println!("LTB 3.4V DAC Power:       {:.3}[W]", pb_vcp.p3v4d_ltb_power);
-        println!("LTB 3.6V Voltage:         {:.3}[V]", pb_vcp.p3v6_ltb_voltage);
-        println!("LTB 3.6V Current:         {:.3}[A]", pb_vcp.p3v6_ltb_current);
-        println!("LTB 3.6V Power:           {:.3}[W]", pb_vcp.p3v6_ltb_power);
-        println!("LTB -1.6V Voltage:       {:.3}[V]", pb_vcp.n1v6_ltb_voltage);
-        println!("LTB -1.6V Current:        {:.3}[A]", pb_vcp.n1v6_ltb_current);
-        println!("LTB -1.6V Power:          {:.3}[W]", pb_vcp.n1v6_ltb_power);
+        println!("LTB 3.4V FPGA Power:      {:.3}[V] | {:.3}[A] | {:.3}[W]", pb_vcp.p3v4f_ltb_voltage, pb_vcp.p3v4f_ltb_current, pb_vcp.p3v4f_ltb_power);
+        println!("LTB 3.4V DAC Power:       {:.3}[V] | {:.3}[A] | {:.3}[W]", pb_vcp.p3v4d_ltb_voltage, pb_vcp.p3v4d_ltb_current, pb_vcp.p3v4d_ltb_power);
+        println!("LTB 3.6V Power:           {:.3}[V] | {:.3}[A] | {:.3}[W]", pb_vcp.p3v6_ltb_voltage, pb_vcp.p3v6_ltb_current, pb_vcp.p3v6_ltb_power);
+        println!("LTB -1.6V Power:         {:.3}[V] | {:.3}[A] | {:.3}[W]", pb_vcp.n1v6_ltb_voltage, pb_vcp.n1v6_ltb_current, pb_vcp.n1v6_ltb_power);
+        println!("Preamp 3.6V Power:        {:.3}[V] | {:.3}[A] | {:.3}[W]", pb_vcp.p3v6_preamp_voltage, pb_vcp.p3v6_preamp_current, pb_vcp.p3v6_preamp_power);
+        println!("Preamp -1.6V Power:      {:.3}[V] | {:.3}[A] | {:.3}[W]", pb_vcp.n1v6_preamp_voltage, pb_vcp.n1v6_preamp_current, pb_vcp.n1v6_preamp_power);
     }
 }
 

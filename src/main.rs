@@ -77,10 +77,10 @@ fn main() {
                     RBhumidity::print_rb_hum();
                     println!("--- RB Pressure ---");
                     RBpressure::print_rb_press();
-                    println!("--- RB Voltage, Current and Power ---");
-                    RBvcp::print_rb_vcp();
                     println!("--- RB Magnetic Field ---");
                     RBmagnetic::print_rb_magnetic();
+                    println!("--- RB Voltage, Current and Power ---");
+                    RBvcp::print_rb_vcp();
                 },
                 Action::Set {  } => {
                     Command::new("rbsetup").arg("-i").arg("2").stdout(Stdio::null()).spawn().expect("failed to edxecute rbsetup command");
@@ -112,7 +112,7 @@ fn main() {
                 Action::Read {  } => {
                     println!("--- PB Temperature ---");
                     pb_control::PBtemperature::print_pb_temp();
-                    println!("--- RB Voltage, Current and Power ---");
+                    println!("--- PB Voltage, Current and Power ---");
                     pb_control::PBvcp::print_pb_vcp();
                 },
                 _ => {
@@ -192,6 +192,44 @@ fn main() {
                         println!("Preamps are initialized.");
                     }
                 },
+                Action::Read {  } => {
+                    println!("########## Readout Board Sensors ########################");
+                    println!("");
+                    println!("--- RB Clock Synthesizer ---");
+                    RBclk::print_rb_clk();
+                    println!("--- RB Temperature ---");
+                    RBtemperature::print_rb_temp();
+                    println!("--- RB Humidity ---");
+                    RBhumidity::print_rb_hum();
+                    println!("--- RB Pressure ---");
+                    RBpressure::print_rb_press();
+                    println!("--- RB Magnetic Field ---");
+                    RBmagnetic::print_rb_magnetic();
+                    println!("--- RB Voltage, Current and Power ---");
+                    RBvcp::print_rb_vcp();
+                    println!("");
+                    println!("########## Power Board Sensors ##########################");
+                    println!("");
+                    println!("--- PB Temperature ---");
+                    pb_control::PBtemperature::print_pb_temp();
+                    println!("--- PB Voltage, Current and Power ---");
+                    pb_control::PBvcp::print_pb_vcp();
+                    println!("");
+                    println!("########## Local Trigger Board Sensors ##################");
+                    println!("");
+                    println!("--- LTB Temperature ---");
+                    ltb_control::LTBtemperature::print_ltb_temp();
+                    println!("--- LTB Threshold ---");
+                    ltb_control::LTBdac::print_ltb_dac();
+                    println!("");
+                    println!("########## Preamp Board Sensors #########################");
+                    println!("");
+                    println!("--- Preamp Board Temperature ---");
+                    preamp_control::PreampTemp::print_preamp_temp();
+                    println!("--- Preamp Board Bias Voltage ---");
+                    preamp_control::PreampBiasRead::print_preamp_bias();
+
+                }
                 _ => {
                     println!("bad argument");
                 },
