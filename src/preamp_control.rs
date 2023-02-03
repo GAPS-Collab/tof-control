@@ -1,6 +1,10 @@
 use crate::constant::*;
 use crate::device::{pca9548a, max11615, max11617, max5825};
 
+pub fn initialize() {
+    PreampBiasSet::set_bias();
+}
+
 pub struct PreampTemp {
     preamp_tmp_1: f32,
     preamp_tmp_2: f32,

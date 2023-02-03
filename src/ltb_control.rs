@@ -1,6 +1,15 @@
 use crate::constant::*;
 use crate::device::{tmp112, max5815};
 
+pub fn initialize() {
+    let mut count = 0;
+    while count < 5 {
+        LTBtemperature::new();
+        count += 1;
+    }
+    LTBdac::set_threshold();
+}
+
 pub struct LTBtemperature {
     ltb_temp: f32,
 }
@@ -65,15 +74,18 @@ impl LTBdac {
     }
     pub fn print_ltb_dac() {
         let ltb_dac = LTBdac::new();
-        println!("--- Device Information ---");
-        println!("Device ID:        {}", ltb_dac.device_id);
-        println!("Revision ID:      {}", ltb_dac.rev_id);
-        println!("Reference Mode:   {}", ltb_dac.ref_mode);
-        println!("--- Threshold(CODE) ---");
-        println!("Ch0 Threshold:    {:.3}[mV]({})", Self::adc_to_mv(ltb_dac.dac0), ltb_dac.code0);
-        println!("Ch1 Threshold:    {:.3}[mV]({})", Self::adc_to_mv(ltb_dac.dac1), ltb_dac.code1);
-        println!("Ch2 Threshold:    {:.3}[mV]({})", Self::adc_to_mv(ltb_dac.dac2), ltb_dac.code2);
-        println!("Ch3 Threshold:    {:.3}[mV]({})", Self::adc_to_mv(ltb_dac.dac3), ltb_dac.code3);
+        // println!("--- Device Information ---");
+        // println!("Device ID:        {}", ltb_dac.device_id);
+        // println!("Revision ID:      {}", ltb_dac.rev_id);
+        // println!("Reference Mode:   {}", ltb_dac.ref_mode);
+        // println!("--- Threshold(CODE) ---");
+        // println!("Ch0 Threshold:    {:.3}[mV]({})", Self::adc_to_mv(ltb_dac.dac0), ltb_dac.code0);
+        // println!("Ch1 Threshold:    {:.3}[mV]({})", Self::adc_to_mv(ltb_dac.dac1), ltb_dac.code1);
+        // println!("Ch2 Threshold:    {:.3}[mV]({})", Self::adc_to_mv(ltb_dac.dac2), ltb_dac.code2);
+        // println!("Ch3 Threshold:    {:.3}[mV]({})", Self::adc_to_mv(ltb_dac.dac3), ltb_dac.code3);
+        println!("Ch0 Threshold:    {:.3}[mV]", Self::adc_to_mv(ltb_dac.dac0));
+        println!("Ch1 Threshold:    {:.3}[mV]", Self::adc_to_mv(ltb_dac.dac1));
+        println!("Ch2 Threshold:    {:.3}[mV]", Self::adc_to_mv(ltb_dac.dac2));
     }
     fn adc_to_mv(adc: u16) -> f32 {
         let voltage = LTB_DAC_REF_VOLTAGE * (adc as f32) / 2f32.powf(12.0);

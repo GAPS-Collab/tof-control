@@ -140,7 +140,7 @@ pub const LTB_DAC_REF_VOLTAGE: f32 = 2.5;
 pub const LTB_MAX5815_ADDRESS: u16 = 0x1A;
 
 pub const LTB_DAC_THRESHOLD_0: f32 = 50.0; // 50.0mV
-pub const LTB_DAC_THRESHOLD_1: f32 = 50.0; // 50.0mV
+pub const LTB_DAC_THRESHOLD_1: f32 = 100.0; // 100.0mV
 pub const LTB_DAC_THRESHOLD_2: f32 = 150.0; // 150.0mV
 
 // I2C Options for Preamp Board
