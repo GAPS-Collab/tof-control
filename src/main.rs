@@ -62,6 +62,12 @@ enum Sensor {
     BIAS,
     CLK,
     GPIOE,
+    INITIALIZE_GPIOE,
+    NO_INPUT_MODE,
+    TCAL_MODE,
+    NORMAL_MODE,
+    EN_TCAL,
+    DIS_TCAL,
     DAC,
     LTB_PWR_ON,
     LTB_PWR_OFF,
@@ -110,6 +116,37 @@ fn main() {
                                 RBgpioe::print_rb_gpioe();
                             }
                         },
+                        Sensor::INITIALIZE_GPIOE => {
+                            if cli.print {
+                                RBgpioe::initialize();
+                            }
+                        },
+                        Sensor::NO_INPUT_MODE => {
+                            if cli.print {
+                                RBgpioe::set_rf_switch(0);
+                            }
+                        },
+                        Sensor::TCAL_MODE => {
+                            if cli.print {
+                                RBgpioe::set_rf_switch(1);
+                                RBgpioe::enable_tcal_clock(1);
+                            }
+                        },
+                        Sensor::NORMAL_MODE => {
+                            if cli.print {
+                                RBgpioe::set_rf_switch(2);
+                            }
+                        },
+                        Sensor::EN_TCAL => {
+                            if cli.print {
+                                RBgpioe::enable_tcal_clock(1);
+                            }
+                        },
+                        Sensor::DIS_TCAL => {
+                            if cli.print {
+                                RBgpioe::disable_tcal_clock();
+                            }
+                        }
                         Sensor::DAC => {
                             if cli.print {
                                 RBdac::print_rb_dac();

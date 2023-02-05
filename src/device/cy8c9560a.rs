@@ -21,10 +21,86 @@ const OUTPUT_PORT_4: u16 = 0x0C;
 const OUTPUT_PORT_5: u16 = 0x0D;
 const OUTPUT_PORT_6: u16 = 0x0E;
 const OUTPUT_PORT_7: u16 = 0x0F;
+const INTERRUPT_STATUS_PORT_0: u16 = 0x10;
+const INTERRUPT_STATUS_PORT_1: u16 = 0x11;
+const INTERRUPT_STATUS_PORT_2: u16 = 0x12;
+const INTERRUPT_STATUS_PORT_3: u16 = 0x13;
+const INTERRUPT_STATUS_PORT_4: u16 = 0x14;
+const INTERRUPT_STATUS_PORT_5: u16 = 0x15;
+const INTERRUPT_STATUS_PORT_6: u16 = 0x16;
+const INTERRUPT_STATUS_PORT_7: u16 = 0x17;
 const PORT_SELECT: u16 = 0x18;
 const INTERRUPT_MASK: u16 = 0x19;
 const PIN_DIRECTION: u16 = 0x1C;
+const DRIVE_MODE_PULL_UP: u16 = 0x1D;
+const DRIVE_MODE_PULL_DOWN: u16 = 0x1E;
+const DRIVE_MODE_OPEN_DRAIN_HIGH: u16 = 0x1F;
+const DRIVE_MODE_OPEN_DRAIN_LOW: u16 = 0x20;
+const DRIVE_MODE_STRONG: u16 = 0x21;
+const DRIVE_MODE_SLOW_STRONG: u16 = 0x22;
+const DRIVE_MODE_HIGH_Z: u16 = 0x23;
 const DEVICE_INFO: u16 = 0x2E;
+
+/*
+Ports used for Readout Board V2.5.2
+cy8c9560A
+//////////////////////////////////////////
+//Output
+//////////////////////////////////////////
+
+GP0[7]
+GP0[7]: Si5345_FINC
+
+GP1[]
+
+GP2[1:0]
+GP2[1]: HMC849_EN3
+GP2[0]: HMC849_VCTL3
+
+GP3[5:4,2:0]
+GP3[5]: MARS_WDI_GE
+GP3[4]: VCAL_RST
+GP3[2]: Si5345_FDEC
+GP3[1]: ~Si5345_OE
+GP3[0]: ~Si5345_RST
+
+GP4[7:2]
+GP4[7]: HMC849_VCTL6
+GP4[6]: HMC849_EN6
+GP4[5]: HMC849_VCTL7
+GP4[4]: HMC849_EN7
+GP4[3]: HMC849_VCTL8
+GP4[2]: HMC849_EN8
+
+GP5[5:4,1:0]
+GP5[5]: HMC849_EN5
+GP5[4]: HMC849_VCTL5
+GP5[1]: HMC849_EN4
+GP5[0]: HMC849_VCTL4
+
+GP6[]
+
+GP7[7:0]
+GP7[7]: TCA_CLK_SC_EN
+GP7[6]: TCA_CLK_OUT_EN
+GP7[5]: HMC849_EN0
+GP7[4]: HMC849_VCTL0
+GP7[3]: HMC849_EN1
+GP7[2]: HMC849_VCTL1
+GP7[1]: HMC849_EN2
+GP7[0]: HMC849_VCTL2
+
+Initialization Value:
+GP0: 0x00
+GP1: 0xFF
+GP2: 0x03
+GP3: 0x03
+GP4: 0xFC
+GP5: 0x33
+GP6: 0xFF
+GP7: 0x3F
+
+*/
 
 pub struct CY8C9560A {
     bus: u8,
@@ -61,6 +137,13 @@ impl CY8C9560A {
 
         Ok(port_status)
     }
+    pub fn initialize_all_outputs(&self) -> Result<(), LinuxI2CError> {
+        for i in 0..8 {
+            self.set_output_port(i, 0xFF)?;
+        }
+
+        Ok(())
+    }
     pub fn set_output_port(&self, port: u8, value: u8) -> Result<(), LinuxI2CError> {
         let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", self.bus), self.address)?;
         dev.smbus_write_byte_data(
@@ -80,4 +163,229 @@ impl CY8C9560A {
 
         Ok(())
     }
+    pub fn select_port(&self, port: u8) -> Result<(), LinuxI2CError> {
+        let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", self.bus), self.address)?;
+        dev.smbus_write_byte_data(PORT_SELECT as u8, port)?;
+
+        Ok(())
+    }
+    pub fn set_interrupt_mask_port(&self, value: u8) -> Result<(), LinuxI2CError> {
+        let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", self.bus), self.address)?;
+        dev.smbus_write_byte_data(INTERRUPT_MASK as u8, value)?;
+        
+        Ok(())
+    }
+    pub fn set_pin_direction(&self, value: u8) -> Result<(), LinuxI2CError> {
+        let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", self.bus), self.address)?;
+        dev.smbus_write_byte_data(PIN_DIRECTION as u8, value)?;
+
+        Ok(())
+    }
+    pub fn set_drive_mode(&self, mode: u8) -> Result<(), LinuxI2CError> {
+        let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", self.bus), self.address)?;
+        dev.smbus_write_byte_data(
+            match mode {
+                0 => DRIVE_MODE_PULL_UP as u8,
+                1 => DRIVE_MODE_PULL_DOWN as u8,
+                2 => DRIVE_MODE_OPEN_DRAIN_HIGH as u8,
+                3 => DRIVE_MODE_OPEN_DRAIN_LOW as u8,
+                4 => DRIVE_MODE_STRONG as u8,
+                5 => DRIVE_MODE_SLOW_STRONG as u8,
+                6 => DRIVE_MODE_HIGH_Z as u8,
+                _ => 0xFF,
+            }, 0x01)?;
+        
+        Ok(())
+    }
+    // Set RF Switch (HMC849)
+    pub fn set_rf_switch(&self, channel: u8, mode: u8) -> Result<(), LinuxI2CError> {
+        match channel {
+            0 => match mode {
+                0 => {
+                    let value: u8 = (0x3F & !0x30) | 0x20;
+                    self.set_output_port(7, value)?;
+                },
+                1 => {
+                    let value: u8 = (0x3F & !0x30) | 0x10;
+                    self.set_output_port(7, value)?;
+                },
+                2 => {
+                    let value: u8 = (0x3F & !0x30) | 0x00;
+                    self.set_output_port(7, value)?;
+                },
+                _ => {
+                    self.set_output_port(7, 0x3F)?;
+                },
+            },
+            1 => match mode {
+                0 => {
+                    let value: u8 = (0x3F | 0x0C) & 0x0C;
+                    self.set_output_port(7, value)?;
+                },
+                1 => {
+                    let value: u8 = (0x3F & !0x0C) | 0x04;
+                    self.set_output_port(7, value)?;
+                },
+                2 => {
+                    let value: u8 = (0x3F & !0x0C) | 0x00;
+                    self.set_output_port(7, value)?;
+                },
+                _ => {
+                    self.set_output_port(7, 0x3F)?;
+                },
+            },
+            2 => match mode {
+                0 => {
+                    let value: u8 = (0x3F | 0x03) & 0x03;
+                    self.set_output_port(7, value)?;
+                },
+                1 => {
+                    let value: u8 = (0x3F & !0x03) | 0x01;
+                    self.set_output_port(7, value)?;
+                },
+                2 => {
+                    let value: u8 = (0x3F & !0x03) | 0x00;
+                    self.set_output_port(7, value)?;
+                },
+                _ => {
+                    self.set_output_port(7, 0x3F)?;
+                },
+            },
+            3 => match mode {
+                0 => {
+                    let value: u8 = (0x03 | 0x03) & 0x03;
+                    self.set_output_port(2, value)?;
+                },
+                1 => {
+                    let value: u8 = (0x03 & !0x03) | 0x01;
+                    self.set_output_port(2, value)?;
+                },
+                2 => {
+                    let value: u8 = (0x03 & !0x03) | 0x00;
+                    self.set_output_port(2, value)?;
+                },
+                _ => {
+                    self.set_output_port(2, 0x03)?;
+                },
+            },
+            4 => match mode {
+                0 => {
+                    let value: u8 = (0x33 | 0x03) & 0x03;
+                    self.set_output_port(5, value)?;
+                },
+                1 => {
+                    let value: u8 = (0x33 & !0x03) | 0x02;
+                    self.set_output_port(5, value)?;
+                },
+                2 => {
+                    let value: u8 = (0x33 & !0x03) | 0x00;
+                    self.set_output_port(5, value)?;
+                },
+                _ => {
+                    self.set_output_port(5, 0x33)?;
+                },
+            },
+            5 => match mode {
+                0 => {
+                    let value: u8 = (0x33 | 0x30) & 0x30;
+                    self.set_output_port(5, value)?;
+                },
+                1 => {
+                    let value: u8 = (0x33 & !0x30) | 0x10;
+                    self.set_output_port(5, value)?;
+                },
+                2 => {
+                    let value: u8 = (0x33 & !0x30) | 0x00;
+                    self.set_output_port(5, value)?;
+                },
+                _ => {
+                    self.set_output_port(5, 0x33)?;
+                },
+            },
+            6 => match mode {
+                0 => {
+                    let value: u8 = (0xFC | 0xC0) & 0xC0;
+                    self.set_output_port(4, value)?;
+                },
+                1 => {
+                    let value: u8 = (0xFC & !0xC0) | 0x80;
+                    self.set_output_port(4, value)?;
+                },
+                2 => {
+                    let value: u8 = (0xFC & !0xC0) | 0x00;
+                    self.set_output_port(4, value)?;
+                },
+                _ => {
+                    self.set_output_port(4, 0xFC)?;
+                },
+            },
+            7 => match mode {
+                0 => {
+                    let value: u8 = (0xFC | 0x30) & 0x30;
+                    self.set_output_port(4, value)?;
+                },
+                1 => {
+                    let value: u8 = (0xFC & !0x30) | 0x20;
+                    self.set_output_port(4, value)?;
+                },
+                2 => {
+                    let value: u8 = (0xFC & !0x30) | 0x00;
+                    self.set_output_port(4, value)?;
+                },
+                _ => {
+                    self.set_output_port(4, 0xFC)?;
+                },
+            },
+            8 => match mode {
+                0 => {
+                    let value: u8 = (0xFC | 0x0C) & 0x0C;
+                    self.set_output_port(4, value)?;
+                },
+                1 => {
+                    let value: u8 = (0xFC & !0x0C) | 0x08;
+                    self.set_output_port(4, value)?;
+                },
+                2 => {
+                    let value: u8 = (0xFC & !0x0C) | 0x00;
+                    self.set_output_port(4, value)?;
+                },
+                _ => {
+                    self.set_output_port(4, 0xFC)?;
+                },
+            },
+            _ => {},
+        };
+
+        Ok(())
+
+    }
+    // neet to check!
+    pub fn reset_clock_synthesizer(&self) -> Result<(), LinuxI2CError> {
+        let mut value = (0x03 & !0x02) | 0 << 1;
+        value = (value & !0x01) | 1;
+        
+        self.set_output_port(3, value)?;
+
+        Ok(())
+    }
+    // neet to check!
+    pub fn enable_tcal_clock(&self) -> Result<(), LinuxI2CError> {
+        let mut value: u16 = (0x3F | 0x80) | (0x01 << 8);
+        self.set_output_port(7, value as u8)?;
+
+        value = (0x3F | 0x40) | (0x01 << 7);
+        self.set_output_port(7, value as u8)?;
+
+        Ok(())
+    }
+    pub fn disable_tcal_clock(&self) -> Result<(), LinuxI2CError> {
+        let mut value: u16 = (0x3F | 0x80);
+        self.set_output_port(7, value as u8)?;
+
+        value = (0x3F | 0x40);
+        self.set_output_port(7, value as u8)?;
+
+        Ok(())
+    }
+
 }

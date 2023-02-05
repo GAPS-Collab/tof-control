@@ -35,7 +35,7 @@ impl MAX5815 {
         Ok(())
     }
     fn set_reference_voltage(&self, dev: &mut LinuxI2CDevice) -> Result<(), LinuxI2CError> {
-        dev.smbus_write_byte(REF_2_5V as u8)
+        dev.smbus_write_i2c_block_data(REF_2_5V as u8, &[0x00, 0x00])
     }
     pub fn read_device_info(&self) -> Result<(u8, u8, u8), LinuxI2CError> {
         let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", self.bus), self.address)?;
