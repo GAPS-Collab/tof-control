@@ -139,9 +139,9 @@ pub const LTB_TMP112_ADDRESS: u16 = 0x49;
 pub const LTB_DAC_REF_VOLTAGE: f32 = 2.5;
 pub const LTB_MAX5815_ADDRESS: u16 = 0x1A;
 
-pub const LTB_DAC_THRESHOLD_0: f32 = 50.0; // 50.0mV
-pub const LTB_DAC_THRESHOLD_1: f32 = 50.0; // 50.0mV
-pub const LTB_DAC_THRESHOLD_2: f32 = 150.0; // 150.0mV
+pub const LTB_DAC_THRESHOLD_0: f32 = 40.0; // 40.0mV
+pub const LTB_DAC_THRESHOLD_1: f32 = 32.0; // 32.0mV
+pub const LTB_DAC_THRESHOLD_2: f32 = 375.0; // 375.0mV
 
 // I2C Options for Preamp Board
 pub const PREAMP_TEMP_1_CHNANNEL: u8 = 7; // ADC 1, MAX11615
