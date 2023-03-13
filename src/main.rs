@@ -6,6 +6,10 @@ mod pb_control;
 mod ltb_control;
 mod preamp_control;
 
+use std::process::{Command, Stdio};
+use std::thread;
+use std::time::Duration;
+
 use clap::{Parser, ArgGroup, ValueEnum, Subcommand, command};
 
 use rb_control::*;
@@ -20,12 +24,13 @@ struct Cli {
     board: Board,
     #[clap(subcommand)]
     action: Action,
-    #[arg(short = 'p', long = "print", action = clap::ArgAction::SetFalse, help = "Print the operation")]
+    #[arg(short = 'p', long = "print", help = "print output of operation")]
     print: bool,
 }
 
 #[derive(Debug, Clone, ValueEnum)]
 enum Board {
+    ALL,
     RB,
     PB,
     LTB,
@@ -35,42 +40,21 @@ enum Board {
 #[derive(Debug, Subcommand)]
 enum Action {
     Read {
-        #[arg(short = 's', long = "sensor", required = true, ignore_case = true, help = "read sensor of the board")]
-        sensor: Sensor,
+        // #[arg(short = 's', long = "sensor", required = true, ignore_case = true, help = "read sensor of the board")]
+        // sensor: Sensor,
     },
     Set {
 
     },
-    Initialize {
+    Init {
 
     },
     Reset {
 
     },
-    Clock {
+    GPIO {
 
     },
-}
-
-#[derive(Debug, Clone, ValueEnum)]
-enum Sensor {
-    TS,
-    CS,
-    PS,
-    HS,
-    MS,
-    BIAS,
-    CLK,
-    GPIOE,
-    INITIALIZE_GPIOE,
-    NO_INPUT_MODE,
-    TCAL_MODE,
-    NORMAL_MODE,
-    EN_TCAL,
-    DIS_TCAL,
-    DAC,
-    LTB_PWR_ON,
-    LTB_PWR_OFF,
 }
 
 fn main() {
@@ -79,207 +63,185 @@ fn main() {
     match cli.board {
         Board::RB => {
             match cli.action {
-                Action::Read { sensor } => {
-                    match sensor {
-                        Sensor::TS => {
-                            if cli.print {
-                                RBtemperature::print_rb_temp();
-                            }
-                        },
-                        Sensor::CS => {
-                            if cli.print {
-                                RBvcp::print_rb_vcp();
-                            }
-                        },
-                        Sensor::PS => {
-                            if cli.print {
-                                RBpressure::print_rb_press();
-                            }
-                        },
-                        Sensor::HS => {
-                            if cli.print {
-                                RBhumidity::print_rb_hum();
-                            }
-                        },
-                        Sensor::MS => {
-                            if cli.print {
-                                RBmagnetic::print_rb_magnetic();
-                            }
-                        },
-                        Sensor::CLK => {
-                            if cli.print {
-                                RBclk::print_rb_clk();
-                            }
-                        },
-                        Sensor::GPIOE => {
-                            if cli.print {
-                                RBgpioe::print_rb_gpioe();
-                            }
-                        },
-                        Sensor::INITIALIZE_GPIOE => {
-                            if cli.print {
-                                RBgpioe::initialize();
-                            }
-                        },
-                        Sensor::NO_INPUT_MODE => {
-                            if cli.print {
-                                RBgpioe::set_rf_switch(0);
-                            }
-                        },
-                        Sensor::TCAL_MODE => {
-                            if cli.print {
-                                RBgpioe::set_rf_switch(1);
-                                RBgpioe::enable_tcal_clock(1);
-                            }
-                        },
-                        Sensor::NORMAL_MODE => {
-                            if cli.print {
-                                RBgpioe::set_rf_switch(2);
-                            }
-                        },
-                        Sensor::EN_TCAL => {
-                            if cli.print {
-                                RBgpioe::enable_tcal_clock(1);
-                            }
-                        },
-                        Sensor::DIS_TCAL => {
-                            if cli.print {
-                                RBgpioe::disable_tcal_clock();
-                            }
-                        }
-                        Sensor::DAC => {
-                            if cli.print {
-                                RBdac::print_rb_dac();
-                            }
-                        }
-                        _ => println!("bad argument"),
+                Action::Init {  } => {
+                    Command::new("rbsetup").arg("-i").arg("2").stdout(Stdio::null()).spawn().expect("failed to edxecute rbsetup command");
+                    thread::sleep(Duration::from_secs(3));
+                    rb_init::initialize();
+                    if cli.print {
+                        println!("RB is initialized.");
                     }
                 },
-                Action::Set { } => {
-                    todo!();
+                Action::Read {  } => {
+                    println!("--- RB Information ---");
+                    rb_info::RBinfo::print_rb_info();
+                    println!("--- RB Clock Synthesizer ---");
+                    rb_clk::RBclk::print_rb_clk();
+                    println!("--- RB Temperature ---");
+                    rb_temp::RBtemp::print_rb_temp();
+                    println!("--- RB Pressure & Humidity ---");
+                    rb_ph::RBph::print_rb_ph();
+                    println!("--- RB Magnetic Field ---");
+                    rb_mag::RBmag::print_rb_magnetic();
+                    println!("--- RB Voltage, Current and Power ---");
+                    rb_vcp::RBvcp::print_rb_vcp();
                 },
-                Action::Initialize {  } => {
-                    rb_control::initialize();
+                Action::Set {  } => {
+                    Command::new("rbsetup").arg("-i").arg("2").stdout(Stdio::null()).spawn().expect("failed to edxecute rbsetup command");
+                    thread::sleep(Duration::from_secs(3));
+                    if cli.print {
+                        println!("RB is set.");
+                    }
                 },
-                Action::Reset { } => {
-                    todo!();
+                Action::Reset {  } => {
+                    Command::new("rbsetup").arg("-i").arg("2").stdout(Stdio::null()).spawn().expect("failed to edxecute rbsetup command");
+                    thread::sleep(Duration::from_secs(3));
+                    if cli.print {
+                        println!("RB is reset.");
+                    }
                 },
-                Action::Clock {  } => {
-                    RBclk::print_config();
+                Action::GPIO {  } => {
+                    // RBgpioe::print_rb_gpioe();
+                    rb_gpioe::RBgpioe::print_rb_gpioe();
+                    // RBdac::dac_test();
+                }
+                _ => {
+                    println!("bad argument");
                 },
             }
         },
         Board::PB => {
             match cli.action {
-                Action::Read { sensor } => {
-                    match sensor {
-                        Sensor::TS => {
-                            if cli.print {
-                                PBtemperature::print_pb_temp();
-                            }
-                        },
-                        Sensor::CS => {
-                            if cli.print {
-                                PBvcp::print_pb_vcp();
-                            }
-                        },
-                        Sensor::DAC => {
-                            if cli.print {
-                                PBdac::print_pb_dac();
-                            }
-                        },
-                        Sensor::LTB_PWR_ON => {
-                            if cli.print {
-                                LTBpwr::power_on_ltb();
-                            }
-                        },
-                        Sensor::LTB_PWR_OFF => {
-                            if cli.print {
-                                LTBpwr::power_off_ltb();
-                            }
-                        }
-                        _ => println!("bad argument"),
+                Action::Init {  } => {
+                    pb_init::initialize();
+                    if cli.print {
+                        println!("PB is initialized.");
                     }
                 },
-                Action::Set { } => {
-                    todo!();
+                Action::Read {  } => {
+                    println!("--- PB Temperature ---");
+                    pb_temp::PBtemp::print_pb_temp();
+                    println!("--- PB Voltage, Current and Power ---");
+                    pb_vcp::PBvcp::print_pb_vcp();
                 },
-                Action::Initialize {  } => {
-                    pb_control::initialize();
-                },
-                Action::Reset { } => {
-                    todo!();
-                },
-                Action::Clock {  } => {
-                   todo!();
+                _ => {
+                    println!("bad argument");
                 },
             }
         },
         Board::LTB => {
             match cli.action {
-                Action::Read { sensor } => {
-                    match sensor {
-                        Sensor::TS => {
-                            if cli.print {
-                                LTBtemperature::print_ltb_temp();
-                            }
-                        },
-                        Sensor::DAC => {
-                            if cli.print {
-                                LTBdac::print_ltb_dac();
-                            }
-                        }
-                        _ => println!("bad argument"),
+                Action::Init {  } => {
+                    ltb_init::initialize();
+                    if cli.print {
+                        println!("LTB is initialized.");
                     }
                 },
-                Action::Set { } => {
-                    LTBdac::set_threshold();
+                Action::Read {  } => {
+                    println!("--- LTB Temperature ---");
+                    ltb_temp::LTBtemp::print_ltb_temp();
+                    println!("--- LTB Threshold ---");
+                    ltb_dac::LTBdac::print_ltb_dac();
                 },
-                Action::Initialize {  } => {
-                    todo!();
+                Action::Set {  } => {
+                    ltb_dac::LTBdac::set_threshold();
                 },
-                Action::Reset { } => {
-                    LTBdac::reset_threshold();
+                Action::Reset {  } => {
+                    ltb_dac::LTBdac::reset_threshold();
                 },
-                Action::Clock {  } => {
-                    todo!();
-                 },
+                _ => {
+                    println!("bad argument");
+                },
             }
         },
         Board::Preamp => {
             match cli.action {
-                Action::Read { sensor } => {
-                    match sensor {
-                        Sensor::TS => {
-                            if cli.print {
-                                PreampTemp::print_preamp_temp();
-                            }
-                        },
-                        Sensor::BIAS => {
-                            if cli.print {
-                                PreampBiasRead::print_preamp_bias();
-                            }
-                        },
-                        _ => println!("bad argument"),
+                Action::Init {  } => {
+                    preamp_init::initialize();
+                    if cli.print {
+                        println!("Preamps are initialized.");
                     }
                 },
-                Action::Set { } => {
-                    PreampBiasSet::set_bias();
+                Action::Read {  } => {
+                    println!("--- Preamp Board Temperature ---");
+                    preamp_temp::PreampTemp::print_preamp_temp();
+                    println!("--- Preamp Board Bias Voltage ---");
+                    preamp_bias::PreampBiasRead::print_preamp_bias();
                 },
-                Action::Initialize {  } => {
-                    todo!();
+                Action::Set {  } => {
+                    preamp_bias::PreampBiasSet::set_bias();
+                }
+                Action::Reset {  } => {
+                    preamp_bias::PreampBiasSet::reset_bias();
                 },
-                Action::Reset { } => {
-                    PreampBiasSet::reset_bias();
+                _ => {
+                    println!("bad argument");
                 },
-                Action::Clock {  } => {
-                    todo!();
-                 },
+            }
+        },
+        Board::ALL => {
+            match cli.action {
+                Action::Init {  } => {
+                    Command::new("rbsetup").arg("-i").arg("2").stdout(Stdio::null()).spawn().expect("failed to edxecute rbsetup command");
+                    thread::sleep(Duration::from_secs(3));
+                    rb_init::initialize();
+                    if cli.print {
+                        println!("RB is initialized.");
+                    }
+                    pb_init::initialize();
+                    if cli.print {
+                        println!("PB is initialized.");
+                    }
+                    ltb_init::initialize();
+                    if cli.print {
+                        println!("LTB is initialized.");
+                    }
+                    preamp_init::initialize();
+                    if cli.print {
+                        println!("Preamps are initialized.");
+                    }
+                },
+                Action::Read {  } => {
+                    println!("########## Readout Board Sensors ########################");
+                    println!("");
+                    println!("--- RB Information ---");
+                    rb_info::RBinfo::print_rb_info();
+                    println!("--- RB Clock Synthesizer ---");
+                    rb_clk::RBclk::print_rb_clk();
+                    println!("--- RB Temperature ---");
+                    rb_temp::RBtemp::print_rb_temp();
+                    println!("--- RB Pressure & Humidity ---");
+                    rb_ph::RBph::print_rb_ph();
+                    println!("--- RB Magnetic Field ---");
+                    rb_mag::RBmag::print_rb_magnetic();
+                    println!("--- RB Voltage, Current and Power ---");
+                    rb_vcp::RBvcp::print_rb_vcp();
+                    println!("");
+                    println!("########## Power Board Sensors ##########################");
+                    println!("");
+                    println!("--- PB Temperature ---");
+                    pb_temp::PBtemp::print_pb_temp();
+                    println!("--- PB Voltage, Current and Power ---");
+                    pb_vcp::PBvcp::print_pb_vcp();
+                    println!("");
+                    println!("########## Local Trigger Board Sensors ##################");
+                    println!("");
+                    println!("--- LTB Temperature ---");
+                    ltb_temp::LTBtemp::print_ltb_temp();
+                    println!("--- LTB Threshold ---");
+                    ltb_dac::LTBdac::print_ltb_dac();
+                    println!("");
+                    println!("########## Preamp Board Sensors #########################");
+                    println!("");
+                    println!("--- Preamp Board Temperature ---");
+                    preamp_temp::PreampTemp::print_preamp_temp();
+                    println!("--- Preamp Board Bias Voltage ---");
+                    preamp_bias::PreampBiasRead::print_preamp_bias();
+
+                }
+                _ => {
+                    println!("bad argument");
+                },
             }
         }
-        // Board::PB => PBTemp::print_pb_temp(),
-        // Board::LTB => LTBTemp::print_ltb_temp(),
-        // Board::Preamp => PreampTemp::print_preamp_temp(),
-        // _ => println!("bad argument"),
-    };
+    }
 }
