@@ -40,3 +40,43 @@ pub fn set_dac() {
     i2c_mux.reset().expect("cannot reset PCA9548A");
 
 }
+
+pub fn dac_noi_mode() {
+    let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
+    i2c_mux.select(RB_AD5675_CHANNEL).expect("cannot accesss to PCA9548A");
+    let ad5675 = ad5675::AD5675::new(RB_AD5675_ADDRESS);
+
+    ad5675.write_dac(1, 25600);
+
+    i2c_mux.reset().expect("cannot reset PCA9548A");
+}
+
+pub fn dac_vcal_mode() {
+    let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
+    i2c_mux.select(RB_AD5675_CHANNEL).expect("cannot accesss to PCA9548A");
+    let ad5675 = ad5675::AD5675::new(RB_AD5675_ADDRESS);
+
+    ad5675.write_dac(1, 46400);
+
+    i2c_mux.reset().expect("cannot reset PCA9548A");
+}
+
+pub fn dac_tcal_mode() {
+    let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
+    i2c_mux.select(RB_AD5675_CHANNEL).expect("cannot accesss to PCA9548A");
+    let ad5675 = ad5675::AD5675::new(RB_AD5675_ADDRESS);
+
+    ad5675.write_dac(1, 25600);
+
+    i2c_mux.reset().expect("cannot reset PCA9548A");
+}
+
+pub fn dac_sma_mode() {
+    let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
+    i2c_mux.select(RB_AD5675_CHANNEL).expect("cannot accesss to PCA9548A");
+    let ad5675 = ad5675::AD5675::new(RB_AD5675_ADDRESS);
+
+    ad5675.write_dac(1, 25600);
+
+    i2c_mux.reset().expect("cannot reset PCA9548A");
+}

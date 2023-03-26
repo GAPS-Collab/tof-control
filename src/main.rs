@@ -34,6 +34,8 @@ struct Cli {
     reset: bool,
     #[arg(long, help = "RF Input")]
     input: Option<Input>,
+    #[arg(long, help = "Select Mode")]
+    mode: Option<Mode>,
 }
 
 #[derive(Debug, Clone, ValueEnum)]
@@ -51,6 +53,14 @@ enum Input {
     TCA,
 }
 
+#[derive(Debug, Clone, ValueEnum)]
+enum Mode {
+    NOI,
+    VCAL,
+    TCAL,
+    SMA,
+}
+
 fn main() {
     let cli = Cli::parse();
 
@@ -66,16 +76,33 @@ fn main() {
                 Some(input) => {
                     match &input {
                         Input::OFF => {
-                            rb_gpioe::disable_nb3v9312c();
-                            rb_gpioe::rf_input_select(0);
+                            rb_input::disable_rf_input();
                         },
                         Input::SMA => {
-                            rb_gpioe::disable_nb3v9312c();
-                            rb_gpioe::rf_input_select(2);
+                            rb_input::enable_sma_input();
                         },
                         Input::TCA => {
-                            rb_gpioe::enable_nb3v9312c();
-                            rb_gpioe::rf_input_select(1);
+                            rb_input::enable_tca_input();
+                        }
+                    }
+                }
+                None => {
+                }
+            }
+            match &cli.mode {
+                Some(mode) => {
+                    match &mode {
+                        Mode::NOI => {
+                            rb_mode::select_noi_mode();
+                        },
+                        Mode::VCAL => {
+                            rb_mode::select_vcal_mode();
+                        },
+                        Mode::TCAL => {
+                            rb_mode::select_tcal_mode();
+                        },
+                        Mode::SMA => {
+                            rb_mode::select_sma_mode();
                         }
                     }
                 }
