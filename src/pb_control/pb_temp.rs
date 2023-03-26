@@ -2,10 +2,10 @@ use crate::constant::*;
 use crate::device::{pca9548a, tmp1075};
 
 pub struct PBtemp {
-    pds_temp: f32,
-    pas_temp: f32,
-    nas_temp: f32,
-    shv_temp: f32,
+    pub pds_temp: f32,
+    pub pas_temp: f32,
+    pub nas_temp: f32,
+    pub shv_temp: f32,
 }
 
 impl PBtemp {

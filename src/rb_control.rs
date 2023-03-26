@@ -7,3 +7,4 @@ pub mod rb_ph;
 pub mod rb_clk;
 pub mod rb_gpioe;
 pub mod rb_dac;
+pub mod rb_table;

@@ -5,8 +5,8 @@ use crate::constant::*;
 use crate::device::tmp112;
 
 pub struct LTBtemp {
-    trenz_temp: f32,
-    ltb_temp: f32,
+    pub trenz_temp: f32,
+    pub ltb_temp: f32,
 }
 
 impl LTBtemp {

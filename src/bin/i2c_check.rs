@@ -94,14 +94,14 @@ fn main() {
         Err(_LinuxI2CError) => println!("\x1b[91mFailed\x1b[0m => Channel  {}: SI5345 ({:#02X})", RB_SI5345B_CHANNEL, RB_SI5345B_ADDRESS)
     };
 
-    // AD5675
-    rb_gpioe::RBgpioe::dac_reset();
-    i2c_mux_2.select(RB_AD5675_CHANNEL).expect("cannot accesss to PCA9548A");
-    let ad5675 = ad5675::AD5675::new(I2C_BUS, RB_AD5675_ADDRESS).read_dac(0);
-    let ad5675 = match ad5675 {
-        Ok(_u16) => println!("Passed => Channel  {}: AD5675 ({:#02X})", RB_AD5675_CHANNEL, RB_AD5675_ADDRESS),
-        Err(_LinuxI2CError) => println!("\x1b[91mFailed\x1b[0m => Channel  {}: AD5675 ({:#02X})", RB_AD5675_CHANNEL, RB_AD5675_ADDRESS)
-    };
+    // // AD5675
+    // rb_gpioe::RBgpioe::dac_reset();
+    // i2c_mux_2.select(RB_AD5675_CHANNEL).expect("cannot accesss to PCA9548A");
+    // let ad5675 = ad5675::AD5675::new(I2C_BUS, RB_AD5675_ADDRESS).read_dac(0);
+    // let ad5675 = match ad5675 {
+    //     Ok(_u16) => println!("Passed => Channel  {}: AD5675 ({:#02X})", RB_AD5675_CHANNEL, RB_AD5675_ADDRESS),
+    //     Err(_LinuxI2CError) => println!("\x1b[91mFailed\x1b[0m => Channel  {}: AD5675 ({:#02X})", RB_AD5675_CHANNEL, RB_AD5675_ADDRESS)
+    // };
 
     // INA226 (ADC DVDD)
     i2c_mux_2.select(RB_ADC_DVDD_INA226_CHANNEL).expect("cannot accesss to PCA9548A");

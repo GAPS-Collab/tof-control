@@ -1,11 +1,12 @@
+#![allow(unused)]
 use crate::constant::*;
 use crate::memory::*;
 
 pub struct RBinfo {
-    global_ver: u32,
-    global_sha: u32,
-    loss_of_lock: u8,
-    loss_of_lock_stable: u8,
+    pub global_ver: String,
+    pub global_sha: u32,
+    pub loss_of_lock: String,
+    pub loss_of_lock_stable: String,
     // cnt_lost_event: u16,
     // event_counter: u32,
     // trig_received: u32,
@@ -15,11 +16,11 @@ pub struct RBinfo {
 
 impl RBinfo {
     pub fn new() -> Self {
-        let global_ver = read_control_reg(GLOBAL_VER).expect("cannot read GLOBAL_VER register");
+        let global_ver = Self::decode_fw_version(read_control_reg(GLOBAL_VER).expect("cannot read GLOBAL_VER register"));
         let global_sha = read_control_reg(GLOBAL_SHA).expect("cannot read GLOBAL_SHA register");
 
-        let loss_of_lock = (read_control_reg(LOSS_OF_LOCK).expect("cannot read LOSS_OF_LOCK register") as u8);
-        let loss_of_lock_stable = ((read_control_reg(LOSS_OF_LOCK_STABLE).expect("cannot read LOSS_OF_LOCK_STABLE register") as u8) >> 1) & 0x01;
+        let loss_of_lock = Self::decode_loss_of_lock((read_control_reg(LOSS_OF_LOCK).expect("cannot read LOSS_OF_LOCK register") as u8));
+        let loss_of_lock_stable = Self::decode_loss_of_lock_stable(((read_control_reg(LOSS_OF_LOCK_STABLE).expect("cannot read LOSS_OF_LOCK_STABLE register") as u8) >> 1) & 0x01);
 
         // write_control_reg(TRIGGER_ENABLE, 1).expect("cannot write TRIGGER_ENABLE register");
         // let event_counter = read_control_reg(MT_EVENT_CNT).expect("cannot write MT_EVENT_CNT register");
@@ -42,11 +43,11 @@ impl RBinfo {
     }
     pub fn print_rb_info() {
         let rb_info = RBinfo::new();
-        println!("FPGA Firmware Version:    {}", Self::decode_fw_version(rb_info.global_ver));
+        println!("FPGA Firmware Version:    {}", rb_info.global_ver);
         println!("FPGA Firmware Hash:       {:02X}", rb_info.global_sha);
-        println!("Loss of Lock Status:      {}", Self::decode_loss_of_lock(rb_info.loss_of_lock));
+        println!("Loss of Lock Status:      {}", rb_info.loss_of_lock);
         // println!("Loss of Lock Status:      {}", rb_info.loss_of_lock);
-        println!("Loss of Lock Stable:      {}", Self::decode_loss_of_lock_stable(rb_info.loss_of_lock_stable));
+        println!("Loss of Lock Stable:      {}", rb_info.loss_of_lock_stable);
         // println!("Event Counter from MTB:   {}", rb_info.event_counter);
         // println!("Number of Trigger Lost:   {}", rb_info.cnt_lost_event);
         // println!("Number of Trig Received:  {}", rb_info.trig_received);

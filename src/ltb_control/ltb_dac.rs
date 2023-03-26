@@ -2,62 +2,29 @@ use crate::constant::*;
 use crate::device::max5815;
 
 pub struct LTBdac {
-    device_id: u8,
-    rev_id: u8,
-    ref_mode: u8,
-    code0: u16,
-    code1: u16,
-    code2: u16,
-    code3: u16,
-    dac0: u16,
-    dac1: u16,
-    dac2: u16,
-    dac3: u16,
+    pub dac0: f32,
+    pub dac1: f32,
+    pub dac2: f32,
 }
 
 impl LTBdac {
     pub fn new() -> Self {
         let ltb_dac = max5815::MAX5815::new(I2C_BUS, LTB_MAX5815_ADDRESS);
-        let (device_id, rev_id, ref_mode) = ltb_dac.read_device_info().expect("cannot read MAX5815");
-        // let codea = ltb_dac.read_codea().expect("cannot read MAX5815");
-        let code0 = ltb_dac.read_coden(0).expect("cannot read MAX5815");
-        let code1 = ltb_dac.read_coden(1).expect("cannot read MAX5815");
-        let code2 = ltb_dac.read_coden(2).expect("cannot read MAX5815");
-        let code3 = ltb_dac.read_coden(3).expect("cannot read MAX5815");
-        // let daca = ltb_dac.read_daca().expect("cannot read MAX5815");
-        let dac0 = ltb_dac.read_dacn(0).expect("cannot read MAX5815");
-        let dac1 = ltb_dac.read_dacn(1).expect("cannot read MAX5815");
-        let dac2 = ltb_dac.read_dacn(2).expect("cannot read MAX5815");
-        let dac3 = ltb_dac.read_dacn(3).expect("cannot read MAX5815");
+        let dac0 = Self::adc_to_mv(ltb_dac.read_dacn(0).expect("cannot read MAX5815"));
+        let dac1 = Self::adc_to_mv(ltb_dac.read_dacn(1).expect("cannot read MAX5815"));
+        let dac2 = Self::adc_to_mv(ltb_dac.read_dacn(2).expect("cannot read MAX5815"));
 
         Self {
-            device_id,
-            rev_id,
-            ref_mode,
-            code0,
-            code1,
-            code2,
-            code3,
             dac0,
             dac1,
             dac2,
-            dac3,
         }
     }
     pub fn print_ltb_dac() {
         let ltb_dac = LTBdac::new();
-        // println!("--- Device Information ---");
-        // println!("Device ID:        {}", ltb_dac.device_id);
-        // println!("Revision ID:      {}", ltb_dac.rev_id);
-        // println!("Reference Mode:   {}", ltb_dac.ref_mode);
-        // println!("--- Threshold(CODE) ---");
-        // println!("Ch0 Threshold:    {:.3} [mV]({})", Self::adc_to_mv(ltb_dac.dac0), ltb_dac.code0);
-        // println!("Ch1 Threshold:    {:.3} [mV]({})", Self::adc_to_mv(ltb_dac.dac1), ltb_dac.code1);
-        // println!("Ch2 Threshold:    {:.3} [mV]({})", Self::adc_to_mv(ltb_dac.dac2), ltb_dac.code2);
-        // println!("Ch3 Threshold:    {:.3} [mV]({})", Self::adc_to_mv(ltb_dac.dac3), ltb_dac.code3);
-        println!("Ch0 Threshold:            {:.3} [mV]", Self::adc_to_mv(ltb_dac.dac0));
-        println!("Ch1 Threshold:            {:.3} [mV]", Self::adc_to_mv(ltb_dac.dac1));
-        println!("Ch2 Threshold:            {:.3} [mV]", Self::adc_to_mv(ltb_dac.dac2));
+        println!("Threshold 0:            {:.3} [mV]", ltb_dac.dac0);
+        println!("Threshold 1:            {:.3} [mV]", ltb_dac.dac1);
+        println!("Threshold 2:            {:.3} [mV]", ltb_dac.dac2);
     }
     fn adc_to_mv(adc: u16) -> f32 {
         let voltage = LTB_DAC_REF_VOLTAGE * (adc as f32) / 2f32.powf(12.0);

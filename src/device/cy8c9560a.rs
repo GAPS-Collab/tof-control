@@ -41,67 +41,7 @@ const DRIVE_MODE_SLOW_STRONG: u16 = 0x22;
 const DRIVE_MODE_HIGH_Z: u16 = 0x23;
 const DEVICE_INFO: u16 = 0x2E;
 
-/*
-Ports used for Readout Board V2.5.2
-cy8c9560A
-//////////////////////////////////////////
-//Output
-//////////////////////////////////////////
-
-GP0[7]
-GP0[7]: Si5345_FINC
-
-GP1[]
-
-GP2[1:0]
-GP2[1]: HMC849_EN3
-GP2[0]: HMC849_VCTL3
-
-GP3[5:4,2:0]
-GP3[5]: MARS_WDI_GE
-GP3[4]: VCAL_RST
-GP3[2]: Si5345_FDEC
-GP3[1]: ~Si5345_OE
-GP3[0]: ~Si5345_RST
-
-GP4[7:2]
-GP4[7]: HMC849_VCTL6
-GP4[6]: HMC849_EN6
-GP4[5]: HMC849_VCTL7
-GP4[4]: HMC849_EN7
-GP4[3]: HMC849_VCTL8
-GP4[2]: HMC849_EN8
-
-GP5[5:4,1:0]
-GP5[5]: HMC849_EN5
-GP5[4]: HMC849_VCTL5
-GP5[1]: HMC849_EN4
-GP5[0]: HMC849_VCTL4
-
-GP6[]
-
-GP7[7:0]
-GP7[7]: TCA_CLK_SC_EN
-GP7[6]: TCA_CLK_OUT_EN
-GP7[5]: HMC849_EN0
-GP7[4]: HMC849_VCTL0
-GP7[3]: HMC849_EN1
-GP7[2]: HMC849_VCTL1
-GP7[1]: HMC849_EN2
-GP7[0]: HMC849_VCTL2
-
-Initialization Value:
-GP0: 0x00
-GP1: 0xFF
-GP2: 0x03
-GP3: 0x03
-GP4: 0xFC
-GP5: 0x33
-GP6: 0xFF
-GP7: 0x3F
-
-*/
-
+#[derive(Copy, Clone)]
 pub struct CY8C9560A {
     bus: u8,
     address: u16,

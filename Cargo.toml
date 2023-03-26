@@ -1,9 +1,13 @@
 [package]
 name = "tof-control"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
+# build = "build.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+# [target.armv7-unknown-linux-musleabi]
+# linker = "arm-linux-musleabi-gcc"
 
 [profile.release]
 opt-level = "z"
@@ -20,9 +24,34 @@ path = "src/bin/rb_watchdog.rs"
 name = "dac-test"
 path = "src/bin/dac_test.rs"
 
+[[bin]]
+name = "gpioe-watchdog"
+path = "src/bin/gpioe_watchdog.rs"
+
+[[bin]]
+name = "board-id"
+path = "src/bin/board_id.rs"
+
+[[bin]]
+name = "sma-input"
+path = "src/bin/sma_input.rs"
+
+[[bin]]
+name = "clk-synth"
+path = "src/bin/clk_synth.rs"
+
 [dependencies]
 i2cdev = "0.5.1"
+i2c-linux-sys = "0.2.1"
 memmap = "0.7"
 log = "0.4"
 clap = { version = "4.1", features = ["derive"] }
 csv = "1.1"
+comfy-table = "6.1.4"
+gethostname = "0.4.1"
+libc = "0.2.140"
+
+
+[build-dependencies]
+bindgen = "0.64.0"
+cc = "1.0.79"

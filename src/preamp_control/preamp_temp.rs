@@ -2,22 +2,22 @@ use crate::constant::*;
 use crate::device::{pca9548a, max11615, max11617};
 
 pub struct PreampTemp {
-    preamp_tmp_1: f32,
-    preamp_tmp_2: f32,
-    preamp_tmp_3: f32,
-    preamp_tmp_4: f32,
-    preamp_tmp_5: f32,
-    preamp_tmp_6: f32,
-    preamp_tmp_7: f32,
-    preamp_tmp_8: f32,
-    preamp_tmp_9: f32,
-    preamp_tmp_10: f32,
-    preamp_tmp_11: f32,
-    preamp_tmp_12: f32,
-    preamp_tmp_13: f32,
-    preamp_tmp_14: f32,
-    preamp_tmp_15: f32,
-    preamp_tmp_16: f32,
+    pub preamp_tmp_1: f32,
+    pub preamp_tmp_2: f32,
+    pub preamp_tmp_3: f32,
+    pub preamp_tmp_4: f32,
+    pub preamp_tmp_5: f32,
+    pub preamp_tmp_6: f32,
+    pub preamp_tmp_7: f32,
+    pub preamp_tmp_8: f32,
+    pub preamp_tmp_9: f32,
+    pub preamp_tmp_10: f32,
+    pub preamp_tmp_11: f32,
+    pub preamp_tmp_12: f32,
+    pub preamp_tmp_13: f32,
+    pub preamp_tmp_14: f32,
+    pub preamp_tmp_15: f32,
+    pub preamp_tmp_16: f32,
 }
 
 impl PreampTemp {
@@ -77,7 +77,7 @@ impl PreampTemp {
     }
     fn voltage_to_temp(voltage: f32) -> f32 {
         let mut temperature = (voltage - 0.5) * 100.0;
-        if -40.0 > temperature || temperature > 150.0 {
+        if -60.0 > temperature || temperature > 150.0 {
             temperature = 500.0;
         }
 

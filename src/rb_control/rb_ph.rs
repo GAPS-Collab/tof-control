@@ -3,8 +3,8 @@ use crate::constant::*;
 use crate::device::{pca9548a, bme280};
 
 pub struct RBph {
-    pressure: f32,
-    humidity: f32,
+    pub pressure: f32,
+    pub humidity: f32,
 }
 
 impl RBph {

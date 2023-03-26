@@ -1,3 +1,4 @@
+#![allow(unused)]
 use crate::constant::*;
 
 use crate::device::{pca9548a, si5345b};
@@ -36,4 +37,37 @@ impl RBclk {
         let si5345b = si5345b::SI5345B::new(I2C_BUS, RB_SI5345B_ADDRESS);
         si5345b.configure_si5345b().expect("cannot configure SI5345B");
     }
+}
+
+pub fn configure_clk_synth() {
+    let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
+    i2c_mux.select(RB_SI5345B_CHANNEL).expect("cannot accesss to PCA9548A");
+
+    let si5345b = si5345b::SI5345B::new(I2C_BUS, RB_SI5345B_ADDRESS);
+
+    si5345b.configure_si5345b().expect("cannot configure SI5345B");
+
+    i2c_mux.reset().expect("cannot reset PCA9548A");
+}
+
+pub fn hard_reset_clk_synth() {
+    let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
+    i2c_mux.select(RB_SI5345B_CHANNEL).expect("cannot accesss to PCA9548A");
+
+    let si5345b = si5345b::SI5345B::new(I2C_BUS, RB_SI5345B_ADDRESS);
+
+    si5345b.hard_reset_si5345b().expect("cannot hard reset SI5345B");
+
+    i2c_mux.reset().expect("cannot reset PCA9548A");
+}
+
+pub fn soft_reset_clk_synth() {
+    let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
+    i2c_mux.select(RB_SI5345B_CHANNEL).expect("cannot accesss to PCA9548A");
+
+    let si5345b = si5345b::SI5345B::new(I2C_BUS, RB_SI5345B_ADDRESS);
+
+    si5345b.soft_reset_si5345b().expect("cannot soft reset SI5345B");
+
+    i2c_mux.reset().expect("cannot reset PCA9548A");
 }

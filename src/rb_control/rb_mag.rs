@@ -2,10 +2,10 @@ use crate::constant::*;
 use crate::device::{pca9548a, lis3mdltr};
 
 pub struct RBmag {
-    magnetic_x: f32,
-    magnetic_y: f32,
-    magnetic_z: f32,
-    magnetic_t: f32,
+    pub magnetic_x: f32,
+    pub magnetic_y: f32,
+    pub magnetic_z: f32,
+    pub magnetic_t: f32,
 }
 
 impl RBmag {

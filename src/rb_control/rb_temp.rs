@@ -1,15 +1,16 @@
+#![allow(unused)]
 use crate::constant::*;
 use crate::memory::*;
 
 use crate::device::{pca9548a, tmp112, lis3mdltr, bme280};
 
 pub struct RBtemp {
-    drs_temp: f32,
-    clk_temp: f32,
-    adc_temp: f32,
-    lis3mdltr_temp: f32,
-    bme280_temp: f32,
-    zynq_temp: f32,
+    pub drs_temp: f32,
+    pub clk_temp: f32,
+    pub adc_temp: f32,
+    pub lis3mdltr_temp: f32,
+    pub bme280_temp: f32,
+    pub zynq_temp: f32,
 }
 
 impl RBtemp {

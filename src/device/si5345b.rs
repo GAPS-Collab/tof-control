@@ -10,6 +10,8 @@ use i2cdev::linux::{LinuxI2CDevice, LinuxI2CError};
 const SET_PAGE: u16 = 0x01;
 
 const LOL_HOLD_STATUS: u16 = 0x00E;
+const SOFT_RST_ALL: u16 = 0x001C; // Bits: 0
+const HARD_RST: u16 = 0x001E; // Bits: 1
 
 pub struct SI5345B {
     bus: u8,
@@ -71,6 +73,27 @@ impl SI5345B {
                 thread::sleep(Duration::from_millis(300));
             }
         }
+
+        Ok(())
+    }
+    pub fn hard_reset_si5345b(&self) -> Result<(), LinuxI2CError> {
+        let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", self.bus), self.address)?;
+        dev.smbus_write_byte_data(SET_PAGE as u8, ((HARD_RST >> 8) as u8));
+
+        let mut value = dev.smbus_read_byte_data((HARD_RST & 0xFF) as u8)?;
+        value = value | 0x02;
+        dev.smbus_write_byte_data((HARD_RST & 0xFF) as u8, value);
+
+        value = value & 0xFD;
+        dev.smbus_write_byte_data((HARD_RST & 0xFF) as u8, value);
+
+        Ok(())
+    }
+    pub fn soft_reset_si5345b(&self) -> Result<(), LinuxI2CError> {
+        let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", self.bus), self.address)?;
+        dev.smbus_write_byte_data(SET_PAGE as u8, ((SOFT_RST_ALL >> 8) as u8));
+
+        dev.smbus_write_byte_data((SOFT_RST_ALL & 0xFF) as u8, 0x01);
 
         Ok(())
     }
