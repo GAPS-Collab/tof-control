@@ -9,29 +9,17 @@ use crate::memory::*;
 
 pub fn initialize() {
     initialize_gpioe();
-    println!("initialize_gpioe done");
     initialize_clk_synth();
-    println!("initialize_clk_synth done");
     initialize_rf_input();
-    println!("initialize_rf_input done");
     initialize_dac();
-    println!("initialize_dac done");
 
     initialize_env_ics();
-    println!("initialize_env_ics done");
 
     set_board_id();
-    println!("set_board_id done");
     disable_daq_fragment();
-    println!("disable_daq_fragment done");
     enable_spike_clean();
-    println!("enable_spike_clean done");
     enable_all_channels();
-    println!("enable_all_channels done");
-    // // 1 milisec sleep
-    // thread::sleep(Duration::from_millis(1));
     start_drs();
-    println!("start_drs done");
 }
 
 fn initialize_gpioe() {
@@ -44,7 +32,8 @@ fn initialize_clk_synth() {
 }
 
 fn initialize_rf_input() {
-    rb_gpioe::rf_input_select(1);
+    // SMA Input
+    rb_gpioe::rf_input_select(2);
 }
 
 fn initialize_dac() {

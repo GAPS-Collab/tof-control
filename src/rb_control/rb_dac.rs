@@ -29,7 +29,8 @@ pub fn set_dac() {
     ad5675.write_dac(1, 25600);
     // offset
     // DRS ROFS 1V, 1.6V max
-    ad5675.write_dac(2, 35200);
+    // ad5675.write_dac(2, 35200);
+    ad5675.write_dac(2, 42500);
     // THS4509 common mode voltage: V_CM
 	// For +3.5 V and -1.5 V split supply, half range is 1 V
     ad5675.write_dac(3, 32000);

@@ -413,8 +413,8 @@ pub fn disable_nb3v9312c() {
     
     hmcChannel: 0 - 8
     mode: 0: RFC = OFF  (No Connection)
-          1: RFC -> RF1 (RF Input )
-          2: RFC -> RF2 (TCA Calibration input)
+          1: RFC -> RF1 (TCA Calibration Input)
+          2: RFC -> RF2 (SMA Input)
 
 */
 

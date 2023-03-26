@@ -63,13 +63,13 @@ else
     # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb07:~/bin
     # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb08:~/bin
     # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb09:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb10:~/bin
+    scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb10:~/bin
     # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb11:~/bin
     # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb12:~/bin
     # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb13:~/bin
     # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb14:~/bin
     # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb15:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb16:~/bin
+    scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb16:~/bin
     # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb17:~/bin
     # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb18:~/bin
     # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb19:~/bin
@@ -80,7 +80,7 @@ else
     # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb52-ssl:~/bin
 
     # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb05:~/bin
-    scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb10:~/takeru_dev
+    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb10:~/takeru_dev
     # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb21:~/takeru_dev
     # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb22:~/takeru_dev
 

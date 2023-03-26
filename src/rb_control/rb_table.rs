@@ -27,6 +27,10 @@ pub fn rb_info_table() {
             Cell::new("Value").add_attribute(Attribute::Bold),
         ])
         .add_row(vec![
+            Cell::new("Board ID"),
+            Cell::new(&format!("{}", rb_info.board_id)),
+        ])
+        .add_row(vec![
             Cell::new("FPGA Firmware Version"),
             Cell::new(&format!("{}", rb_info.global_ver)),
         ])

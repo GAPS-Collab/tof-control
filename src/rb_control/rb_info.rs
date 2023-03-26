@@ -3,6 +3,7 @@ use crate::constant::*;
 use crate::memory::*;
 
 pub struct RBinfo {
+    pub board_id: u8,
     pub global_ver: String,
     pub global_sha: u32,
     pub loss_of_lock: String,
@@ -16,6 +17,7 @@ pub struct RBinfo {
 
 impl RBinfo {
     pub fn new() -> Self {
+        let board_id = read_control_reg(BOARD_ID).expect("cannot read BOARD_ID register") as u8;
         let global_ver = Self::decode_fw_version(read_control_reg(GLOBAL_VER).expect("cannot read GLOBAL_VER register"));
         let global_sha = read_control_reg(GLOBAL_SHA).expect("cannot read GLOBAL_SHA register");
 
@@ -30,6 +32,7 @@ impl RBinfo {
         // let lost_trigger_rate = read_control_reg(LOST_TRIGGER_RATE).expect("cannot read LOST_TRIGGER_RATE register");
 
         Self {
+            board_id,
             global_ver,
             global_sha,
             loss_of_lock,
@@ -43,6 +46,7 @@ impl RBinfo {
     }
     pub fn print_rb_info() {
         let rb_info = RBinfo::new();
+        println!("Board ID:                 {}", rb_info.board_id);
         println!("FPGA Firmware Version:    {}", rb_info.global_ver);
         println!("FPGA Firmware Hash:       {:02X}", rb_info.global_sha);
         println!("Loss of Lock Status:      {}", rb_info.loss_of_lock);

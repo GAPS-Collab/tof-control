@@ -68,17 +68,14 @@ fn main() {
                         Input::OFF => {
                             rb_gpioe::disable_nb3v9312c();
                             rb_gpioe::rf_input_select(0);
-                            // rb_gpioe::read_port();
                         },
                         Input::SMA => {
                             rb_gpioe::disable_nb3v9312c();
-                            rb_gpioe::rf_input_select(1);
-                            // rb_gpioe::read_port();
+                            rb_gpioe::rf_input_select(2);
                         },
                         Input::TCA => {
                             rb_gpioe::enable_nb3v9312c();
-                            rb_gpioe::rf_input_select(2);
-                            // rb_gpioe::read_port();
+                            rb_gpioe::rf_input_select(1);
                         }
                     }
                 }
