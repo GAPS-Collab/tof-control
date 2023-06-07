@@ -239,3 +239,28 @@ pub const PREAMP_DAC_13_VOLTAGE: f32 = 58.0; // DAC2, MAX5825
 pub const PREAMP_DAC_14_VOLTAGE: f32 = 58.0; // DAC2, MAX5825
 pub const PREAMP_DAC_15_VOLTAGE: f32 = 58.0; // DAC2, MAX5825
 pub const PREAMP_DAC_16_VOLTAGE: f32 = 58.0; // DAC2, MAX5825
+
+// I2C Options for CPC
+pub const CPC_TMP1075_ADDRESS: u16 = 0x48;
+
+pub const CPC_INA219_ADDRESS: u16 = 0x46;
+pub const CPC_INA219_RSHUNT: f32 = 0.03;
+pub const CPC_INA219_MEC: f32 = 1.25;
+
+pub const CPC_MAX7320_ADDRESS: u16 = 0x59;
+
+// I2C Options for TCPC
+pub const TCPC_TMP1075_ADDRESS: u16 = 0x48;
+
+pub const TCPC_INA219_ADDRESS: u16 = 0x46;
+pub const TCPC_INA219_RSHUNT: f32 = 0.03;
+pub const TCPC_INA219_MEC: f32 = 1.25;
+
+pub const TCPC_MAX7320_ADDRESS: u16 = 0x59;
+
+// InfluxDB Options
+pub const INFLUXDB_ORG: &'static str = "gaps";
+pub const INFLUXDB_URL: &'static str = "http://10.0.1.1:8086";
+pub const INFLUXDB_URL_UCLA: &'static str = "http://10.0.1.5:8086";
+pub const INFLUXDB_TOKEN: &'static str = "x4aIWRXyDX6gppuY7ByYaNeIhxSEpwGQbEv4D3SRDfN4-hyE3zmunrtjcyNIx7mq10wSqAJLklrLiAGq61V1Vg==";
+pub const INFLUXDB_TOKEN_UCLA: &'static str = "WXqbeoDBq0euIIK-1OyBKrJ0R4XwOq5TZaZiIEtKTlcXgqTLo8tMIZgkft3OTgTQD2LQyejRo8h3mrMWsCTfYw==";

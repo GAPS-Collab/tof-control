@@ -75,6 +75,9 @@ impl PreampTemp {
             preamp_tmp_16,
         }
     }
+    // fn read_temp(channel: u8) -> f32 {
+        
+    // }
     fn voltage_to_temp(voltage: f32) -> f32 {
         let mut temperature = (voltage - 0.5) * 100.0;
         if -60.0 > temperature || temperature > 150.0 {

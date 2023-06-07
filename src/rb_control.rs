@@ -11,3 +11,5 @@ pub mod rb_dac;
 pub mod rb_table;
 pub mod rb_input;
 pub mod rb_mode;
+pub mod rb_influxdb;
+pub mod rb_config;

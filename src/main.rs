@@ -36,6 +36,8 @@ struct Cli {
     input: Option<Input>,
     #[arg(long, help = "Select Mode")]
     mode: Option<Mode>,
+    #[arg(long, help = "Select LTB Mode")]
+    ltb_mode: Option<LTBMode>,
 }
 
 #[derive(Debug, Clone, ValueEnum)]
@@ -59,6 +61,11 @@ enum Mode {
     VCAL,
     TCAL,
     SMA,
+}
+
+#[derive(Debug, Clone, ValueEnum)]
+enum LTBMode {
+    UCLA,
 }
 
 fn main() {
@@ -130,6 +137,17 @@ fn main() {
             };
             if cli.reset {
                 ltb_dac::LTBdac::reset_threshold();
+            }
+            match &cli.ltb_mode {
+                Some(ltb_mode) => {
+                    match &ltb_mode {
+                        LTBMode::UCLA => {
+                            ltb_mode::ucla_mode();
+                        }
+                    }
+                }
+                None => {
+                }
             }
         },
         Board::Preamp => {

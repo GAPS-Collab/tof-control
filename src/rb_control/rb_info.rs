@@ -61,10 +61,11 @@ impl RBinfo {
     fn decode_fw_version(global_ver: u32) -> String {
         let global_ver_str = format!("{:08X}", global_ver);
 
-        let major_ver = &global_ver_str[..2].parse::<u8>().unwrap();
-        let minor_ver = &global_ver_str[2..4].parse::<u8>().unwrap();
-        let patch = &global_ver_str[4..].parse::<u8>().unwrap();
+        let major_ver = i64::from_str_radix(&global_ver_str[..2], 16).unwrap() as u8;
+        let minor_ver = i64::from_str_radix(&global_ver_str[2..4], 16).unwrap() as u8;
+        let patch = i64::from_str_radix(&global_ver_str[4..], 16).unwrap() as u8;
         let version = format!("{}.{}.{}", major_ver, minor_ver, patch);
+
 
         version
     }

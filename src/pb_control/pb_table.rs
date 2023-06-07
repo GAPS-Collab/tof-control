@@ -30,7 +30,7 @@ pub fn pb_env_table() {
         ])
         .add_row(vec![
             Cell::new("3.6V Line Temperature"),
-            Cell::new(&format!("{:.3}", pb_temp.pds_temp)),
+            Cell::new(&format!("{:.3}", pb_temp.pas_temp)),
             Cell::new("°C"),
         ])
         .add_row(vec![

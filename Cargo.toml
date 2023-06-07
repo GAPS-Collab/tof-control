@@ -1,6 +1,6 @@
 [package]
 name = "tof-control"
-version = "0.2.2"
+version = "0.2.4"
 edition = "2021"
 # build = "build.rs"
 
@@ -40,6 +40,26 @@ path = "src/bin/sma_input.rs"
 name = "clk-synth"
 path = "src/bin/clk_synth.rs"
 
+[[bin]]
+name = "tof-influxdb"
+path = "src/bin/tof_influxdb.rs"
+
+[[bin]]
+name = "cpc-control"
+path = "src/bin/cpc_control.rs"
+
+[[bin]]
+name = "cpc-influxdb"
+path = "src/bin/cpc_influxdb.rs"
+
+[[bin]]
+name = "tcpc-control"
+path = "src/bin/tcpc_control.rs"
+
+[[bin]]
+name = "tcpc-influxdb"
+path = "src/bin/tcpc_influxdb.rs"
+
 [dependencies]
 i2cdev = "0.5.1"
 i2c-linux-sys = "0.2.1"
@@ -50,7 +70,13 @@ csv = "1.1"
 comfy-table = "6.1.4"
 gethostname = "0.4.1"
 libc = "0.2.140"
-
+openssl = { version = "0.10", features = ["vendored"] }
+influxdb2 = "0.4.0"
+# tokio = "1.27.0"
+tokio = { version = "1.27.0", features = ["macros", "rt-multi-thread"] }
+futures = "0.3.28"
+chrono = "0.4.24"
+influxdb2-derive = "0.1.1"
 
 [build-dependencies]
 bindgen = "0.64.0"
