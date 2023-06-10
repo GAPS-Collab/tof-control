@@ -20,7 +20,10 @@ use tof_control::preamp_control::*;
 async fn main() {
     // let rat_config = rb_config::RBConfig::new();
     // println!("{:?}", rat_config.rb1_id_arr);
-    rb_matching().await;
+    loop {
+        rb_matching().await;
+        thread::sleep(Duration::from_secs(10));
+    }
 }
 
 async fn rb_matching() {

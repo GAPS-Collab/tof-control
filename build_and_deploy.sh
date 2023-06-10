@@ -64,8 +64,9 @@ elif [ "$1" = "tof-influxdb" ]; then
     # scp target/armv7-unknown-linux-musleabi/release/gpioe-watchdog tof-rb00:~/takeru_dev
     # scp target/armv7-unknown-linux-musleabi/release/tof-influxdb tof-rb16:~/takeru_dev
     # scp target/armv7-unknown-linux-musleabi/release/tof-influxdb tof-rb25:~/takeru_dev
-    scp target/armv7-unknown-linux-musleabi/release/tof-influxdb tof-rb43:~/takeru_dev
-    scp target/armv7-unknown-linux-musleabi/release/tof-influxdb tof-rb44:~/takeru_dev
+    scp target/armv7-unknown-linux-musleabi/release/tof-influxdb tof-rb43:~/bin
+    scp target/armv7-unknown-linux-musleabi/release/tof-influxdb tof-rb44:~/bin
+    cp target/armv7-unknown-linux-musleabi/release/tof-influxdb /home/gaps/nts_bin
 else
     CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
     cross build --bin tof-control --target=armv7-unknown-linux-musleabi
