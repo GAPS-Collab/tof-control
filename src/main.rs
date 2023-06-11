@@ -30,6 +30,8 @@ struct Cli {
     status: bool,
     #[clap(long, help = "Set")]
     set: bool,
+    #[clap(long, help = "Set SiPM Bias Voltage Manually", required = false)]
+    manual: Option<f32>,
     #[clap(long, help = "Reset")]
     reset: bool,
     #[arg(long, help = "RF Input")]
@@ -159,6 +161,14 @@ fn main() {
             }
             if cli.set {
                 preamp_bias::PreampBiasSet::set_bias();
+            }
+            if cli.manual != None {
+                let bias = cli.manual.unwrap();
+                if bias >= 0.0 && bias <= 68.0{
+                    preamp_bias::PreampBiasSet::set_bias_manual(cli.manual.unwrap());
+                } else {
+                    println!("Bias voltage must be between 0.0V to 68.0V");
+                }
             }
             if cli.reset {
                 preamp_bias::PreampBiasSet::reset_bias();
