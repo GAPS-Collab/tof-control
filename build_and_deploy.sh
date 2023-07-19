@@ -111,6 +111,7 @@ else
     # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb21:~/takeru_dev
     # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb22:~/takeru_dev
     scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb43:~/takeru_dev
+    cp target/armv7-unknown-linux-musleabi/debug/tof-control /home/gaps/nts_bin
 
     # ## SSL
     # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb01:~/bin
