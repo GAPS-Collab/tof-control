@@ -43,9 +43,13 @@ elif [ "$1" = "clk-synth" ]; then
     # scp target/armv7-unknown-linux-musleabi/release/gpioe-watchdog tof-rb00:~/takeru_dev
     scp target/armv7-unknown-linux-musleabi/release/clk-synth tof-rb10:~/takeru_dev
 elif [ "$1" = "cpc-control" ]; then
-    CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
-    cross build --release --bin cpc-control --target=aarch64-unknown-linux-musl
-    scp target/aarch64-unknown-linux-musl/release/cpc-control tof-pi3:~/
+    # CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
+    # cross build --release --bin cpc-control --target=aarch64-unknown-linux-musl
+    # scp target/aarch64-unknown-linux-musl/release/cpc-control tof-pi3:~/
+    # scp target/aarch64-unknown-linux-musl/release/cpc-control tof-pi3:~/
+    CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
+    cross build --bin cpc-control --target=x86_64-unknown-linux-musl
+    scp target/x86_64-unknown-linux-musl/debug/cpc-control tof-computer:~/takeruhayashi
 elif [ "$1" = "cpc-influxdb" ]; then
     CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
     cross build --release --bin cpc-influxdb --target=aarch64-unknown-linux-musl
