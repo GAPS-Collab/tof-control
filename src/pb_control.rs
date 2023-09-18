@@ -4,4 +4,5 @@ pub mod pb_vcp;
 pub mod pb_dac;
 pub mod pb_ltb_pwr;
 pub mod pb_table;
+#[cfg(feature="influxdb")]
 pub mod pb_influxdb;
