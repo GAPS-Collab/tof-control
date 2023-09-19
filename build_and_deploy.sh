@@ -71,6 +71,10 @@ elif [ "$1" = "tof-influxdb" ]; then
     scp target/armv7-unknown-linux-musleabi/release/tof-influxdb tof-rb43:~/bin
     scp target/armv7-unknown-linux-musleabi/release/tof-influxdb tof-rb44:~/bin
     cp target/armv7-unknown-linux-musleabi/release/tof-influxdb /home/gaps/nts_bin
+elif [ "$1" = "rb-clk-nvm" ]; then
+    CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
+    cross build --release --bin rb-clk-nvm --target=armv7-unknown-linux-musleabi
+    scp target/armv7-unknown-linux-musleabi/release/rb-clk-nvm tof-rb00:~/bin
 else
     CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
     cross build --bin tof-control --target=armv7-unknown-linux-musleabi

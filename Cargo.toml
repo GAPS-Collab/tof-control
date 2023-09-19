@@ -60,6 +60,11 @@ path = "src/bin/tcpc_control.rs"
 name = "tcpc-influxdb"
 path = "src/bin/tcpc_influxdb.rs"
 
+[[bin]]
+name = "rb-clk-nvm"
+path = "src/bin/rb_clk_nvm.rs"
+
+
 [dependencies]
 i2cdev = "0.5.1"
 i2c-linux-sys = "0.2.1"
