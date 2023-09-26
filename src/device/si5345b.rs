@@ -88,65 +88,78 @@ impl SI5345B {
     pub fn configure_nvm_si5345b(&self) -> Result<(), LinuxI2CError> {
         let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", self.bus), self.address)?;
 
-        /// Write all registers as needed
-        self.configure_si5345b()?;
-
-        /// Write identification into the user scratch space (registers 0x026B to 0x0272)
-        let design_id = String::from("RB2.5.2");
-        let mut design_id_ary: [u8; 8] = [0; 8];
-        for (i, char) in design_id.clone().into_bytes().iter().enumerate() {
-            design_id_ary[i] = *char;
-        }
-        let mut scratch_space_reg: u16 = 0x026B;
-        println!("Writing identification into the user scratch space (registers 0x026B to 0x0272)...");
-        for byte in design_id_ary.iter() {
-            let page = scratch_space_reg >> 8;
-            let register = scratch_space_reg & 0xFF;
-            dev.smbus_write_byte_data(SET_PAGE as u8, page as u8);
-            dev.smbus_write_byte_data(register as u8, *byte);
-            // println!("Page: {:x}, Register: {:x}, Data: {:x}", page, register, byte);
-            // let mut original_data = dev.smbus_read_byte_data(register as u8)?;
-            // println!("Page: {:x}, Register: {:x}, Original Data: {:x}", page, register, original_data);
-
-            scratch_space_reg += 1;
+        /// Check how many user bank writes has carried out so far
+        let active_nvm_bank_page = ACTIVE_NVM_BANK >> 8;
+        let active_nvm_bank_reg = ACTIVE_NVM_BANK & 0xFF;
+        dev.smbus_write_byte_data(SET_PAGE as u8, active_nvm_bank_page as u8);
+        let active_nvm_bank = dev.smbus_read_byte_data(active_nvm_bank_reg as u8)?;
+        match active_nvm_bank {
+            3 => println!("Number of User Banks Burned: 1\nNumber of User Banks Available to Burn: 2"),
+            15 => println!("Number of User Banks Burned: 2\nNumber of User Banks Available to Burn: 1"),
+            63 => println!("Number of User Banks Burned: 3\nNumber of User Banks Available to Burn: 0"),
+            _ => println!("ACTIVE_NVM_BANK Error"),
         }
 
-        /// Write 0xC7 to NVM_WRITE (0x00E3) register
-        let nvm_write_page = NVM_WRITE >> 8;
-        let nvm_write_reg = NVM_WRITE & 0xFF;
-        println!("Writing 0xC7 to NVM_WRITE (0x00E3) register...");
-        dev.smbus_write_byte_data(SET_PAGE as u8, nvm_write_page as u8);
-        dev.smbus_write_byte_data(nvm_write_reg as u8, 0xC7);
-        thread::sleep(Duration::from_millis(300));
+        // /// Write all registers as needed
+        // self.configure_si5345b()?;
+        // thread::sleep(Duration::from_millis(300));
+
+        // /// Write identification into the user scratch space (registers 0x026B to 0x0272)
+        // let design_id = String::from("RB2.5.2");
+        // let mut design_id_ary: [u8; 8] = [0; 8];
+        // for (i, char) in design_id.clone().into_bytes().iter().enumerate() {
+        //     design_id_ary[i] = *char;
+        // }
+        // let mut scratch_space_reg: u16 = 0x026B;
+        // println!("Writing identification into the user scratch space (registers 0x026B to 0x0272)...");
+        // for byte in design_id_ary.iter() {
+        //     let page = scratch_space_reg >> 8;
+        //     let register = scratch_space_reg & 0xFF;
+        //     dev.smbus_write_byte_data(SET_PAGE as u8, page as u8);
+        //     dev.smbus_write_byte_data(register as u8, *byte);
+        //     // println!("Page: {:x}, Register: {:x}, Data: {:x}", page, register, byte);
+        //     // let mut original_data = dev.smbus_read_byte_data(register as u8)?;
+        //     // println!("Page: {:x}, Register: {:x}, Original Data: {:x}", page, register, original_data);
+
+        //     scratch_space_reg += 1;
+        // }
+
+        // /// Write 0xC7 to NVM_WRITE (0x00E3) register
+        // let nvm_write_page = NVM_WRITE >> 8;
+        // let nvm_write_reg = NVM_WRITE & 0xFF;
+        // println!("Writing 0xC7 to NVM_WRITE (0x00E3) register...");
         // dev.smbus_write_byte_data(SET_PAGE as u8, nvm_write_page as u8);
-        // let nvm_write_data = dev.smbus_read_byte_data(nvm_write_reg as u8)?;
-        // println!("{:#x?}: {:#x?}", NVM_WRITE, nvm_write_data);
+        // dev.smbus_write_byte_data(nvm_write_reg as u8, 0xC7);
+        // thread::sleep(Duration::from_millis(300));
+        // // dev.smbus_write_byte_data(SET_PAGE as u8, nvm_write_page as u8);
+        // // let nvm_write_data = dev.smbus_read_byte_data(nvm_write_reg as u8)?;
+        // // println!("{:#x?}: {:#x?}", NVM_WRITE, nvm_write_data);
 
-        /// Wait until DEVICE_READY (0x00FE) = 0x0F
-        let device_ready_page = DEVICE_READY >> 8;
-        let device_ready_reg = DEVICE_READY & 0xFF;
-        dev.smbus_write_byte_data(SET_PAGE as u8, device_ready_page as u8);
-        let mut device_ready_data = dev.smbus_read_byte_data(device_ready_reg as u8)?;
-        if device_ready_data != 0x0F {
-            thread::sleep(Duration::from_millis(300));
-        }
-        // println!("{:#x?}: {:#x?}", DEVICE_READY, device_ready_data);
+        // /// Wait until DEVICE_READY (0x00FE) = 0x0F
+        // let device_ready_page = DEVICE_READY >> 8;
+        // let device_ready_reg = DEVICE_READY & 0xFF;
+        // dev.smbus_write_byte_data(SET_PAGE as u8, device_ready_page as u8);
+        // let mut device_ready_data = dev.smbus_read_byte_data(device_ready_reg as u8)?;
+        // if device_ready_data != 0x0F {
+        //     thread::sleep(Duration::from_millis(300));
+        // }
+        // // println!("{:#x?}: {:#x?}", DEVICE_READY, device_ready_data);
 
-        /// Set NVM_READ_BANK (0x00E4[0]) = “1”
-        let nvm_read_bank_page = NVM_READ_BANK >> 8;
-        let nvm_read_bank_reg = NVM_READ_BANK & 0xFF;
-        println!("Writing 1 to NVM_READ_BANK (0x00E4[0]) register...");
-        dev.smbus_write_byte_data(SET_PAGE as u8, nvm_read_bank_page as u8);
-        dev.smbus_write_byte_data(nvm_read_bank_reg as u8, 0x01);
-        thread::sleep(Duration::from_millis(300));
+        // /// Set NVM_READ_BANK (0x00E4[0]) = “1”
+        // let nvm_read_bank_page = NVM_READ_BANK >> 8;
+        // let nvm_read_bank_reg = NVM_READ_BANK & 0xFF;
+        // println!("Writing 1 to NVM_READ_BANK (0x00E4[0]) register...");
+        // dev.smbus_write_byte_data(SET_PAGE as u8, nvm_read_bank_page as u8);
+        // dev.smbus_write_byte_data(nvm_read_bank_reg as u8, 0x01);
+        // thread::sleep(Duration::from_millis(300));
 
-        /// Wait until DEVICE_READY (0x00FE) = 0x0F
-        dev.smbus_write_byte_data(SET_PAGE as u8, device_ready_page as u8);
-        device_ready_data = dev.smbus_read_byte_data(device_ready_reg as u8)?;
-        if device_ready_data != 0x0F {
-            thread::sleep(Duration::from_millis(300));
-        }
-        // println!("{:#x?}: {:#x?}", DEVICE_READY, device_ready_data);
+        // /// Wait until DEVICE_READY (0x00FE) = 0x0F
+        // dev.smbus_write_byte_data(SET_PAGE as u8, device_ready_page as u8);
+        // device_ready_data = dev.smbus_read_byte_data(device_ready_reg as u8)?;
+        // if device_ready_data != 0x0F {
+        //     thread::sleep(Duration::from_millis(300));
+        // }
+        // // println!("{:#x?}: {:#x?}", DEVICE_READY, device_ready_data);
 
         Ok(())
 
