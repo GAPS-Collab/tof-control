@@ -1,0 +1,26 @@
+pub struct PreampMonData {
+    // PB Temperature Sensor
+    pub pds_temp: f32,
+    pub pas_temp: f32,
+    pub nas_temp: f32,
+    pub shv_temp: f32,
+    // PB VCP (Voltage, Current and Power) Sensor
+    pub p3v6_preamp_voltage: f32,
+    pub p3v6_preamp_current: f32,
+    pub p3v6_preamp_power: f32,
+    pub n1v6_preamp_voltage: f32,
+    pub n1v6_preamp_current: f32,
+    pub n1v6_preamp_power: f32,
+    pub p3v4f_ltb_voltage: f32,
+    pub p3v4f_ltb_current: f32,
+    pub p3v4f_ltb_power: f32,
+    pub p3v4d_ltb_voltage: f32,
+    pub p3v4d_ltb_current: f32,
+    pub p3v4d_ltb_power: f32,
+    pub p3v6_ltb_voltage: f32,
+    pub p3v6_ltb_current: f32,
+    pub p3v6_ltb_power: f32,
+    pub n1v6_ltb_voltage: f32,
+    pub n1v6_ltb_current: f32,
+    pub n1v6_ltb_power: f32,
+}

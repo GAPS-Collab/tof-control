@@ -2,6 +2,7 @@
 mod constant;
 mod device;
 mod memory;
+mod helper;
 mod rb_control;
 mod pb_control;
 mod ltb_control;

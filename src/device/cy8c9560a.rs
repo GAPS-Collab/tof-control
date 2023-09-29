@@ -1,6 +1,7 @@
 #![allow(unused)]
 use crate::constant::*;
 
+use i2c_linux_sys::i2c_smbus_read_i2c_block_data;
 use i2cdev::core::*;
 use i2cdev::linux::{LinuxI2CDevice, LinuxI2CError};
 
@@ -39,7 +40,9 @@ const DRIVE_MODE_OPEN_DRAIN_LOW: u16 = 0x20;
 const DRIVE_MODE_STRONG: u16 = 0x21;
 const DRIVE_MODE_SLOW_STRONG: u16 = 0x22;
 const DRIVE_MODE_HIGH_Z: u16 = 0x23;
+const ENABLE_REGISTER: u16 = 0x2D;
 const DEVICE_INFO: u16 = 0x2E;
+const COMMAND: u16 = 0x30;
 
 #[derive(Copy, Clone)]
 pub struct CY8C9560A {
@@ -58,6 +61,31 @@ impl CY8C9560A {
         let device_setting = device_info & 0x01;
 
         Ok((device_family, device_setting))
+    }
+    pub fn read_enable_register(&self) -> Result<u8, LinuxI2CError> {
+        let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", self.bus), self.address)?;
+        let enable_register = dev.smbus_read_byte_data(ENABLE_REGISTER as u8)?;
+        
+        Ok(enable_register)
+    }
+    pub fn enable_eeprom(&self) -> Result<(), LinuxI2CError> {
+        let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", self.bus), self.address)?;
+        let eeprom_enable_sequence: [u8; 4] = [0x43, 0x4D, 0x53, 0x02];
+        dev.smbus_write_i2c_block_data(ENABLE_REGISTER as u8, &eeprom_enable_sequence)?;
+
+        Ok(())
+    }
+    pub fn store_config_eeprom_por(&self) -> Result<(), LinuxI2CError> {
+        let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", self.bus), self.address)?;
+        dev.smbus_write_byte_data(COMMAND as u8, 0x01)?;
+
+        Ok(())
+    }
+    pub fn reset_config_eeprom_por(&self) -> Result<(), LinuxI2CError> {
+        let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", self.bus), self.address)?;
+        dev.smbus_write_byte_data(COMMAND as u8, 0x02)?;
+
+        Ok(())
     }
     pub fn read_port_status(&self, port: u8) -> Result<u8, LinuxI2CError> {
         let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", self.bus), self.address)?;

@@ -25,6 +25,10 @@ name = "dac-test"
 path = "src/bin/dac_test.rs"
 
 [[bin]]
+name = "rb-test"
+path = "src/bin/rb_test.rs"
+
+[[bin]]
 name = "gpioe-watchdog"
 path = "src/bin/gpioe_watchdog.rs"
 
