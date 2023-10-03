@@ -2,7 +2,6 @@ pub mod rb_clk;
 pub mod rb_config;
 pub mod rb_dac;
 pub mod rb_gpioe;
-pub mod rb_influxdb;
 pub mod rb_info;
 pub mod rb_init;
 pub mod rb_input;
