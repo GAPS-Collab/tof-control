@@ -13,6 +13,10 @@ edition = "2021"
 opt-level = "z"
 
 [[bin]]
+name = "ltb-control"
+path = "src/bin/ltb_control.rs"
+
+[[bin]]
 name = "i2c-check"
 path = "src/bin/i2c_check.rs"
 
