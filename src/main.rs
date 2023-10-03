@@ -1,12 +1,12 @@
 #![allow(unused)]
 mod constant;
 mod device;
-mod memory;
 mod helper;
-mod rb_control;
-mod pb_control;
 mod ltb_control;
+mod memory;
+mod pb_control;
 mod preamp_control;
+mod rb_control;
 
 use std::process::{Command, Stdio};
 use std::thread;
@@ -14,16 +14,21 @@ use std::time::Duration;
 
 use clap::{Parser, ValueEnum};
 
-use rb_control::*;
-use pb_control::*;
+use helper::*;
 use ltb_control::*;
+use pb_control::*;
 use preamp_control::*;
+use rb_control::*;
 
 #[derive(Debug, Parser)]
 // #[command(author = "Takeru Hayashi", version, about, long_about = None)]
 #[clap(name = "tof-control", author, about, version)]
 struct Cli {
-    #[arg(short = 'b', long = "board", help = "Board to operate (rb, pb, ltb, or preamp)")]
+    #[arg(
+        short = 'b',
+        long = "board",
+        help = "Board to operate (rb, pb, ltb, or preamp)"
+    )]
     board: Board,
     #[clap(short, long, help = "Show status of board")]
     init: bool,
@@ -83,43 +88,37 @@ fn main() {
                 rb_table::rb_table();
             }
             match &cli.input {
-                Some(input) => {
-                    match &input {
-                        Input::OFF => {
-                            rb_input::disable_rf_input();
-                        },
-                        Input::SMA => {
-                            rb_input::enable_sma_input();
-                        },
-                        Input::TCA => {
-                            rb_input::enable_tca_input();
-                        }
+                Some(input) => match &input {
+                    Input::OFF => {
+                        rb_input::disable_rf_input();
                     }
-                }
-                None => {
-                }
+                    Input::SMA => {
+                        rb_input::enable_sma_input();
+                    }
+                    Input::TCA => {
+                        rb_input::enable_tca_input();
+                    }
+                },
+                None => {}
             }
             match &cli.mode {
-                Some(mode) => {
-                    match &mode {
-                        Mode::NOI => {
-                            rb_mode::select_noi_mode();
-                        },
-                        Mode::VCAL => {
-                            rb_mode::select_vcal_mode();
-                        },
-                        Mode::TCAL => {
-                            rb_mode::select_tcal_mode();
-                        },
-                        Mode::SMA => {
-                            rb_mode::select_sma_mode();
-                        }
+                Some(mode) => match &mode {
+                    Mode::NOI => {
+                        rb_mode::select_noi_mode();
                     }
-                }
-                None => {
-                }
+                    Mode::VCAL => {
+                        rb_mode::select_vcal_mode();
+                    }
+                    Mode::TCAL => {
+                        rb_mode::select_tcal_mode();
+                    }
+                    Mode::SMA => {
+                        rb_mode::select_sma_mode();
+                    }
+                },
+                None => {}
             }
-        },
+        }
         Board::PB => {
             if cli.init {
                 todo!();
@@ -127,7 +126,7 @@ fn main() {
             if cli.status {
                 pb_table::pb_table();
             }
-        },
+        }
         Board::LTB => {
             if cli.init {
                 ltb_init::initialize();
@@ -142,17 +141,14 @@ fn main() {
                 ltb_dac::LTBdac::reset_threshold();
             }
             match &cli.ltb_mode {
-                Some(ltb_mode) => {
-                    match &ltb_mode {
-                        LTBMode::UCLA => {
-                            ltb_mode::ucla_mode();
-                        }
+                Some(ltb_mode) => match &ltb_mode {
+                    LTBMode::UCLA => {
+                        ltb_mode::ucla_mode();
                     }
-                }
-                None => {
-                }
+                },
+                None => {}
             }
-        },
+        }
         Board::Preamp => {
             if cli.init {
                 todo!();
@@ -165,7 +161,7 @@ fn main() {
             }
             if cli.manual != None {
                 let bias = cli.manual.unwrap();
-                if bias >= 0.0 && bias <= 68.0{
+                if bias >= 0.0 && bias <= 68.0 {
                     preamp_bias::PreampBiasSet::set_bias_manual(cli.manual.unwrap());
                 } else {
                     println!("Bias voltage must be between 0.0V to 68.0V");

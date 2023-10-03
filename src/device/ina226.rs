@@ -5,57 +5,62 @@ use i2cdev::core::*;
 use i2cdev::linux::{LinuxI2CDevice, LinuxI2CError};
 
 // Register
-const CONFIG: u16  = 0x00;
-const SHUNT: u16   = 0x01;
-const BUS: u16     = 0x02;
-const POWER: u16   = 0x03;
+const CONFIG: u16 = 0x00;
+const SHUNT: u16 = 0x01;
+const BUS: u16 = 0x02;
+const POWER: u16 = 0x03;
 const CURRENT: u16 = 0x04;
-const CALIB: u16   = 0x05;
+const CALIB: u16 = 0x05;
 // Configuration Parameters
-const CONFIG_RST: u16         = 0xC000;
-const CONFIG_AVG_1: u16       = 0x4000;
-const CONFIG_AVG_4: u16       = 0x4200;
-const CONFIG_AVG_16: u16      = 0x4400;
-const CONFIG_AVG_64: u16      = 0x4600;
-const CONFIG_AVG_128: u16     = 0x4800;
-const CONFIG_AVG_256: u16     = 0x4A00;
-const CONFIG_AVG_512: u16     = 0x4C00;
-const CONFIG_AVG_1024: u16    = 0x4E00;
-const CONFIG_VBUSCT_140: u16  = 0x4000;
-const CONFIG_VBUSCT_204: u16  = 0x4040;
-const CONFIG_VBUSCT_332: u16  = 0x4080;
-const CONFIG_VBUSCT_588: u16  = 0x40C0;
+const CONFIG_RST: u16 = 0xC000;
+const CONFIG_AVG_1: u16 = 0x4000;
+const CONFIG_AVG_4: u16 = 0x4200;
+const CONFIG_AVG_16: u16 = 0x4400;
+const CONFIG_AVG_64: u16 = 0x4600;
+const CONFIG_AVG_128: u16 = 0x4800;
+const CONFIG_AVG_256: u16 = 0x4A00;
+const CONFIG_AVG_512: u16 = 0x4C00;
+const CONFIG_AVG_1024: u16 = 0x4E00;
+const CONFIG_VBUSCT_140: u16 = 0x4000;
+const CONFIG_VBUSCT_204: u16 = 0x4040;
+const CONFIG_VBUSCT_332: u16 = 0x4080;
+const CONFIG_VBUSCT_588: u16 = 0x40C0;
 const CONFIG_VBUSCT_1100: u16 = 0x4100;
 const CONFIG_VBUSCT_2116: u16 = 0x4140;
 const CONFIG_VBUSCT_4156: u16 = 0x4180;
 const CONFIG_VBUSCT_8244: u16 = 0x41C0;
-const CONFIG_VSHCT_140: u16   = 0x4000;
-const CONFIG_VSHCT_204: u16   = 0x4008;
-const CONFIG_VSHCT_332: u16   = 0x4010;
-const CONFIG_VSHCT_588: u16   = 0x4018;
-const CONFIG_VSHCT_1100: u16  = 0x4020;
-const CONFIG_VSHCT_2116: u16  = 0x4028;
-const CONFIG_VSHCT_4156: u16  = 0x4030;
-const CONFIG_VSHCT_8244: u16  = 0x4038;
-const CONFIG_MODE_PDS: u16    = 0x4000; // Power-Down (or Shutdown)
-const CONFIG_MODE_SVT: u16    = 0x4001; // Shunt Voltage, Triggered
-const CONFIG_MODE_BVT: u16    = 0x4002; // Bus Voltage, Triggered
-const CONFIG_MODE_SBT: u16    = 0x4003; // Shunt and Bus, Triggered
-const CONFIG_MODE_PDS_2: u16  = 0x4004; // Power-Down (or Shutdown) 2
-const CONFIG_MODE_SVC: u16    = 0x4005; // Shunt Voltage, Continuous
-const CONFIG_MODE_BVC: u16    = 0x4006; // Bus Voltage, Continuous
-const CONFIG_MODE_SBC: u16    = 0x4007; // Shunt and Bus, Continuous
+const CONFIG_VSHCT_140: u16 = 0x4000;
+const CONFIG_VSHCT_204: u16 = 0x4008;
+const CONFIG_VSHCT_332: u16 = 0x4010;
+const CONFIG_VSHCT_588: u16 = 0x4018;
+const CONFIG_VSHCT_1100: u16 = 0x4020;
+const CONFIG_VSHCT_2116: u16 = 0x4028;
+const CONFIG_VSHCT_4156: u16 = 0x4030;
+const CONFIG_VSHCT_8244: u16 = 0x4038;
+const CONFIG_MODE_PDS: u16 = 0x4000; // Power-Down (or Shutdown)
+const CONFIG_MODE_SVT: u16 = 0x4001; // Shunt Voltage, Triggered
+const CONFIG_MODE_BVT: u16 = 0x4002; // Bus Voltage, Triggered
+const CONFIG_MODE_SBT: u16 = 0x4003; // Shunt and Bus, Triggered
+const CONFIG_MODE_PDS_2: u16 = 0x4004; // Power-Down (or Shutdown) 2
+const CONFIG_MODE_SVC: u16 = 0x4005; // Shunt Voltage, Continuous
+const CONFIG_MODE_BVC: u16 = 0x4006; // Bus Voltage, Continuous
+const CONFIG_MODE_SBC: u16 = 0x4007; // Shunt and Bus, Continuous
 
 pub struct INA226 {
     bus: u8,
     address: u16,
     rshunt: f32, // shunt resistance value
-    mec: f32, // maximum expected current
+    mec: f32,    // maximum expected current
 }
 
 impl INA226 {
     pub fn new(bus: u8, address: u16, rshunt: f32, mec: f32) -> Self {
-        Self { bus, address, rshunt, mec }
+        Self {
+            bus,
+            address,
+            rshunt,
+            mec,
+        }
     }
     pub fn configure(&self) -> Result<(), LinuxI2CError> {
         let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", self.bus), self.address)?;
@@ -75,19 +80,28 @@ impl INA226 {
     pub fn read_data(&self) -> Result<(f32, f32, f32), LinuxI2CError> {
         let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", self.bus), self.address)?;
 
-        let shunt_voltage = self.read_shunt_voltage(&mut dev).expect("cannot read shunt voltage on INA226");
-        let bus_voltage = self.read_bus_voltage(&mut dev).expect("cannot read bus voltage on INA226");
+        let shunt_voltage = self
+            .read_shunt_voltage(&mut dev)
+            .expect("cannot read shunt voltage on INA226");
+        let bus_voltage = self
+            .read_bus_voltage(&mut dev)
+            .expect("cannot read bus voltage on INA226");
 
         let (c_lsb, p_lsb) = self.calibrate(&mut dev).expect("cannot calibrate INA226");
 
-        let current = self.read_current(&mut dev, c_lsb).expect("cannot read current on INA226");
-        let power = self.read_power(&mut dev, p_lsb).expect("cannot read power on INA226");
+        let current = self
+            .read_current(&mut dev, c_lsb)
+            .expect("cannot read current on INA226");
+        let power = self
+            .read_power(&mut dev, p_lsb)
+            .expect("cannot read power on INA226");
 
         Ok((bus_voltage, current, power))
     }
-    fn read_shunt_voltage(&self, dev: &mut LinuxI2CDevice) ->  Result<(f32), LinuxI2CError> {
+    fn read_shunt_voltage(&self, dev: &mut LinuxI2CDevice) -> Result<(f32), LinuxI2CError> {
         let shunt_voltage_raw = dev.smbus_read_i2c_block_data(SHUNT as u8, 2)?;
-        let mut shunt_voltage_adc = ((shunt_voltage_raw[0] as u16) << 8) | (shunt_voltage_raw[1] as u16);
+        let mut shunt_voltage_adc =
+            ((shunt_voltage_raw[0] as u16) << 8) | (shunt_voltage_raw[1] as u16);
         let mut sign: f32 = 1.0;
         if shunt_voltage_adc >= 0x8000 {
             sign = -1.0;

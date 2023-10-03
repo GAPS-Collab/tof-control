@@ -4,7 +4,6 @@ use comfy_table::*;
 
 use crate::rb_control::*;
 
-
 pub fn rb_table() {
     println!("RB Information");
     rb_info_table();
@@ -21,7 +20,8 @@ pub fn rb_info_table() {
 
     let rb_info = rb_info::RBinfo::new();
 
-    table.load_preset(UTF8_FULL)
+    table
+        .load_preset(UTF8_FULL)
         .set_header(vec![
             Cell::new("Information").add_attribute(Attribute::Bold),
             Cell::new("Value").add_attribute(Attribute::Bold),
@@ -46,9 +46,8 @@ pub fn rb_info_table() {
             Cell::new("Loss of Lock Stability"),
             Cell::new(&format!("{}", rb_info.loss_of_lock_stable)),
         ]);
-    
-    println!("{table}");
 
+    println!("{table}");
 }
 
 pub fn rb_env_table() {
@@ -58,7 +57,8 @@ pub fn rb_env_table() {
     let rb_ph = rb_ph::RBph::new();
     let rb_mag = rb_mag::RBmag::new();
 
-    table.load_preset(UTF8_FULL)
+    table
+        .load_preset(UTF8_FULL)
         .set_header(vec![
             Cell::new("Measurement").add_attribute(Attribute::Bold),
             Cell::new("Value").add_attribute(Attribute::Bold),
@@ -144,7 +144,8 @@ pub fn rb_vcp_table() {
 
     let rb_vcp = rb_vcp::RBvcp::new();
 
-    table.load_preset(UTF8_FULL)
+    table
+        .load_preset(UTF8_FULL)
         .set_header(vec![
             Cell::new("Measurement").add_attribute(Attribute::Bold),
             Cell::new("Voltage [V]").add_attribute(Attribute::Bold),

@@ -1,15 +1,15 @@
 #![allow(unused)]
-use gethostname::gethostname;
 use chrono::Utc;
 use futures::prelude::*;
-use std::thread;
-use std::time::Duration;
+use gethostname::gethostname;
 use influxdb2::models::DataPoint;
 use influxdb2::Client;
 use influxdb2_derive::WriteDataPoint;
+use std::thread;
+use std::time::Duration;
 
 use tof_control::constant::*;
-use tof_control::device::{tmp1075, ina219, max7320};
+use tof_control::device::{ina219, max7320, tmp1075};
 
 #[tokio::main]
 async fn main() {
@@ -21,12 +21,15 @@ async fn main() {
 
 // #[tokio::main]
 async fn tcpc_influxdb_write() -> Result<(), Box<dyn std::error::Error>> {
-    let hostname = gethostname().into_string().expect("cannot convert hostname");
+    let hostname = gethostname()
+        .into_string()
+        .expect("cannot convert hostname");
 
     let org = "gaps";
     let bucket = "TCPC01";
     let influx_url = "http://10.97.108.31:8086";
-    let token = "WXqbeoDBq0euIIK-1OyBKrJ0R4XwOq5TZaZiIEtKTlcXgqTLo8tMIZgkft3OTgTQD2LQyejRo8h3mrMWsCTfYw==";
+    let token =
+        "WXqbeoDBq0euIIK-1OyBKrJ0R4XwOq5TZaZiIEtKTlcXgqTLo8tMIZgkft3OTgTQD2LQyejRo8h3mrMWsCTfYw==";
 
     let client = influxdb2::Client::new(influx_url, org, token);
 
@@ -53,7 +56,7 @@ async fn tcpc_influxdb_write() -> Result<(), Box<dyn std::error::Error>> {
     ];
 
     client.write(bucket, stream::iter(points)).await?;
-    
+
     Ok(())
 }
 
@@ -66,9 +69,11 @@ fn tcpc_temperature() -> f64 {
 }
 
 fn tcpc_vcp() -> (f64, f64, f64) {
-    let tcpc_ina219 = ina219::INA219::new(1, TCPC_INA219_ADDRESS, TCPC_INA219_RSHUNT, TCPC_INA219_MEC);
+    let tcpc_ina219 =
+        ina219::INA219::new(1, TCPC_INA219_ADDRESS, TCPC_INA219_RSHUNT, TCPC_INA219_MEC);
     tcpc_ina219.configure().expect("cannot configure INA219");
-    let (tcpc_voltage, tcpc_current, tcpc_power) = tcpc_ina219.read_data().expect("cannot read INA219");
+    let (tcpc_voltage, tcpc_current, tcpc_power) =
+        tcpc_ina219.read_data().expect("cannot read INA219");
 
     (tcpc_voltage as f64, tcpc_current as f64, tcpc_power as f64)
 }

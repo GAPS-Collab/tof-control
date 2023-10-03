@@ -18,11 +18,20 @@ pub struct RBinfo {
 impl RBinfo {
     pub fn new() -> Self {
         let board_id = read_control_reg(BOARD_ID).expect("cannot read BOARD_ID register") as u8;
-        let global_ver = Self::decode_fw_version(read_control_reg(GLOBAL_VER).expect("cannot read GLOBAL_VER register"));
+        let global_ver = Self::decode_fw_version(
+            read_control_reg(GLOBAL_VER).expect("cannot read GLOBAL_VER register"),
+        );
         let global_sha = read_control_reg(GLOBAL_SHA).expect("cannot read GLOBAL_SHA register");
 
-        let loss_of_lock = Self::decode_loss_of_lock((read_control_reg(LOSS_OF_LOCK).expect("cannot read LOSS_OF_LOCK register") as u8));
-        let loss_of_lock_stable = Self::decode_loss_of_lock_stable(((read_control_reg(LOSS_OF_LOCK_STABLE).expect("cannot read LOSS_OF_LOCK_STABLE register") as u8) >> 1) & 0x01);
+        let loss_of_lock = Self::decode_loss_of_lock(
+            (read_control_reg(LOSS_OF_LOCK).expect("cannot read LOSS_OF_LOCK register") as u8),
+        );
+        let loss_of_lock_stable = Self::decode_loss_of_lock_stable(
+            ((read_control_reg(LOSS_OF_LOCK_STABLE)
+                .expect("cannot read LOSS_OF_LOCK_STABLE register") as u8)
+                >> 1)
+                & 0x01,
+        );
 
         // write_control_reg(TRIGGER_ENABLE, 1).expect("cannot write TRIGGER_ENABLE register");
         // let event_counter = read_control_reg(MT_EVENT_CNT).expect("cannot write MT_EVENT_CNT register");
@@ -65,7 +74,6 @@ impl RBinfo {
         let minor_ver = i64::from_str_radix(&global_ver_str[2..4], 16).unwrap() as u8;
         let patch = i64::from_str_radix(&global_ver_str[4..], 16).unwrap() as u8;
         let version = format!("{}.{}.{}", major_ver, minor_ver, patch);
-
 
         version
     }

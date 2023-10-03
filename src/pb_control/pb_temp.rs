@@ -12,7 +12,9 @@ impl PBtemp {
     pub fn new() -> Self {
         let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, PB_PCA9548A_ADDRESS);
 
-        i2c_mux.select(PB_TMP1075_CHANNEL).expect("cannot access to PCA9548A");
+        i2c_mux
+            .select(PB_TMP1075_CHANNEL)
+            .expect("cannot access to PCA9548A");
 
         let pds_tmp1075 = tmp1075::TMP1075::new(I2C_BUS, PB_PDS_TMP1075_ADDRESS);
         pds_tmp1075.config().expect("cannot configure TMP1075");

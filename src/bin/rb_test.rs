@@ -1,7 +1,7 @@
 #![allow(unused)]
 use tof_control::constant::*;
+use tof_control::device::{cy8c9560a, pca9548a, si5345b};
 use tof_control::memory::*;
-use tof_control::device::{pca9548a, cy8c9560a, si5345b};
 
 use tof_control::rb_control::rb_gpioe;
 
@@ -52,10 +52,8 @@ fn main() {
         Err(e) => {
             eprintln!("Error enabling TCAL input on CY8C9560A chip: {:?}", e);
             std::process::exit(1);
-        },
+        }
     }
-
-
 }
 
 fn read_temp() -> Result<f32, RegisterError> {
@@ -94,9 +92,8 @@ fn check_enable_register_cy8c9560a() {
         Err(e) => {
             eprintln!("Error reading CY8C9560A enable register: {:?}", e);
             std::process::exit(1);
-        },
+        }
     }
-
 }
 
 fn enable_eeprom_cy8c9560a() {
@@ -107,7 +104,7 @@ fn enable_eeprom_cy8c9560a() {
         Err(e) => {
             eprintln!("Error enabling EEPROM on CY8C9560A: {:?}", e);
             std::process::exit(1);
-        },
+        }
     }
 }
 
@@ -117,9 +114,12 @@ fn store_config_eeprom_por_cy8c9560a() {
     match cy8c9560a.store_config_eeprom_por() {
         Ok(_) => println!("Successfuly stored current configuration to EEPROM on CY8C9560A"),
         Err(e) => {
-            eprintln!("Error storing current configuration to EEPROM on CY8C9560A: {:?}", e);
+            eprintln!(
+                "Error storing current configuration to EEPROM on CY8C9560A: {:?}",
+                e
+            );
             std::process::exit(1);
-        },
+        }
     }
 }
 
@@ -129,9 +129,12 @@ fn reset_config_eeprom_por_cy8c9560a() {
     match cy8c9560a.reset_config_eeprom_por() {
         Ok(_) => println!("Successfuly reset configuration to EEPROM on CY8C9560A"),
         Err(e) => {
-            eprintln!("Error resetting configuration to EEPROM on CY8C9560A: {:?}", e);
+            eprintln!(
+                "Error resetting configuration to EEPROM on CY8C9560A: {:?}",
+                e
+            );
             std::process::exit(1);
-        },
+        }
     }
 }
 
@@ -199,7 +202,7 @@ fn initialize_cy8c9560a() -> Result<(), LinuxI2CError> {
     Ok(())
 }
 
-fn enable_tcal_input() -> Result<(), LinuxI2CError>  {
+fn enable_tcal_input() -> Result<(), LinuxI2CError> {
     rb_gpioe::enable_nb3v9312c();
     rb_gpioe::rf_input_select(1);
 

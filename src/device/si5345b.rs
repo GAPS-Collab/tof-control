@@ -1,18 +1,18 @@
 #![allow(unused)]
 use crate::constant::*;
 
-use std::thread;
-use std::time::Duration;
 use csv;
 use i2cdev::core::*;
 use i2cdev::linux::{LinuxI2CDevice, LinuxI2CError};
+use std::thread;
+use std::time::Duration;
 
 const SET_PAGE: u16 = 0x01;
 
 const LOL_HOLD_STATUS: u16 = 0x00E;
 const SOFT_RST_ALL: u16 = 0x001C; // Bits: 0
 const HARD_RST: u16 = 0x001E; // Bits: 1
-// Registers for NVM Programming
+                              // Registers for NVM Programming
 const ACTIVE_NVM_BANK: u16 = 0x00E2; // [7:0], R, Indicates number of user bank writes carried out so far.A
 const NVM_WRITE: u16 = 0x00E3; // [7:0], R/W, Initiates an NVM write when written with 0xC7
 const NVM_READ_BANK: u16 = 0x00E4; // [0], S, Download register values with content stored in NVM
@@ -68,12 +68,14 @@ impl SI5345B {
 
         for (i, record) in reader.records().enumerate() {
             let record = record.expect("failed to convert record");
-            let address = i64::from_str_radix(&record[0].trim_start_matches("0x"), 16).expect("cannot convert register from address");
-            let data = i64::from_str_radix(&record[1].trim_start_matches("0x"), 16).expect("cannot convert register from data");
+            let address = i64::from_str_radix(&record[0].trim_start_matches("0x"), 16)
+                .expect("cannot convert register from address");
+            let data = i64::from_str_radix(&record[1].trim_start_matches("0x"), 16)
+                .expect("cannot convert register from data");
             let page = address >> 8;
             let register = address & 0xFF;
             // println!("{} {:?} {:?}", i, address, data);
-            
+
             dev.smbus_write_byte_data(SET_PAGE as u8, page as u8);
             dev.smbus_write_byte_data(register as u8, data as u8);
 
@@ -94,9 +96,15 @@ impl SI5345B {
         dev.smbus_write_byte_data(SET_PAGE as u8, active_nvm_bank_page as u8);
         let active_nvm_bank = dev.smbus_read_byte_data(active_nvm_bank_reg as u8)?;
         match active_nvm_bank {
-            3 => println!("Number of User Banks Burned: 1\nNumber of User Banks Available to Burn: 2"),
-            15 => println!("Number of User Banks Burned: 2\nNumber of User Banks Available to Burn: 1"),
-            63 => println!("Number of User Banks Burned: 3\nNumber of User Banks Available to Burn: 0"),
+            3 => println!(
+                "Number of User Banks Burned: 1\nNumber of User Banks Available to Burn: 2"
+            ),
+            15 => println!(
+                "Number of User Banks Burned: 2\nNumber of User Banks Available to Burn: 1"
+            ),
+            63 => println!(
+                "Number of User Banks Burned: 3\nNumber of User Banks Available to Burn: 0"
+            ),
             _ => println!("ACTIVE_NVM_BANK Error"),
         }
 
@@ -162,7 +170,6 @@ impl SI5345B {
         // // println!("{:#x?}: {:#x?}", DEVICE_READY, device_ready_data);
 
         Ok(())
-
     }
 
     pub fn hard_reset_si5345b(&self) -> Result<(), LinuxI2CError> {

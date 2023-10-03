@@ -1,8 +1,8 @@
-pub struct RBMonData {
+pub struct RBMoniData {
     // RB Information
     pub board_id: u8,
-    pub loss_of_lock: bool,
-    pub loss_of_lock_stable: bool,
+    pub lol: bool,
+    pub lol_stable: bool,
     pub trigger_rate: u16,
     // RB Temperature Sensor
     pub drs_temp: f32,

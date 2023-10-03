@@ -1,5 +1,5 @@
 use crate::constant::*;
-use crate::device::{pca9548a, lis3mdltr};
+use crate::device::{lis3mdltr, pca9548a};
 
 pub struct RBmag {
     pub magnetic_x: f32,
@@ -11,11 +11,15 @@ pub struct RBmag {
 impl RBmag {
     pub fn new() -> Self {
         let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_1);
-        i2c_mux.select(RB_LIS3MDLTR_CHANNEL).expect("cannot accesss to PCA9548A");
+        i2c_mux
+            .select(RB_LIS3MDLTR_CHANNEL)
+            .expect("cannot accesss to PCA9548A");
 
         let lis3mdltr = lis3mdltr::LIS3MDLTR::new(I2C_BUS, RB_LIS3MDLTR_ADDRESS);
         lis3mdltr.configure();
-        let magnetic_field = lis3mdltr.read_magnetic_field().expect("cannot read LIS3MDLTR");
+        let magnetic_field = lis3mdltr
+            .read_magnetic_field()
+            .expect("cannot read LIS3MDLTR");
 
         i2c_mux.reset().expect("cannot reset PCA9548A");
 
@@ -29,8 +33,14 @@ impl RBmag {
     pub fn print_rb_magnetic() {
         let rb_magnetic = RBmag::new();
         println!("Magnetic X:              {:.3} [G]", rb_magnetic.magnetic_x);
-        println!("Magnetic Y:               {:.3} [G]", rb_magnetic.magnetic_y);
+        println!(
+            "Magnetic Y:               {:.3} [G]",
+            rb_magnetic.magnetic_y
+        );
         println!("Magnetic Z:              {:.3} [G]", rb_magnetic.magnetic_z);
-        println!("Magnetic Total:           {:.3} [G]", rb_magnetic.magnetic_t);
+        println!(
+            "Magnetic Total:           {:.3} [G]",
+            rb_magnetic.magnetic_t
+        );
     }
 }

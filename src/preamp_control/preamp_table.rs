@@ -3,7 +3,6 @@ use comfy_table::*;
 
 use crate::preamp_control::*;
 
-
 pub fn preamp_table() {
     println!("Preamp Environmental Status");
     preamp_temp_table();
@@ -17,7 +16,8 @@ pub fn preamp_temp_table() {
 
     let preamp_temp = preamp_temp::PreampTemp::new();
 
-    table.load_preset(UTF8_FULL)
+    table
+        .load_preset(UTF8_FULL)
         .set_header(vec![
             Cell::new("Measurement").add_attribute(Attribute::Bold),
             Cell::new("Value").add_attribute(Attribute::Bold),
@@ -112,7 +112,8 @@ pub fn preamp_bias_table() {
 
     let preamp_bias = preamp_bias::PreampBiasRead::new();
 
-    table.load_preset(UTF8_FULL)
+    table
+        .load_preset(UTF8_FULL)
         .set_header(vec![
             Cell::new("Measurement").add_attribute(Attribute::Bold),
             Cell::new("Value").add_attribute(Attribute::Bold),
@@ -198,6 +199,6 @@ pub fn preamp_bias_table() {
             Cell::new(&format!("{:.3}", preamp_bias.preamp_bias_read_16)),
             Cell::new("V"),
         ]);
-        
+
     println!("{table}");
 }

@@ -57,7 +57,7 @@ impl MAX5825 {
 
         Ok((coden))
     }
-    pub fn read_dacn(&self, channel: u8) -> Result<(u16), LinuxI2CError> { 
+    pub fn read_dacn(&self, channel: u8) -> Result<(u16), LinuxI2CError> {
         let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", self.bus), self.address)?;
         let dacn_buf = dev.smbus_read_i2c_block_data(((READBACK_DACN as u8) | channel), 2)?;
         let dacn = ((dacn_buf[0] as u16) << 4) | (((dacn_buf[1] as u16) & 0xF0) >> 4);

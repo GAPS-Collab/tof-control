@@ -1,6 +1,6 @@
+use csv;
 use std::thread;
 use std::time::Duration;
-use csv;
 // use i2cdev::core::*;
 // use i2cdev::linux::{LinuxI2CDevice, LinuxI2CError};
 
@@ -17,12 +17,17 @@ fn main() {
 
     for (i, record) in reader.records().enumerate() {
         let record = record.expect("failed to convert record");
-        let address = i64::from_str_radix(&record[0].trim_start_matches("0x"), 16).expect("cannot convert register from address");
-        let data = i64::from_str_radix(&record[1].trim_start_matches("0x"), 16).expect("cannot convert register from data");
+        let address = i64::from_str_radix(&record[0].trim_start_matches("0x"), 16)
+            .expect("cannot convert register from address");
+        let data = i64::from_str_radix(&record[1].trim_start_matches("0x"), 16)
+            .expect("cannot convert register from data");
         let page = address >> 8;
         let register = address & 0xFF;
-        println!("index: {}, page: {:#02X}, reg: {:#02X}, value: {:#02X}", i, page, register, data);
-        
+        println!(
+            "index: {}, page: {:#02X}, reg: {:#02X}, value: {:#02X}",
+            i, page, register, data
+        );
+
         // dev.smbus_write_byte_data(SET_PAGE as u8, page as u8);
         // dev.smbus_write_byte_data(register as u8, data as u8);
 
@@ -30,8 +35,7 @@ fn main() {
             thread::sleep(Duration::from_millis(300));
             println!("preamble done");
         }
-
     }
-    
+
     println!("Done!");
 }

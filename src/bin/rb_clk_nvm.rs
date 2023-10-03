@@ -2,7 +2,7 @@ use i2cdev::linux::LinuxI2CError;
 use std::process::exit;
 
 use tof_control::constant::*;
-use tof_control::device::{pca9548a, si5345b, cy8c9560a};
+use tof_control::device::{cy8c9560a, pca9548a, si5345b};
 
 fn main() {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
@@ -32,7 +32,6 @@ fn main() {
     });
 
     println!("Successfully written clock configuration to SI5345B NVM!");
-
 }
 
 fn enable_si5345b() -> Result<(), LinuxI2CError> {
@@ -49,5 +48,4 @@ fn program_nvm_si5345b() -> Result<(), LinuxI2CError> {
     si5345b.configure_nvm_si5345b()?;
 
     Ok(())
-
 }

@@ -1,10 +1,11 @@
 use crate::ltb_control::*;
+use crate::helper::ltb_type::LTBTemp;
 
 pub fn initialize() {
     let mut count = 0;
     while count < 5 {
-        ltb_temp::LTBtemp::new();
+        LTBTemp::new();
         count += 1;
     }
-    ltb_dac::LTBdac::set_threshold();
+    // ltb_threshold::LTBdac::set_threshold();
 }

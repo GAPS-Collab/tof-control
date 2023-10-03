@@ -3,7 +3,6 @@ use comfy_table::*;
 
 use crate::pb_control::*;
 
-
 pub fn pb_table() {
     println!("PB Environmental Status");
     pb_env_table();
@@ -17,7 +16,8 @@ pub fn pb_env_table() {
 
     let pb_temp = pb_temp::PBtemp::new();
 
-    table.load_preset(UTF8_FULL)
+    table
+        .load_preset(UTF8_FULL)
         .set_header(vec![
             Cell::new("Measurement").add_attribute(Attribute::Bold),
             Cell::new("Value").add_attribute(Attribute::Bold),
@@ -52,7 +52,8 @@ pub fn pb_vcp_table() {
 
     let pb_vcp = pb_vcp::PBvcp::new();
 
-    table.load_preset(UTF8_FULL)
+    table
+        .load_preset(UTF8_FULL)
         .set_header(vec![
             Cell::new("Measurement").add_attribute(Attribute::Bold),
             Cell::new("Voltage [V]").add_attribute(Attribute::Bold),

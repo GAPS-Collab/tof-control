@@ -1,11 +1,11 @@
 #![allow(unused)]
+use gethostname::gethostname;
 use std::thread;
 use std::time::Duration;
-use gethostname::gethostname;
 
-use crate::rb_control::*;
 use crate::constant::*;
 use crate::memory::*;
+use crate::rb_control::*;
 
 pub fn initialize() {
     initialize_gpioe();
@@ -52,7 +52,9 @@ fn initialize_env_ics() {
 }
 
 fn set_board_id() {
-    let hostname = gethostname().into_string().expect("cannot convert hostname");
+    let hostname = gethostname()
+        .into_string()
+        .expect("cannot convert hostname");
     let board_id: u32 = hostname.replace("tof-rb", "").parse().unwrap();
     write_control_reg(BOARD_ID, board_id).expect("cannot write BOARD_ID register");
 }
@@ -62,13 +64,15 @@ fn start_drs() {
 }
 
 fn disable_daq_fragment() {
-    let mut value = read_control_reg(DAQ_FRAGMENT_EN).expect("cannot read DAQ_FRAGMENT_EN register");
+    let mut value =
+        read_control_reg(DAQ_FRAGMENT_EN).expect("cannot read DAQ_FRAGMENT_EN register");
     value = value | 0x00;
     write_control_reg(DAQ_FRAGMENT_EN, value).expect("cannot write DAQ_FRAGMENT_EN register");
 }
 
 fn enable_spike_clean() {
-    let mut value = read_control_reg(EN_SPIKE_REMOVAL).expect("cannot read EN_SPIKE_REMOVAL register");
+    let mut value =
+        read_control_reg(EN_SPIKE_REMOVAL).expect("cannot read EN_SPIKE_REMOVAL register");
     value = value | 0x400000;
     write_control_reg(EN_SPIKE_REMOVAL, value).expect("cannot write EN_SPIKE_REMOVAL register");
 }

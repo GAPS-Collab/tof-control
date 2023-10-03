@@ -1,6 +1,7 @@
 use comfy_table::presets::UTF8_FULL;
 use comfy_table::*;
 
+use crate::helper::ltb_type::{LTBTemp, LTBThreshold};
 use crate::ltb_control::*;
 
 pub fn ltb_table() {
@@ -14,9 +15,10 @@ pub fn ltb_table() {
 pub fn ltb_env_table() {
     let mut table = Table::new();
 
-    let ltb_temp = ltb_temp::LTBtemp::new();
+    let ltb_temp = LTBTemp::new().unwrap();
 
-    table.load_preset(UTF8_FULL)
+    table
+        .load_preset(UTF8_FULL)
         .set_header(vec![
             Cell::new("Measurement").add_attribute(Attribute::Bold),
             Cell::new("Value").add_attribute(Attribute::Bold),
@@ -25,12 +27,12 @@ pub fn ltb_env_table() {
         .add_row(vec![
             Cell::new("LTB Temperature"),
             Cell::new(&format!("{:.3}", ltb_temp.ltb_temp)),
-            Cell::new("°C")
+            Cell::new("°C"),
         ])
         .add_row(vec![
             Cell::new("Trenz Temperature"),
             Cell::new(&format!("{:.3}", ltb_temp.trenz_temp)),
-            Cell::new("°C")
+            Cell::new("°C"),
         ]);
 
     println!("{table}");
@@ -39,9 +41,10 @@ pub fn ltb_env_table() {
 pub fn ltb_dac_table() {
     let mut table = Table::new();
 
-    let ltb_threshold = ltb_dac::LTBdac::new();
+    let ltb_threshold = LTBThreshold::new().unwrap();
 
-    table.load_preset(UTF8_FULL)
+    table
+        .load_preset(UTF8_FULL)
         .set_header(vec![
             Cell::new("Threshold Channel").add_attribute(Attribute::Bold),
             Cell::new("Value").add_attribute(Attribute::Bold),
@@ -49,18 +52,18 @@ pub fn ltb_dac_table() {
         ])
         .add_row(vec![
             Cell::new("Threshold 0"),
-            Cell::new(&format!("{:.3}", ltb_threshold.dac0)),
-            Cell::new("mV")
+            Cell::new(&format!("{:.3}", ltb_threshold.threshold_0)),
+            Cell::new("mV"),
         ])
         .add_row(vec![
             Cell::new("Threshold 1"),
-            Cell::new(&format!("{:.3}", ltb_threshold.dac1)),
-            Cell::new("mV")
+            Cell::new(&format!("{:.3}", ltb_threshold.threshold_1)),
+            Cell::new("mV"),
         ])
         .add_row(vec![
             Cell::new("Threshold 2"),
-            Cell::new(&format!("{:.3}", ltb_threshold.dac2)),
-            Cell::new("mV")
+            Cell::new(&format!("{:.3}", ltb_threshold.threshold_2)),
+            Cell::new("mV"),
         ]);
 
     println!("{table}");

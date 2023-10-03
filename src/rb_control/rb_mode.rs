@@ -1,5 +1,5 @@
 #![allow(unused)]
-use crate::rb_control::{rb_input, rb_dac};
+use crate::rb_control::{rb_dac, rb_input};
 
 pub fn select_noi_mode() {
     rb_dac::dac_noi_mode();
