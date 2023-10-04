@@ -8,29 +8,14 @@ use tof_control::rb_control::rb_gpioe;
 use i2cdev::linux::LinuxI2CError;
 
 fn main() {
-    // match enable_clk_output() {
-    //     Ok(_) => (),
-    //     Err(e) => {
-    //         eprintln!("Error enabling Si5345B output: {:?}", e);
-    //         std::process::exit(1);
-    //     },
-    // }
+    match enable_clk_output() {
+        Ok(_) => (),
+        Err(e) => {
+            eprintln!("Error enabling Si5345B output: {:?}", e);
+            std::process::exit(1);
+        },
+    }
 
-    // match read_temp() {
-    //     Ok(zynq_temp) => println!("ZYNQ:    {:.3}[°C]", zynq_temp),
-    //     Err(e) =>{
-    //         eprintln!("ZYNQ temperature readout error: {:?}", e);
-    //         std::process::exit(1);
-    //     },
-    // }
-
-    // match enable_i2c_cy8c9560a() {
-    //     Ok(_) => (),
-    //     Err(e) => {
-    //         eprintln!("Error enabling CY8C9560A chip: {:?}", e);
-    //         std::process::exit(1);
-    //     },
-    // }
     // check_enable_register_cy8c9560a();
     // enable_eeprom_cy8c9560a();
     // check_enable_register_cy8c9560a();
@@ -39,13 +24,13 @@ fn main() {
 
     // reset_config_eeprom_por_cy8c9560a();
 
-    // match initialize_cy8c9560a() {
-    //     Ok(_) => (),
-    //     Err(e) => {
-    //         eprintln!("Error initializing CY8C9560A chip: {:?}", e);
-    //         std::process::exit(1);
-    //     },
-    // }
+    match initialize_cy8c9560a() {
+        Ok(_) => (),
+        Err(e) => {
+            eprintln!("Error initializing CY8C9560A chip: {:?}", e);
+            std::process::exit(1);
+        },
+    }
 
     match enable_tcal_input() {
         Ok(_) => (),
@@ -82,61 +67,61 @@ fn enable_i2c_cy8c9560a() -> Result<(), LinuxI2CError> {
     Ok(())
 }
 
-fn check_enable_register_cy8c9560a() {
-    enable_i2c_cy8c9560a();
-    let cy8c9560a = cy8c9560a::CY8C9560A::new(I2C_BUS, RB_CY8C9560A_ADDRESS);
-    let value = cy8c9560a.read_enable_register();
+// fn check_enable_register_cy8c9560a() {
+//     enable_i2c_cy8c9560a();
+//     let cy8c9560a = cy8c9560a::CY8C9560A::new(I2C_BUS, RB_CY8C9560A_ADDRESS);
+//     let value = cy8c9560a.read_enable_register();
 
-    match value {
-        Ok(enable_register) => println!("Enable Register: {:08b}", enable_register),
-        Err(e) => {
-            eprintln!("Error reading CY8C9560A enable register: {:?}", e);
-            std::process::exit(1);
-        }
-    }
-}
+//     match value {
+//         Ok(enable_register) => println!("Enable Register: {:08b}", enable_register),
+//         Err(e) => {
+//             eprintln!("Error reading CY8C9560A enable register: {:?}", e);
+//             std::process::exit(1);
+//         }
+//     }
+// }
 
-fn enable_eeprom_cy8c9560a() {
-    enable_i2c_cy8c9560a();
-    let cy8c9560a = cy8c9560a::CY8C9560A::new(I2C_BUS, RB_CY8C9560A_ADDRESS);
-    match cy8c9560a.enable_eeprom() {
-        Ok(_) => println!("Successfuly enabled EEPROM on CY8C9560A"),
-        Err(e) => {
-            eprintln!("Error enabling EEPROM on CY8C9560A: {:?}", e);
-            std::process::exit(1);
-        }
-    }
-}
+// fn enable_eeprom_cy8c9560a() {
+//     enable_i2c_cy8c9560a();
+//     let cy8c9560a = cy8c9560a::CY8C9560A::new(I2C_BUS, RB_CY8C9560A_ADDRESS);
+//     match cy8c9560a.enable_eeprom() {
+//         Ok(_) => println!("Successfuly enabled EEPROM on CY8C9560A"),
+//         Err(e) => {
+//             eprintln!("Error enabling EEPROM on CY8C9560A: {:?}", e);
+//             std::process::exit(1);
+//         }
+//     }
+// }
 
-fn store_config_eeprom_por_cy8c9560a() {
-    enable_i2c_cy8c9560a();
-    let cy8c9560a = cy8c9560a::CY8C9560A::new(I2C_BUS, RB_CY8C9560A_ADDRESS);
-    match cy8c9560a.store_config_eeprom_por() {
-        Ok(_) => println!("Successfuly stored current configuration to EEPROM on CY8C9560A"),
-        Err(e) => {
-            eprintln!(
-                "Error storing current configuration to EEPROM on CY8C9560A: {:?}",
-                e
-            );
-            std::process::exit(1);
-        }
-    }
-}
+// fn store_config_eeprom_por_cy8c9560a() {
+//     enable_i2c_cy8c9560a();
+//     let cy8c9560a = cy8c9560a::CY8C9560A::new(I2C_BUS, RB_CY8C9560A_ADDRESS);
+//     match cy8c9560a.store_config_eeprom_por() {
+//         Ok(_) => println!("Successfuly stored current configuration to EEPROM on CY8C9560A"),
+//         Err(e) => {
+//             eprintln!(
+//                 "Error storing current configuration to EEPROM on CY8C9560A: {:?}",
+//                 e
+//             );
+//             std::process::exit(1);
+//         }
+//     }
+// }
 
-fn reset_config_eeprom_por_cy8c9560a() {
-    enable_i2c_cy8c9560a();
-    let cy8c9560a = cy8c9560a::CY8C9560A::new(I2C_BUS, RB_CY8C9560A_ADDRESS);
-    match cy8c9560a.reset_config_eeprom_por() {
-        Ok(_) => println!("Successfuly reset configuration to EEPROM on CY8C9560A"),
-        Err(e) => {
-            eprintln!(
-                "Error resetting configuration to EEPROM on CY8C9560A: {:?}",
-                e
-            );
-            std::process::exit(1);
-        }
-    }
-}
+// fn reset_config_eeprom_por_cy8c9560a() {
+//     enable_i2c_cy8c9560a();
+//     let cy8c9560a = cy8c9560a::CY8C9560A::new(I2C_BUS, RB_CY8C9560A_ADDRESS);
+//     match cy8c9560a.reset_config_eeprom_por() {
+//         Ok(_) => println!("Successfuly reset configuration to EEPROM on CY8C9560A"),
+//         Err(e) => {
+//             eprintln!(
+//                 "Error resetting configuration to EEPROM on CY8C9560A: {:?}",
+//                 e
+//             );
+//             std::process::exit(1);
+//         }
+//     }
+// }
 
 fn initialize_cy8c9560a() -> Result<(), LinuxI2CError> {
     enable_i2c_cy8c9560a();

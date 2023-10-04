@@ -1,3 +1,5 @@
+use crate::device::*;
+
 pub struct RBMoniData {
     // RB Information
     pub board_id: u8,
@@ -44,4 +46,41 @@ pub struct RBMoniData {
     pub mag_y: f32,
     pub mag_z: f32,
     pub mag_t: f32,
+}
+
+/// RB Error Type
+#[derive(Debug)]
+pub enum RBError {
+    Clk(RBClkError),
+    GPIOe(RBGPIOeError),
+}
+
+impl From<RBClkError> for RBError {
+    fn from(e: RBClkError) -> Self {
+        RBError::Clk(e)
+    }
+}
+
+#[derive(Debug)]
+pub enum RBClkError {
+    /// I2C Error
+    I2C(i2cdev::linux::LinuxI2CError),
+}
+
+impl From<i2cdev::linux::LinuxI2CError> for RBClkError {
+    fn from(e: i2cdev::linux::LinuxI2CError) -> Self {
+        RBClkError::I2C(e)
+    }
+}
+
+#[derive(Debug)]
+pub enum RBGPIOeError {
+    /// I2C Error
+    I2C(i2cdev::linux::LinuxI2CError),
+}
+
+impl From<i2cdev::linux::LinuxI2CError> for RBGPIOeError {
+    fn from(e: i2cdev::linux::LinuxI2CError) -> Self {
+        RBGPIOeError::I2C(e)
+    }
 }

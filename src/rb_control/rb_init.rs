@@ -8,9 +8,9 @@ use crate::memory::*;
 use crate::rb_control::*;
 
 pub fn initialize() {
-    initialize_gpioe();
-    initialize_clk_synth();
-    initialize_rf_input();
+    // initialize_gpioe();
+    // initialize_clk_synth();
+    // initialize_rf_input();
     initialize_dac();
 
     initialize_env_ics();
@@ -22,19 +22,19 @@ pub fn initialize() {
     start_drs();
 }
 
-fn initialize_gpioe() {
-    rb_gpioe::initialize();
-}
+// fn initialize_gpioe() {
+//     rb_gpioe::initialize();
+// }
 
-fn initialize_clk_synth() {
-    rb_gpioe::enable_si5345b();
-    rb_clk::configure_clk_synth();
-}
+// fn initialize_clk_synth() {
+//     rb_gpioe::enable_si5345b();
+//     rb_clk::configure_clk_synth();
+// }
 
-fn initialize_rf_input() {
-    // SMA Input
-    rb_gpioe::rf_input_select(2);
-}
+// fn initialize_rf_input() {
+//     // SMA Input
+//     rb_gpioe::rf_input_select_gpioe(2);
+// }
 
 fn initialize_dac() {
     rb_dac::set_dac();

@@ -11,7 +11,7 @@ fn main() {
         std::process::exit(1);
     }
 
-    rb_gpioe::enable_ad5675();
+    rb_gpioe::enable_ad5675_gpioe();
 
     let i2c_mux_2 = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux_2
