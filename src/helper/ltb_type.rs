@@ -1,5 +1,4 @@
-use std::{num::{ParseFloatError, ParseIntError}, string::ParseError};
-
+/// LTB Data Type
 #[derive(Debug)]
 pub struct LTBMoniData {
     pub temperature: LTBTemp,
@@ -48,16 +47,18 @@ pub enum LTBTempError {
     I2C(i2cdev::linux::LinuxI2CError),
 }
 
-#[derive(Debug)]
-pub enum LTBThresholdError {
-    /// I2C Error
-    I2C(i2cdev::linux::LinuxI2CError),
-}
-
 impl From<i2cdev::linux::LinuxI2CError> for LTBTempError {
     fn from(e: i2cdev::linux::LinuxI2CError) -> Self {
         LTBTempError::I2C(e)
     }
+}
+
+#[derive(Debug)]
+pub enum LTBThresholdError {
+    /// I2C Error
+    I2C(i2cdev::linux::LinuxI2CError),
+    /// Setting Threshold Error
+    SetThreshold(),
 }
 
 impl From<i2cdev::linux::LinuxI2CError> for LTBThresholdError {

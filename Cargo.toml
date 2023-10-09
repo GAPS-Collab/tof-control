@@ -17,6 +17,10 @@ name = "ltb-control"
 path = "src/bin/ltb_control.rs"
 
 [[bin]]
+name = "pb-control"
+path = "src/bin/pb_control.rs"
+
+[[bin]]
 name = "i2c-check"
 path = "src/bin/i2c_check.rs"
 
