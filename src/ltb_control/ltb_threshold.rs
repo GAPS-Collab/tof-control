@@ -4,29 +4,20 @@ use crate::device::max5815;
 
 impl LTBThreshold {
     pub fn new() -> Self {
-        let threshold_0: f32;
-        match Self::read_threshold(0) {
-            Ok(v) => threshold_0 = v,
-            Err(_) => threshold_0 = f32::MAX,
-        }
+        let ltb_dac: max5815::MAX5815 = max5815::MAX5815::new(I2C_BUS, LTB_MAX5815_ADDRESS);
 
-        let threshold_1: f32;
-        match Self::read_threshold(1) {
-            Ok(v) => threshold_1 = v,
-            Err(_) => threshold_1 = f32::MAX,
-        }
-
-        let threshold_2: f32;
-        match Self::read_threshold(2) {
-            Ok(v) => threshold_2 = v,
-            Err(_) => threshold_2 = f32::MAX,
+        let mut thresholds: [f32; 3] = Default::default();
+        for i in 0..=2 {
+            match ltb_dac.read_dacn(i) {
+                Ok(v) => thresholds[i as usize] = Self::adc_to_mv(v),
+                Err(_) => thresholds[i as usize] = f32::MAX,
+             }
         }
 
         Self {
-            threshold_0,
-            threshold_1,
-            threshold_2,
+            thresholds,
         }
+
     }
     pub fn read_threshold(channel: u8) -> Result<f32, LTBThresholdError> {
         let ltb_dac = max5815::MAX5815::new(I2C_BUS, LTB_MAX5815_ADDRESS);
@@ -34,6 +25,16 @@ impl LTBThreshold {
         let threshold = Self::adc_to_mv(threshold_raw);
 
         Ok(threshold)
+    }
+    pub fn read_thresholds() -> Result<[f32; 3], LTBThresholdError> {
+        let ltb_dac: max5815::MAX5815 = max5815::MAX5815::new(I2C_BUS, LTB_MAX5815_ADDRESS);
+        let mut thresholds: [f32; 3] = Default::default();
+        for i in 0..=2 {
+            let threshold_raw = ltb_dac.read_dacn(i)?;
+            thresholds[i as usize] = Self::adc_to_mv(threshold_raw);
+        }
+
+        Ok(thresholds)
     }
     fn adc_to_mv(adc: u16) -> f32 {
         let voltage = LTB_DAC_REF_VOLTAGE * (adc as f32) / 2f32.powf(12.0);

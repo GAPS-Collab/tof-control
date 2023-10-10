@@ -15,9 +15,7 @@ pub struct LTBTemp {
 // LTB Threshold Voltages
 #[derive(Debug)]
 pub struct LTBThreshold {
-    pub threshold_0: f32,
-    pub threshold_1: f32,
-    pub threshold_2: f32,
+    pub thresholds: [f32; 3],
 }
 
 /// LTB Error Type

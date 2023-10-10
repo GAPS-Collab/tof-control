@@ -21,6 +21,10 @@ name = "pb-control"
 path = "src/bin/pb_control.rs"
 
 [[bin]]
+name = "preamp-control"
+path = "src/bin/preamp_control.rs"
+
+[[bin]]
 name = "i2c-check"
 path = "src/bin/i2c_check.rs"
 

@@ -1,217 +1,139 @@
 use crate::constant::*;
+use crate::helper::preamp_type::{PreampBias, PreampBiasError};
 use crate::device::{max11615, max11617, max5825, pca9548a};
 
-pub struct PreampBiasRead {
-    pub preamp_bias_read_1: f32,
-    pub preamp_bias_read_2: f32,
-    pub preamp_bias_read_3: f32,
-    pub preamp_bias_read_4: f32,
-    pub preamp_bias_read_5: f32,
-    pub preamp_bias_read_6: f32,
-    pub preamp_bias_read_7: f32,
-    pub preamp_bias_read_8: f32,
-    pub preamp_bias_read_9: f32,
-    pub preamp_bias_read_10: f32,
-    pub preamp_bias_read_11: f32,
-    pub preamp_bias_read_12: f32,
-    pub preamp_bias_read_13: f32,
-    pub preamp_bias_read_14: f32,
-    pub preamp_bias_read_15: f32,
-    pub preamp_bias_read_16: f32,
-}
-
-impl PreampBiasRead {
+impl PreampBias {
     pub fn new() -> Self {
+        let mut preamp_biases: [f32; 16] = Default::default();
+
+        let preamp_channels = [
+            PREAMP_SEN_1_CHANNEL, PREAMP_SEN_2_CHANNEL, PREAMP_SEN_3_CHANNEL, PREAMP_SEN_4_CHANNEL,
+            PREAMP_SEN_5_CHANNEL, PREAMP_SEN_6_CHANNEL, PREAMP_SEN_7_CHANNEL, PREAMP_SEN_8_CHANNEL,
+            PREAMP_SEN_9_CHANNEL, PREAMP_SEN_10_CHANNEL, PREAMP_SEN_11_CHANNEL, PREAMP_SEN_12_CHANNEL,
+            PREAMP_SEN_13_CHANNEL, PREAMP_SEN_14_CHANNEL, PREAMP_SEN_15_CHANNEL, PREAMP_SEN_16_CHANNEL,
+        ];
+
         let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, PB_PCA9548A_ADDRESS);
-
-        i2c_mux
-            .select(PB_ADC_1_CHANNEL)
-            .expect("cannot access to PCA9548A");
+        if i2c_mux.select(PB_ADC_1_CHANNEL).is_err() {
+            preamp_biases = [f32::MAX; 16];
+            return Self { preamp_biases }
+        }
         let max11615 = max11615::MAX11615::new(I2C_BUS, PB_MAX11615_ADDRESS);
-        max11615.setup().expect("cannot setup MAX11615");
+        if max11615.setup().is_err() {
+            preamp_biases = [f32::MAX; 16];
+            return Self { preamp_biases }
+        }
         let max11617 = max11617::MAX11617::new(I2C_BUS, PB_MAX11617_ADDRESS);
-        max11617.setup().expect("cannot setup MAX11617");
+        if max11617.setup().is_err() {
+            preamp_biases = [f32::MAX; 16];
+            return Self { preamp_biases }
+        }
 
-        let preamp_bias_read_1 = Self::convert_bias_voltage(
-            max11615
-                .read(PREAMP_SEN_1_CHANNEL)
-                .expect("cannot read MAX11615"),
-        );
-        let preamp_bias_read_2 = Self::convert_bias_voltage(
-            max11615
-                .read(PREAMP_SEN_2_CHANNEL)
-                .expect("cannot read MAX11615"),
-        );
-        let preamp_bias_read_3 = Self::convert_bias_voltage(
-            max11615
-                .read(PREAMP_SEN_3_CHANNEL)
-                .expect("cannot read MAX11615"),
-        );
-        let preamp_bias_read_4 = Self::convert_bias_voltage(
-            max11615
-                .read(PREAMP_SEN_4_CHANNEL)
-                .expect("cannot read MAX11615"),
-        );
-        let preamp_bias_read_5 = Self::convert_bias_voltage(
-            max11617
-                .read(PREAMP_SEN_5_CHANNEL)
-                .expect("cannot read MAX11617"),
-        );
-        let preamp_bias_read_6 = Self::convert_bias_voltage(
-            max11617
-                .read(PREAMP_SEN_6_CHANNEL)
-                .expect("cannot read MAX11617"),
-        );
-        let preamp_bias_read_7 = Self::convert_bias_voltage(
-            max11617
-                .read(PREAMP_SEN_7_CHANNEL)
-                .expect("cannot read MAX11617"),
-        );
-        let preamp_bias_read_8 = Self::convert_bias_voltage(
-            max11617
-                .read(PREAMP_SEN_8_CHANNEL)
-                .expect("cannot read MAX11617"),
-        );
+        for i in 0..=7 {
+            if (0..=3).contains(&i) {
+                match max11615.read(preamp_channels[i]) {
+                    Ok(t) => preamp_biases[i] = Self::convert_bias_voltage(t),
+                    Err(_) => preamp_biases[i] = f32::MAX,
+                }
+            } else {
+                match max11617.read(preamp_channels[i]) {
+                    Ok(t) => preamp_biases[i] = Self::convert_bias_voltage(t),
+                    Err(_) => preamp_biases[i] = f32::MAX,
+                }
+            }
+        }
 
-        i2c_mux
-            .select(PB_ADC_2_CHANNEL)
-            .expect("cannot access to PCA9548A");
-        let max11615 = max11615::MAX11615::new(I2C_BUS, PB_MAX11615_ADDRESS);
-        max11615.setup().expect("cannot setup MAX11615");
-        let max11617 = max11617::MAX11617::new(I2C_BUS, PB_MAX11617_ADDRESS);
-        max11617.setup().expect("cannot setup MAX11617");
+        if i2c_mux.select(PB_ADC_2_CHANNEL).is_err() {
+            preamp_biases = [f32::MAX; 16];
+            return Self { preamp_biases }
+        }
+        if max11615.setup().is_err() {
+            preamp_biases = [f32::MAX; 16];
+            return Self { preamp_biases }
+        }
+        if max11617.setup().is_err() {
+            preamp_biases = [f32::MAX; 16];
+            return Self { preamp_biases }
+        }
 
-        let preamp_bias_read_9 = Self::convert_bias_voltage(
-            max11615
-                .read(PREAMP_SEN_9_CHANNEL)
-                .expect("cannot read MAX11615"),
-        );
-        let preamp_bias_read_10 = Self::convert_bias_voltage(
-            max11615
-                .read(PREAMP_SEN_10_CHANNEL)
-                .expect("cannot read MAX11615"),
-        );
-        let preamp_bias_read_11 = Self::convert_bias_voltage(
-            max11615
-                .read(PREAMP_SEN_11_CHANNEL)
-                .expect("cannot read MAX11615"),
-        );
-        let preamp_bias_read_12 = Self::convert_bias_voltage(
-            max11615
-                .read(PREAMP_SEN_12_CHANNEL)
-                .expect("cannot read MAX11615"),
-        );
-        let preamp_bias_read_13 = Self::convert_bias_voltage(
-            max11617
-                .read(PREAMP_SEN_13_CHANNEL)
-                .expect("cannot read MAX11617"),
-        );
-        let preamp_bias_read_14 = Self::convert_bias_voltage(
-            max11617
-                .read(PREAMP_SEN_14_CHANNEL)
-                .expect("cannot read MAX11617"),
-        );
-        let preamp_bias_read_15 = Self::convert_bias_voltage(
-            max11617
-                .read(PREAMP_SEN_15_CHANNEL)
-                .expect("cannot read MAX11617"),
-        );
-        let preamp_bias_read_16 = Self::convert_bias_voltage(
-            max11617
-                .read(PREAMP_SEN_16_CHANNEL)
-                .expect("cannot read MAX11617"),
-        );
+        for i in 8..=15 {
+            if (8..=11).contains(&i) {
+                match max11615.read(preamp_channels[i]) {
+                    Ok(t) => preamp_biases[i] = Self::convert_bias_voltage(t),
+                    Err(_) => preamp_biases[i] = f32::MAX,
+                }
+            } else {
+                match max11617.read(preamp_channels[i]) {
+                    Ok(t) => preamp_biases[i] = Self::convert_bias_voltage(t),
+                    Err(_) => preamp_biases[i] = f32::MAX,
+                }
+            }
+        }
 
-        i2c_mux.reset().expect("cannot reset PCA9548A");
+        if i2c_mux.reset().is_err() {
+            preamp_biases = [f32::MAX; 16];
+            return Self { preamp_biases }
+        }
+
+        for i in 0..=15 {
+            if preamp_biases[i] < 0.0 || preamp_biases[i] > 67.0 {
+                preamp_biases[i] = f32::MAX;
+            }
+        }
 
         Self {
-            preamp_bias_read_1,
-            preamp_bias_read_2,
-            preamp_bias_read_3,
-            preamp_bias_read_4,
-            preamp_bias_read_5,
-            preamp_bias_read_6,
-            preamp_bias_read_7,
-            preamp_bias_read_8,
-            preamp_bias_read_9,
-            preamp_bias_read_10,
-            preamp_bias_read_11,
-            preamp_bias_read_12,
-            preamp_bias_read_13,
-            preamp_bias_read_14,
-            preamp_bias_read_15,
-            preamp_bias_read_16,
+            preamp_biases,
         }
+
+    }
+    pub fn read_bias() -> Result<[f32; 16], PreampBiasError> {
+        let mut preamp_biases: [f32; 16] = Default::default();
+
+        let preamp_channels = [
+            PREAMP_SEN_1_CHANNEL, PREAMP_SEN_2_CHANNEL, PREAMP_SEN_3_CHANNEL, PREAMP_SEN_4_CHANNEL,
+            PREAMP_SEN_5_CHANNEL, PREAMP_SEN_6_CHANNEL, PREAMP_SEN_7_CHANNEL, PREAMP_SEN_8_CHANNEL,
+            PREAMP_SEN_9_CHANNEL, PREAMP_SEN_10_CHANNEL, PREAMP_SEN_11_CHANNEL, PREAMP_SEN_12_CHANNEL,
+            PREAMP_SEN_13_CHANNEL, PREAMP_SEN_14_CHANNEL, PREAMP_SEN_15_CHANNEL, PREAMP_SEN_16_CHANNEL,
+        ];
+        let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, PB_PCA9548A_ADDRESS);
+        i2c_mux.select(PB_ADC_1_CHANNEL)?;
+        let max11615 = max11615::MAX11615::new(I2C_BUS, PB_MAX11615_ADDRESS);
+        max11615.setup()?;
+        let max11617 = max11617::MAX11617::new(I2C_BUS, PB_MAX11617_ADDRESS);
+        max11617.setup()?;
+
+        for i in 0..=7 {
+            if (0..=3).contains(&i) {
+                let preamp_bias_raw = max11615.read(preamp_channels[i])?;
+                preamp_biases[i] = Self::convert_bias_voltage(preamp_bias_raw);
+            } else {
+                let preamp_bias_raw = max11617.read(preamp_channels[i])?;
+                preamp_biases[i] = Self::convert_bias_voltage(preamp_bias_raw);
+            }
+        }
+
+        i2c_mux.select(PB_ADC_2_CHANNEL)?;
+        max11615.setup()?;
+        max11617.setup()?;
+
+        for i in 8..=15 {
+            if (8..=11).contains(&i) {
+                let preamp_bias_raw = max11615.read(preamp_channels[i])?;
+                preamp_biases[i] = Self::convert_bias_voltage(preamp_bias_raw);
+            } else {
+                let preamp_bias_raw = max11617.read(preamp_channels[i])?;
+                preamp_biases[i] = Self::convert_bias_voltage(preamp_bias_raw);
+            }
+        }
+
+        i2c_mux.reset()?;
+
+        Ok(
+            preamp_biases,
+        )
     }
     fn convert_bias_voltage(voltage: f32) -> f32 {
         22.27659574468085 * voltage
-    }
-    pub fn print_preamp_bias() {
-        let preamp_bias_read = PreampBiasRead::new();
-        println!(
-            "Preamp 1 Bias Voltage:    {:.3} [V]",
-            preamp_bias_read.preamp_bias_read_1
-        );
-        println!(
-            "Preamp 2 Bias Voltage:    {:.3} [V]",
-            preamp_bias_read.preamp_bias_read_2
-        );
-        println!(
-            "Preamp 3 Bias Voltage:    {:.3} [V]",
-            preamp_bias_read.preamp_bias_read_3
-        );
-        println!(
-            "Preamp 4 Bias Voltage:    {:.3} [V]",
-            preamp_bias_read.preamp_bias_read_4
-        );
-        println!(
-            "Preamp 5 Bias Voltage:    {:.3} [V]",
-            preamp_bias_read.preamp_bias_read_5
-        );
-        println!(
-            "Preamp 6 Bias Voltage:    {:.3} [V]",
-            preamp_bias_read.preamp_bias_read_6
-        );
-        println!(
-            "Preamp 7 Bias Voltage:    {:.3} [V]",
-            preamp_bias_read.preamp_bias_read_7
-        );
-        println!(
-            "Preamp 8 Bias Voltage:    {:.3} [V]",
-            preamp_bias_read.preamp_bias_read_8
-        );
-        println!(
-            "Preamp 9 Bias Voltage:    {:.3} [V]",
-            preamp_bias_read.preamp_bias_read_9
-        );
-        println!(
-            "Preamp 10 Bias Voltage:   {:.3} [V]",
-            preamp_bias_read.preamp_bias_read_10
-        );
-        println!(
-            "Preamp 11 Bias Voltage:   {:.3} [V]",
-            preamp_bias_read.preamp_bias_read_11
-        );
-        println!(
-            "Preamp 12 Bias Voltage:   {:.3} [V]",
-            preamp_bias_read.preamp_bias_read_12
-        );
-        println!(
-            "Preamp 13 Bias Voltage:   {:.3} [V]",
-            preamp_bias_read.preamp_bias_read_13
-        );
-        println!(
-            "Preamp 14 Bias Voltage:   {:.3} [V]",
-            preamp_bias_read.preamp_bias_read_14
-        );
-        println!(
-            "Preamp 15 Bias Voltage:   {:.3} [V]",
-            preamp_bias_read.preamp_bias_read_15
-        );
-        println!(
-            "Preamp 16 Bias Voltage:   {:.3} [V]",
-            preamp_bias_read.preamp_bias_read_16
-        );
     }
 }
 

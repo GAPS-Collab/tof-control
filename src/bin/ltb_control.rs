@@ -18,14 +18,14 @@ enum Commands {
     },
     #[clap(short_flag = 's')]
     Set {
-        #[arg(short = 'c', long = "channel")]
+        // #[arg(short = 'c', long = "channel")]
         channel: Option<u8>,
-        #[arg(short = 't', long = "threshold")]
+        // #[arg(short = 't', long = "threshold")]
         threshold: Option<f32>,
     },
     #[clap(short_flag = 'R')]
     Reset {
-        #[arg(short = 'c', long = "channel")]
+        // #[arg(short = 'c', long = "channel")]
         channel: Option<u8>,
     }
 }
@@ -105,20 +105,15 @@ fn read_temp() {
     let trenz_temp = temperature.trenz_temp;
 
     println!("LTB Temperature");
-    println!("\tBoard Temperature: {}", ltb_temp);
-    println!("\tTrenz Temperature: {}", trenz_temp);
+    println!("\tBoard Temperature: {:.3}[°C]", ltb_temp);
+    println!("\tTrenz Temperature: {:.3}[°C]", trenz_temp);
 }
 
 fn read_threshold() {
-    let threshold = LTBThreshold::new();
-    let thresholds = [
-        threshold.threshold_0,
-        threshold.threshold_1,
-        threshold.threshold_2,
-    ];
+    let thresholds = LTBThreshold::new().thresholds;
 
     println!("LTB Threshold");
     for (i, threshold) in thresholds.iter().enumerate() {
-        println!("\tThreshold {}: {}", i, threshold);
+        println!("\tThreshold {}: {:.3}[mV]", i, threshold);
     }
 }
