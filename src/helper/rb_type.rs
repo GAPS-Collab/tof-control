@@ -78,6 +78,12 @@ pub struct RBVcp {
     pub adc_avdd_vcp    : [f32; 3],
 }
 
+#[derive(Debug)]
+pub struct RBPh {
+    pub pressure        : f32,
+    pub humidity        : f32,
+}
+
 /// RB Error Type
 #[derive(Debug)]
 pub enum RBError {

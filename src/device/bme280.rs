@@ -79,26 +79,31 @@ impl BME280 {
         Self { bus, address }
     }
     pub fn configure(&self) -> Result<(), LinuxI2CError> {
-        let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", self.bus), self.address)
-            .expect("cannot access to i2c");
+        let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", self.bus), self.address)?;
 
-        self.ctrl_humidity(&mut dev)
-            .expect("cannot configure BME280 (CTRL_HUM)");
-        self.ctrl_measurement(&mut dev)
-            .expect("cannot configure BME280 (CTRL_MEAS)");
+        self.ctrl_humidity(&mut dev)?;
+        self.ctrl_measurement(&mut dev)?;
 
         let config = T_SB_250 | FILTER_OFF | SPI3W_DI;
-        dev.smbus_write_byte_data(CONFIG as u8, config as u8)
+        dev.smbus_write_byte_data(CONFIG as u8, config as u8)?;
+
+        Ok(())
     }
     fn ctrl_humidity(&self, dev: &mut LinuxI2CDevice) -> Result<(), LinuxI2CError> {
-        dev.smbus_write_byte_data(CTRL_HUM as u8, OSRS_H_1 as u8)
+        dev.smbus_write_byte_data(CTRL_HUM as u8, OSRS_H_1 as u8)?;
+
+        Ok(())
     }
     fn ctrl_measurement(&self, dev: &mut LinuxI2CDevice) -> Result<(), LinuxI2CError> {
         let config = OSRS_T_1 | OSRS_P_1 | MODE_N;
-        dev.smbus_write_byte_data(CTRL_MEAS as u8, config as u8)
+        dev.smbus_write_byte_data(CTRL_MEAS as u8, config as u8)?;
+
+        Ok(())
     }
     fn reset(&self, dev: &mut LinuxI2CDevice) -> Result<(), LinuxI2CError> {
-        dev.smbus_write_byte_data(RESET as u8, RESET_CODE as u8)
+        dev.smbus_write_byte_data(RESET as u8, RESET_CODE as u8)?;
+
+        Ok(())
     }
     fn read_compensate(&self, dev: &mut LinuxI2CDevice) -> Result<CompensateData, LinuxI2CError> {
         let mut dig_t = Vec::new();
@@ -151,24 +156,22 @@ impl BME280 {
             dig_h[5] = 0xFF - dig_h[5];
         };
 
-        Ok(CompensateData {
-            dig_t,
-            dig_p,
-            dig_h,
-        })
+        Ok(
+            CompensateData {
+                dig_t,
+                dig_p,
+                dig_h,
+            }
+        )
     }
-    pub fn read_data(&self) -> Result<(f32, f32, f32), LinuxI2CError> {
+    pub fn read(&self) -> Result<[f32; 2], LinuxI2CError> {
         let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", self.bus), self.address)?;
 
-        let compensate_data = self
-            .read_compensate(&mut dev)
-            .expect("cannot compensate BME280");
+        let compensate_data = self.read_compensate(&mut dev)?;
 
-        let temp_measurement = self
-            .read_temperature(&mut dev, compensate_data.dig_t)
-            .expect("cannot read temperature from BME280");
-        let temperature = temp_measurement.0;
-        let t_fine = temp_measurement.1;
+        let temp_measurement = self.read_temperature(&mut dev, compensate_data.dig_t)?;
+        let _temperature = temp_measurement[0];
+        let t_fine = temp_measurement[1];
 
         let pressure = self
             .read_pressure(&mut dev, t_fine, compensate_data.dig_p)
@@ -178,13 +181,15 @@ impl BME280 {
             .read_humidity(&mut dev, t_fine, compensate_data.dig_h)
             .expect("cannot read humidity from BME280");
 
-        Ok((temperature, pressure, humidity))
+        let ph = [pressure, humidity];
+
+        Ok(ph)
     }
     fn read_temperature(
         &self,
         dev: &mut LinuxI2CDevice,
         dig_t: Vec<u16>,
-    ) -> Result<(f32, f32), LinuxI2CError> {
+    ) -> Result<[f32; 2], LinuxI2CError> {
         let temp_msb = dev.smbus_read_byte_data(TEMP_MSB as u8)?;
         let temp_lsb = dev.smbus_read_byte_data(TEMP_LSB as u8)?;
         let temp_xlsb = dev.smbus_read_byte_data(TEMP_XLSB as u8)?;
@@ -192,12 +197,12 @@ impl BME280 {
         let temp_adc =
             ((temp_msb as u32) << 12) | ((temp_lsb as u32) << 4) | ((temp_xlsb as u32) >> 4);
         let temp_result = self.compensate_temperature(temp_adc, dig_t);
-        let temp = temp_result.0;
-        let t_fine = temp_result.1;
+        let temp = temp_result[0];
+        let t_fine = temp_result[1];
 
-        Ok((temp, t_fine))
+        Ok([temp, t_fine])
     }
-    fn compensate_temperature(&self, adc: u32, dig_t: Vec<u16>) -> (f32, f32) {
+    fn compensate_temperature(&self, adc: u32, dig_t: Vec<u16>) -> [f32; 2] {
         let var1 = ((adc as f32) / 8.0 - (dig_t[0] as f32) * 2.0) * (dig_t[1] as f32) / 2048.0;
         let var2 = ((adc as f32) / 16.0 - (dig_t[0] as f32))
             * ((adc as f32) / 16.0 - (dig_t[0] as f32))
@@ -208,7 +213,7 @@ impl BME280 {
 
         let temp = ((t_fine * 5.0 + 128.0) / 256.0) / 100.0;
 
-        (temp, t_fine)
+        [temp, t_fine]
     }
     fn read_pressure(
         &self,

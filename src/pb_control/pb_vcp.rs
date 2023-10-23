@@ -30,12 +30,12 @@ impl PBVcp {
             PB_P3V6_PREAMP_INA226_RSHUNT,
             PB_P3V6_PREAMP_INA226_MEC,
         );
-        // p3v6_preamp_ina226.configure()?;
+        p3v6_preamp_ina226.configure()?;
         let p3v6_preamp_vcp = p3v6_preamp_ina226.read()?;
 
         i2c_mux.select(PB_ADC_1_CHANNEL)?;
         let max11617 = max11617::MAX11617::new(I2C_BUS, PB_MAX11617_ADDRESS);
-        // max11617.setup()?;
+        max11617.setup()?;
         let n1v6_preamp_voltage = max11617.read(PB_N1V6_PREAMP_VOLTAGE_INA201_CHANNEL)? * -1.0;
         let n1v6_preamp_current = max11617.read(PB_N1V6_PREAMP_CURRENT_INA201_CHANNEL)? / 50.0 / 0.1;
         let n1v6_preamp_power = n1v6_preamp_voltage.abs() * n1v6_preamp_current;
@@ -48,7 +48,7 @@ impl PBVcp {
             PB_P3V4F_LTB_INA219_RSHUNT,
             PB_P3V4F_LTB_INA219_MEC,
         );
-        // p3v4f_ltb_ina219.configure()?;
+        p3v4f_ltb_ina219.configure()?;
         let p3v4f_ltb_vcp = p3v4f_ltb_ina219.read()?;
 
         let p3v4d_ltb_ina219 = ina219::INA219::new(
@@ -57,7 +57,7 @@ impl PBVcp {
             PB_P3V4D_LTB_INA219_RSHUNT,
             PB_P3V4D_LTB_INA219_MEC,
         );
-        // p3v4d_ltb_ina219.configure()?;
+        p3v4d_ltb_ina219.configure()?;
         let p3v4d_ltb_vcp = p3v4d_ltb_ina219.read()?;
 
         let p3v6_ltb_ina219 = ina219::INA219::new(
@@ -66,12 +66,12 @@ impl PBVcp {
             PB_P3V6_LTB_INA219_RSHUNT,
             PB_P3V6_LTB_INA219_MEC,
         );
-        // p3v6_ltb_ina219.configure()?;
+        p3v6_ltb_ina219.configure()?;
         let p3v6_ltb_vcp = p3v6_ltb_ina219.read()?;
 
         i2c_mux.select(PB_ADC_2_CHANNEL)?;
         let max11617 = max11617::MAX11617::new(I2C_BUS, PB_MAX11617_ADDRESS);
-        // max11617.setup()?;
+        max11617.setup()?;
         let n1v6_ltb_voltage = max11617.read(PB_N1V6_LTB_VOLTAGE_INA202_CHANNEL)? * -1.0;
         let n1v6_ltb_current = max11617.read(PB_N1V6_LTB_CURRENT_INA202_CHANNEL)? / 100.0 / 0.1;
         let n1v6_ltb_power = n1v6_ltb_voltage.abs() * n1v6_ltb_current;
