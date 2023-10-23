@@ -1,5 +1,6 @@
 use crate::constant::*;
 
+use crate::helper::rb_type::RBVcpError;
 use crate::device::{ina226, max11645, pca9548a};
 
 pub struct RBvcp {
@@ -224,4 +225,81 @@ impl RBvcp {
             rb_vcp.adc_avdd_voltage, rb_vcp.adc_avdd_current, rb_vcp.adc_avdd_power
         );
     }
+}
+
+pub fn config_vcp() -> Result<(), RBVcpError> {
+    let i2c_mux_1 = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_1);
+    let i2c_mux_2 = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
+
+    i2c_mux_1.select(RB_DRS_DVDD_INA226_CHANNEL)?;
+    let drs_dvdd_ina226 = ina226::INA226::new(
+        I2C_BUS,
+        RB_DRS_DVDD_INA226_ADDRESS,
+        RB_DRS_DVDD_INA226_RSHUNT,
+        RB_DRS_DVDD_INA226_MEC,
+    );
+    drs_dvdd_ina226.configure()?;
+
+    i2c_mux_1.select(RB_P3V3_INA226_CHANNEL)?;
+    let p3v3_ina226 = ina226::INA226::new(
+        I2C_BUS,
+        RB_P3V3_INA226_ADDRESS,
+        RB_P3V3_INA226_RSHUNT,
+        RB_P3V3_INA226_MEC,
+    );
+    p3v3_ina226.configure()?;
+
+    i2c_mux_1.select(RB_ZYNQ_INA226_CHANNEL)?;
+    let zynq_ina226 = ina226::INA226::new(
+        I2C_BUS,
+        RB_ZYNQ_INA226_ADDRESS,
+        RB_ZYNQ_INA226_RSHUNT,
+        RB_ZYNQ_INA226_MEC,
+    );
+    zynq_ina226.configure()?;
+
+    i2c_mux_1.select(RB_P3V5_INA226_CHANNEL)?;
+    let p3v5_ina226 = ina226::INA226::new(
+        I2C_BUS,
+        RB_P3V5_INA226_ADDRESS,
+        RB_P3V5_INA226_RSHUNT,
+        RB_P3V5_INA226_MEC,
+    );
+    p3v5_ina226.configure()?;
+
+    i2c_mux_2.select(RB_ADC_DVDD_INA226_CHANNEL)?;
+    let adc_dvdd_ina226 = ina226::INA226::new(
+        I2C_BUS,
+        RB_ADC_DVDD_INA226_ADDRESS,
+        RB_ADC_DVDD_INA226_RSHUNT,
+        RB_ADC_DVDD_INA226_MEC,
+    );
+    adc_dvdd_ina226.configure()?;
+
+    i2c_mux_2.select(RB_ADC_AVDD_INA226_CHANNEL)?;
+    let adc_avdd_ina226 = ina226::INA226::new(
+        I2C_BUS,
+        RB_ADC_AVDD_INA226_ADDRESS,
+        RB_ADC_AVDD_INA226_RSHUNT,
+        RB_ADC_AVDD_INA226_MEC,
+    );
+    adc_avdd_ina226.configure()?;
+
+    i2c_mux_2.select(RB_DRS_AVDD_INA226_CHANNEL)?;
+    let drs_avdd_ina226 = ina226::INA226::new(
+        I2C_BUS,
+        RB_DRS_AVDD_INA226_ADDRESS,
+        RB_DRS_AVDD_INA226_RSHUNT,
+        RB_DRS_AVDD_INA226_MEC,
+    );
+    drs_avdd_ina226.configure()?;
+
+    i2c_mux_1.select(RB_MAX11645_CHANNEL)?;
+    let max11645 = max11645::MAX11645::new(I2C_BUS, RB_MAX11645_ADDRESS);
+    max11645.setup()?;
+
+    i2c_mux_1.reset()?;
+    i2c_mux_2.reset()?;
+
+    Ok(())
 }

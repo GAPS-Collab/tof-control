@@ -19,10 +19,18 @@ pub struct PreampBias {
 /// Preamp Error Type
 #[derive(Debug)]
 pub enum PreampError {
+    /// Init Error
+    Init(PreampInitError),
     /// Temp Error
     Temp(PreampTempError),
     /// Bias Error
     Bias(PreampBiasError),
+}
+
+impl From<PreampInitError> for PreampError {
+    fn from(e: PreampInitError) -> Self {
+        PreampError::Init(e)
+    }
 }
 
 impl From<PreampTempError> for PreampError {
@@ -37,6 +45,23 @@ impl From<PreampBiasError> for PreampError {
     }
 }
 
+#[derive(Debug)]
+pub enum PreampInitError {
+    /// Bias Error
+    Bias(PreampBiasError),
+}
+
+impl std::fmt::Display for PreampInitError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "PreampInitError")
+    }
+}
+
+impl From<PreampBiasError> for PreampInitError {
+    fn from(e: PreampBiasError) -> Self {
+        PreampInitError::Bias(e)
+    }
+}
 
 #[derive(Debug)]
 pub enum PreampTempError {

@@ -1,4 +1,6 @@
 use crate::constant::*;
+
+use crate::helper::rb_type::RBMagError;
 use crate::device::{lis3mdltr, pca9548a};
 
 pub struct RBmag {
@@ -16,7 +18,7 @@ impl RBmag {
             .expect("cannot accesss to PCA9548A");
 
         let lis3mdltr = lis3mdltr::LIS3MDLTR::new(I2C_BUS, RB_LIS3MDLTR_ADDRESS);
-        lis3mdltr.configure();
+        // lis3mdltr.configure()?;
         let magnetic_field = lis3mdltr
             .read_magnetic_field()
             .expect("cannot read LIS3MDLTR");
@@ -43,4 +45,15 @@ impl RBmag {
             rb_magnetic.magnetic_t
         );
     }
+}
+
+pub fn config_mag() -> Result<(), RBMagError> {
+    let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_1);
+    i2c_mux.select(RB_LIS3MDLTR_CHANNEL)?;
+    let lis3mdltr = lis3mdltr::LIS3MDLTR::new(I2C_BUS, RB_LIS3MDLTR_ADDRESS);
+    lis3mdltr.configure()?;
+
+    i2c_mux.reset()?;
+
+    Ok(())
 }

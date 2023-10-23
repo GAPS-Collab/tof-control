@@ -87,22 +87,34 @@ impl LIS3MDLTR {
     pub fn new(bus: u8, address: u16) -> Self {
         Self { bus, address }
     }
-    pub fn configure(&self) {
-        let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", self.bus), self.address)
-            .expect("cannot access to i2c");
+    // pub fn configure(&self) {
+    //     let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", self.bus), self.address)
+    //         .expect("cannot access to i2c");
 
-        self.configure_2(&mut dev, true)
-            .expect("cannot configure LIS3MDLTR (CTRL_REG2)");
-        self.configure_1(&mut dev)
-            .expect("cannot configure LIS3MDLTR (CTRL_REG1)");
-        self.configure_2(&mut dev, false)
-            .expect("cannot configure LIS3MDLTR (CTRL_REG2)");
-        self.configure_3(&mut dev)
-            .expect("cannot configure LIS3MDLTR (CTRL_REG3)");
-        self.configure_4(&mut dev)
-            .expect("cannot configure LIS3MDLTR (CTRL_REG4)");
-        self.configure_5(&mut dev)
-            .expect("cannot configure LIS3MDLTR (CTRL_REG5)");
+    //     self.configure_2(&mut dev, true)
+    //         .expect("cannot configure LIS3MDLTR (CTRL_REG2)");
+    //     self.configure_1(&mut dev)
+    //         .expect("cannot configure LIS3MDLTR (CTRL_REG1)");
+    //     self.configure_2(&mut dev, false)
+    //         .expect("cannot configure LIS3MDLTR (CTRL_REG2)");
+    //     self.configure_3(&mut dev)
+    //         .expect("cannot configure LIS3MDLTR (CTRL_REG3)");
+    //     self.configure_4(&mut dev)
+    //         .expect("cannot configure LIS3MDLTR (CTRL_REG4)");
+    //     self.configure_5(&mut dev)
+    //         .expect("cannot configure LIS3MDLTR (CTRL_REG5)");
+    // }
+    pub fn configure(&self) -> Result<(), LinuxI2CError> {
+        let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", self.bus), self.address)?;
+
+        self.configure_2(&mut dev, true)?;
+        self.configure_1(&mut dev)?;
+        self.configure_2(&mut dev, false)?;
+        self.configure_3(&mut dev)?;
+        self.configure_4(&mut dev)?;
+        self.configure_5(&mut dev)?;
+
+        Ok(())
     }
     fn configure_1(&self, dev: &mut LinuxI2CDevice) -> Result<(), LinuxI2CError> {
         let config = TEMP_EN | OM_MPM | DO_10 | FAST_ODR_DI | ST_DI;

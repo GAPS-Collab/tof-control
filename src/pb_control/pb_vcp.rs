@@ -1,4 +1,5 @@
 use crate::constant::*;
+use crate::helper::pb_type::PBVcpError;
 use crate::device::{ina219, ina226, max11617, pca9548a};
 
 pub struct PBvcp {
@@ -167,4 +168,54 @@ impl PBvcp {
             pb_vcp.n1v6_preamp_voltage, pb_vcp.n1v6_preamp_current, pb_vcp.n1v6_preamp_power
         );
     }
+}
+
+pub fn config_vcp() -> Result<(), PBVcpError> {
+    let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, PB_PCA9548A_ADDRESS);
+    
+    i2c_mux.select(PB_P3V6_PREAMP_INA226_CHANNEL)?;
+    let p3v6_preamp_ina226 = ina226::INA226::new(
+        I2C_BUS,
+        PB_P3V6_PREAMP_INA226_ADDRESS,
+        PB_P3V6_PREAMP_INA226_RSHUNT,
+        PB_P3V6_PREAMP_INA226_MEC,
+    );
+    p3v6_preamp_ina226.configure()?;
+
+    i2c_mux.select(PB_ADC_1_CHANNEL)?;
+    let max11617 = max11617::MAX11617::new(I2C_BUS, PB_MAX11617_ADDRESS);
+    max11617.setup()?;
+
+    i2c_mux.select(PB_LTB_INA219_CHANNEL)?;
+    let p3v4f_ltb_ina219 = ina219::INA219::new(
+        I2C_BUS,
+        PB_P3V4F_LTB_INA219_ADDRESS,
+        PB_P3V4F_LTB_INA219_RSHUNT,
+        PB_P3V4F_LTB_INA219_MEC,
+    );
+    p3v4f_ltb_ina219.configure()?;
+
+    let p3v4d_ltb_ina219 = ina219::INA219::new(
+        I2C_BUS,
+        PB_P3V4D_LTB_INA219_ADDRESS,
+        PB_P3V4D_LTB_INA219_RSHUNT,
+        PB_P3V4D_LTB_INA219_MEC,
+    );
+    p3v4d_ltb_ina219.configure()?;
+
+    let p3v6_ltb_ina219 = ina219::INA219::new(
+        I2C_BUS,
+        PB_P3V6_LTB_INA219_ADDRESS,
+        PB_P3V6_LTB_INA219_RSHUNT,
+        PB_P3V6_LTB_INA219_MEC,
+    );
+    p3v6_ltb_ina219.configure()?;
+
+    i2c_mux.select(PB_ADC_2_CHANNEL)?;
+    let max11617 = max11617::MAX11617::new(I2C_BUS, PB_MAX11617_ADDRESS);
+    max11617.setup()?;
+
+    i2c_mux.reset()?;
+
+    Ok(())
 }

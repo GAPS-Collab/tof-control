@@ -76,18 +76,30 @@ elif [ "$1" = "rb-clk-nvm" ]; then
     cross build --release --bin rb-clk-nvm --target=armv7-unknown-linux-musleabi
     scp target/armv7-unknown-linux-musleabi/release/rb-clk-nvm tof-rb00:~/dev
 
+elif [ "$1" = "rb-control" ]; then
+    # rm -rf target/armv7-unknown*
+    CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
+    cross build --release --bin rb-control --target=armv7-unknown-linux-musleabi
+    scp target/armv7-unknown-linux-musleabi/release/rb-control tof-rb18:~/dev
+    scp target/armv7-unknown-linux-musleabi/release/rb-control tof-rb09:~/dev
+    # scp target/armv7-unknown-linux-musleabi/release/rb-control tof-rb00:~/dev
+
 elif [ "$1" = "ltb-control" ]; then
     CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
     cross build --release --bin ltb-control --target=armv7-unknown-linux-musleabi
-    scp target/armv7-unknown-linux-musleabi/release/ltb-control tof-rb19:~/dev
-    scp target/armv7-unknown-linux-musleabi/release/ltb-control tof-rb20:~/dev
-    # scp target/armv7-unknown-linux-musleabi/release/ltb-control tof-rb00:~/dev
+    # scp target/armv7-unknown-linux-musleabi/release/ltb-control tof-rb19:~/dev
+    # scp target/armv7-unknown-linux-musleabi/release/ltb-control tof-rb20:~/dev
+    # scp target/armv7-unknown-linux-musleabi/release/ltb-control tof-rb22:~/dev
+    # scp target/armv7-unknown-linux-musleabi/release/ltb-control tof-rb26:~/dev
+    scp target/armv7-unknown-linux-musleabi/release/ltb-control tof-rb37:~/dev
 
 elif [ "$1" = "pb-control" ]; then
     CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
     cross build --release --bin pb-control --target=armv7-unknown-linux-musleabi
     scp target/armv7-unknown-linux-musleabi/release/pb-control tof-rb19:~/dev
     scp target/armv7-unknown-linux-musleabi/release/pb-control tof-rb20:~/dev
+    scp target/armv7-unknown-linux-musleabi/release/pb-control tof-rb22:~/dev
+    scp target/armv7-unknown-linux-musleabi/release/pb-control tof-rb26:~/dev
     # scp target/armv7-unknown-linux-musleabi/release/pb-control tof-rb26:~/dev
 
 elif [ "$1" = "preamp-control" ]; then
@@ -95,78 +107,36 @@ elif [ "$1" = "preamp-control" ]; then
     cross build --release --bin preamp-control --target=armv7-unknown-linux-musleabi
     scp target/armv7-unknown-linux-musleabi/release/preamp-control tof-rb19:~/dev
     scp target/armv7-unknown-linux-musleabi/release/preamp-control tof-rb20:~/dev
+    scp target/armv7-unknown-linux-musleabi/release/preamp-control tof-rb22:~/dev
+    scp target/armv7-unknown-linux-musleabi/release/preamp-control tof-rb26:~/dev
     # scp target/armv7-unknown-linux-musleabi/release/pb-control tof-rb26:~/dev
+
+elif [ "$1" = "rb-wd" ]; then
+    rm -rf target/
+    CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
+    cross build --release --bin rb-wd --target=armv7-unknown-linux-musleabi
+    scp target/armv7-unknown-linux-musleabi/release/rb-wd tof-computer:/home/gaps/tof-rb/sbin
+
+elif [ "$1" = "rat-init" ]; then
+    rm -rf target/
+    CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
+    cross build --release --bin rat-init --target=armv7-unknown-linux-musleabi
+    scp target/armv7-unknown-linux-musleabi/release/rat-init tof-computer:/home/gaps/tof-rb/bin
+    # scp target/armv7-unknown-linux-musleabi/release/rat-init tof-rb41:~/dev
+    # scp target/armv7-unknown-linux-musleabi/release/rat-init tof-rb42:~/dev
+
+elif [ "$1" = "cpu-control" ]; then
+    # rm -rf target/x86_64-unknown*
+    CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
+    cross build --release --bin cpu-control --target=x86_64-unknown-linux-musl
+    scp target/x86_64-unknown-linux-musl/release/cpu-control tof-computer:/home/gaps/dev
+    # CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
+    # cross build --release --bin cpu-control --target=x86_64-unknown-linux-gnu
+    # scp target/x86_64-unknown-linux-gnu/release/cpu-control tof-computer:/home/gaps/dev
 
 else
     CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
     cross build --bin tof-control --target=armv7-unknown-linux-musleabi
     # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb01:~/takeru_dev
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb02:~/takeru_dev
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb03:~/takeru_dev
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb04:~/takeru_dev
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb05:~/takeru_dev
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb06:~/takeru_dev
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb03:~/takeru_dev
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb52:~/takeru_dev
-
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb00:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb01:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb02:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb03:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb04:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb05:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb06:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb07:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb08:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb09:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb10:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb11:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb12:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb13:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb14:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb15:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb16:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb17:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb18:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb19:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb20:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb21:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb22:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb23:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb49:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb52-ssl:~/bin
-
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb05:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb10:~/takeru_dev
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb21:~/takeru_dev
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb22:~/takeru_dev
-    scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb43:~/takeru_dev
-    cp target/armv7-unknown-linux-musleabi/debug/tof-control /home/gaps/nts_bin
-
-    # ## SSL
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb01:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb02:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb03:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb04:~/bin
-    # # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb05:~/bin
-    # # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb06:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb07:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb08:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb09:~/bin
-    # # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb10:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb11:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb12:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb13:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb14:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb15:~/bin
-    # # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb16:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb17:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb18:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb19:~/bin
-    # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb20:~/bin
-    # # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb21:~/bin
-    # # scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb22:~/bin
 fi
-# scp target/armv7-unknown-linux-musleabi/debug/tof-control gaps@10.97.108.39:~/takeru_dev
-# scp target/armv7-unknown-linux-musleabi/debug/tof-control tof-rb52:~/takeru_dev
 

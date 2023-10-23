@@ -13,6 +13,22 @@ edition = "2021"
 opt-level = "z"
 
 [[bin]]
+name = "cpu-control"
+path = "src/bin/cpu_control.rs"
+
+[[bin]]
+name = "rat-init"
+path = "src/bin/rat_init.rs"
+
+[[bin]]
+name = "rb-control"
+path = "src/bin/rb_control.rs"
+
+[[bin]]
+name = "rb-wd"
+path = "src/bin/rb_wd.rs"
+
+[[bin]]
 name = "ltb-control"
 path = "src/bin/ltb_control.rs"
 
@@ -91,13 +107,14 @@ csv = "1.1"
 comfy-table = "6.1.4"
 gethostname = "0.4.1"
 libc = "0.2.140"
-openssl = { version = "0.10", features = ["vendored"] }
-influxdb2 = "0.4.0"
+# openssl = { version = "0.10", features = ["vendored"] }
 # tokio = "1.27.0"
 tokio = { version = "1.27.0", features = ["macros", "rt-multi-thread"] }
 futures = "0.3.28"
 chrono = "0.4.24"
-influxdb2-derive = "0.1.1"
+sysfs_gpio = "0.6.1"
+systemstat = "0.2.3"
+sysinfo = "0.29.10"
 
 [build-dependencies]
 bindgen = "0.64.0"

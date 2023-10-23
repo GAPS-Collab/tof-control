@@ -41,3 +41,10 @@ impl LTBTemp {
         Ok(trenz_temp)
     }
 }
+
+pub fn config_temp() -> Result<(), LTBTempError> {
+    let ltb_tmp112 = tmp112::TMP112::new(I2C_BUS, LTB_TMP112_ADDRESS);
+    ltb_tmp112.config()?;
+
+    Ok(())
+}
