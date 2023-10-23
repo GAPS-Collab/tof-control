@@ -6,19 +6,14 @@ impl PBTemp {
     pub fn new() -> Self {
         match Self::read_temp() {
             Ok(pb_temp) => {
-                Self {
-                    pds_temp: pb_temp.pds_temp,
-                    pas_temp: pb_temp.pas_temp,
-                    nas_temp: pb_temp.nas_temp,
-                    shv_temp: pb_temp.shv_temp,
-                }
+                pb_temp
             }
             Err(_) => {
                 Self {
-                    pds_temp: f32::MIN,
-                    pas_temp: f32::MIN,
-                    nas_temp: f32::MIN,
-                    shv_temp: f32::MIN,
+                    pds_temp: f32::MAX,
+                    pas_temp: f32::MAX,
+                    nas_temp: f32::MAX,
+                    shv_temp: f32::MAX,
                 }
             }
         }
@@ -30,44 +25,28 @@ impl PBTemp {
 
         // Positive Degital Supply DC-DC Converter Temperature
         let pds_tmp1075 = tmp1075::TMP1075::new(I2C_BUS, PB_PDS_TMP1075_ADDRESS);
-        pds_tmp1075.config()?;
-        let pds_temp: f32;
-        match pds_tmp1075.read() {
-            Ok(t) => pds_temp = t,
-            Err(_) => pds_temp = f32::MAX,
-        }
+        // pds_tmp1075.config()?;
+        let pds_temp = pds_tmp1075.read()?;
 
         // Positive Analog Supply DC-DC Converter Temperature
         let pas_tmp1075 = tmp1075::TMP1075::new(I2C_BUS, PB_PAS_TMP1075_ADDRESS);
-        pas_tmp1075.config()?;
-        let pas_temp: f32;
-        match pas_tmp1075.read() {
-            Ok(t) => pas_temp = t,
-            Err(_) => pas_temp = f32::MAX,
-        }
+        // pas_tmp1075.config()?;
+        let pas_temp = pas_tmp1075.read()?;
 
         // Negative Analog Supply DC-DC Converter Temperature
         let nas_tmp1075 = tmp1075::TMP1075::new(I2C_BUS, PB_NAS_TMP1075_ADDRESS);
-        nas_tmp1075.config()?;
-        let nas_temp: f32;
-        match nas_tmp1075.read() {
-            Ok(t) => nas_temp = t,
-            Err(_) => nas_temp = f32::MAX,
-        }
+        // nas_tmp1075.config()?;
+        let nas_temp = nas_tmp1075.read()?;
 
         // SiPM High Voltage Supply DC-DC Converter Temperature
         let shv_tmp1075 = tmp1075::TMP1075::new(I2C_BUS, PB_SHV_TMP1075_ADDRESS);
-        shv_tmp1075.config()?;
-        let shv_temp: f32;
-        match shv_tmp1075.read() {
-            Ok(t) => shv_temp = t,
-            Err(_) => shv_temp = f32::MAX,
-        }
+        // shv_tmp1075.config()?;
+        let shv_temp = shv_tmp1075.read()?;
 
         i2c_mux.reset()?;
 
         Ok(
-            Self {
+            PBTemp {
                 pds_temp,
                 pas_temp,
                 nas_temp,
