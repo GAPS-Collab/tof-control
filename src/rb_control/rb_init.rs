@@ -50,7 +50,8 @@ fn initialize_daq() -> Result<(), RBInitError> {
 
     // Enable All Channels
     value = read_control_reg(READOUT_MASK)?;
-    value = value | 0x1FF;
+    // value = value | 0x1FF;
+    value = value & 0x1FF;
     write_control_reg(READOUT_MASK, value)?;
 
     // Start DRS Chip

@@ -56,6 +56,17 @@ impl RBTemp {
             }
         )
     }
+    pub fn read_drs_temp() -> Result<f32, RBTempError> {
+        let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_1);
+        i2c_mux.select(RB_DRS_TMP112_CHANNEL)?;
+        let drs_tmp112 = tmp112::TMP112::new(I2C_BUS, RB_DRS_TMP112_ADDRESS);
+        // drs_tmp112.config()?;
+        let drs_temp = drs_tmp112.read()?;
+
+        i2c_mux.reset()?;
+
+        Ok(drs_temp)
+    }
 }
 
 pub fn config_temp() -> Result<(), RBTempError> {

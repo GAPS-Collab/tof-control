@@ -81,7 +81,9 @@ elif [ "$1" = "rb-control" ]; then
     CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
     cross build --release --bin rb-control --target=armv7-unknown-linux-musleabi
     scp target/armv7-unknown-linux-musleabi/release/rb-control tof-rb18:~/dev
-    scp target/armv7-unknown-linux-musleabi/release/rb-control tof-rb09:~/dev
+    # scp target/armv7-unknown-linux-musleabi/release/rb-control tof-rb09:~/dev
+    # scp target/armv7-unknown-linux-musleabi/release/rb-control tof-rb25:~/dev
+    # scp target/armv7-unknown-linux-musleabi/release/rb-control tof-rb16:~/dev
     # scp target/armv7-unknown-linux-musleabi/release/rb-control tof-rb00:~/dev
 
 elif [ "$1" = "ltb-control" ]; then
@@ -124,6 +126,7 @@ elif [ "$1" = "rat-init" ]; then
     scp target/armv7-unknown-linux-musleabi/release/rat-init tof-computer:/home/gaps/tof-rb/bin
     # scp target/armv7-unknown-linux-musleabi/release/rat-init tof-rb41:~/dev
     # scp target/armv7-unknown-linux-musleabi/release/rat-init tof-rb42:~/dev
+    # scp target/armv7-unknown-linux-musleabi/release/rat-init tof-rb25:~/bin
 
 elif [ "$1" = "cpu-control" ]; then
     # rm -rf target/x86_64-unknown*

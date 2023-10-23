@@ -3,7 +3,7 @@ use std::fs::OpenOptions;
 use std::io::prelude::*;
 use chrono::Utc;
 
-use tof_control::helper::rb_type::{RBInfo, RBInitError};
+use tof_control::helper::rb_type::{RBInfo, RBTemp, RBVcp, RBInitError};
 use tof_control::rb_control::{rb_info, rb_init, rb_clk, rb_gpioe, rb_dac};
 use tof_control::constant::*;
 
@@ -41,8 +41,8 @@ enum Commands {
 #[derive(ValueEnum, Clone, Debug)]
 enum Sensor {
     Info,
-    // Temp,
-    // Bias,
+    Temp,
+    Vcp,
 }
 
 fn main() {
@@ -55,12 +55,19 @@ fn main() {
                 Some(s) => {
                     match s {
                         Sensor::Info => {
-                            read_info();
-                        },
+                            print_info();
+                        }
+                        Sensor::Temp => {
+                            print_temp();
+                        }
+                        Sensor::Vcp => {
+                            print_vcp();
+                        }
                     }
                 },
                 None => {
-                    read_info();
+                    print_info();
+                    print_temp();
                 }
             }
         },
@@ -106,7 +113,7 @@ fn initialize_rb() {
     }
 }
 
-fn read_info() {
+fn print_info() {
     let rb_info = RBInfo::new();
 
     println!("RB Information");
@@ -116,6 +123,31 @@ fn read_info() {
     println!("\tTrigger Rate (MTB): {}[Hz]", rb_info.trig_rate);
     // Additional Info
     println!("\tFirmware Version:   {}", rb_info.fw_version);
+    println!("\tReadout Mask:       {:#X}", rb_info.readout_mask);
+}
+
+fn print_temp() {
+    let rb_temp = RBTemp::new();
+
+    println!("RB Temperature");
+    println!("\tZYNQ Temp:          {:.3}[°C]", rb_temp.zynq_temp);
+    println!("\tDRS Temp:           {:.3}[°C]", rb_temp.drs_temp);
+    println!("\tCLK Temp:           {:.3}[°C]", rb_temp.clk_temp);
+    println!("\tADC Temp:           {:.3}[°C]", rb_temp.adc_temp);
+}
+
+fn print_vcp() {
+    let rb_vcp = RBVcp::new();
+
+    println!("RB VCP (Voltage, Current, Power)");
+    println!("\tZYNQ VCP:          {:.3}[V] | {:.3}[A] | {:.3}[W]", rb_vcp.zynq_vcp[0], rb_vcp.zynq_vcp[1], rb_vcp.zynq_vcp[2]);
+    println!("\t3.3V VCP:          {:.3}[V] | {:.3}[A] | {:.3}[W]", rb_vcp.p3v3_vcp[0], rb_vcp.p3v3_vcp[1], rb_vcp.p3v3_vcp[2]);
+    println!("\t3.5V VCP:          {:.3}[V] | {:.3}[A] | {:.3}[W]", rb_vcp.p3v5_vcp[0], rb_vcp.p3v5_vcp[1], rb_vcp.p3v5_vcp[2]);
+    println!("\t-1.5V VCP:         {:.3}[V] | {:.3}[A] | {:.3}[W]", rb_vcp.n1v5_vcp[0], rb_vcp.n1v5_vcp[1], rb_vcp.n1v5_vcp[2]);
+    println!("\tDRS DVDD VCP:      {:.3}[V] | {:.3}[A] | {:.3}[W]", rb_vcp.drs_dvdd_vcp[0], rb_vcp.drs_dvdd_vcp[1], rb_vcp.drs_dvdd_vcp[2]);
+    println!("\tDRS AVDD VCP:      {:.3}[V] | {:.3}[A] | {:.3}[W]", rb_vcp.drs_avdd_vcp[0], rb_vcp.drs_avdd_vcp[1], rb_vcp.drs_avdd_vcp[2]);
+    println!("\tADC DVDD VCP:      {:.3}[V] | {:.3}[A] | {:.3}[W]", rb_vcp.adc_dvdd_vcp[0], rb_vcp.adc_dvdd_vcp[1], rb_vcp.adc_dvdd_vcp[2]);
+    println!("\tADC AVDD VCP:      {:.3}[V] | {:.3}[A] | {:.3}[W]", rb_vcp.adc_avdd_vcp[0], rb_vcp.adc_avdd_vcp[1], rb_vcp.adc_avdd_vcp[2]);
 }
 
 fn write_err_log(error: String) -> Result<(), std::io::Error> {

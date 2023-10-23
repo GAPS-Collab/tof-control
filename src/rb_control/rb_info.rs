@@ -16,13 +16,7 @@ impl RBInfo {
 
         match Self::read_all_info() {
             Ok(rb_info) => {
-                Self {
-                    board_id: rb_info.board_id,
-                    lol: rb_info.lol,
-                    lol_stable: rb_info.lol_stable,
-                    trig_rate: rb_info.trig_rate,
-                    fw_version: rb_info.fw_version,
-                }
+                rb_info
             }
             Err(_) => {
                 Self {
@@ -31,6 +25,7 @@ impl RBInfo {
                     lol_stable: u8::MAX,
                     trig_rate: u16::MAX,
                     fw_version: "0.0.0".to_string(),
+                    readout_mask: u16::MAX,
                 }
             }
         }
@@ -43,6 +38,7 @@ impl RBInfo {
         let trig_rate = Self::read_trig_rate()?;
         // Additional Info
         let fw_version = Self::read_fw_version()?;
+        let readout_mask = Self::read_readout_mask()?;
 
         Ok(
             RBInfo {
@@ -51,6 +47,7 @@ impl RBInfo {
                 lol_stable,
                 trig_rate,
                 fw_version,
+                readout_mask,
             }
         )
     }
@@ -99,6 +96,11 @@ impl RBInfo {
         fw_version = format!("{}.{}.{}", major_ver, minor_ver, patch);
 
         Ok(fw_version)
+    }
+    pub fn read_readout_mask() -> Result<u16, RBInfoError> {
+        let readout_mask = read_control_reg(READOUT_MASK)? as u16;
+
+        Ok(readout_mask)
     }
 
     // pub fn print_rb_info() {

@@ -49,20 +49,33 @@ pub struct RBMoniData {
 
 #[derive(Debug)]
 pub struct RBInfo {
-    pub board_id    : u8,
-    pub lol         : u8,
-    pub lol_stable  : u8,
-    pub trig_rate   : u16,
+    pub board_id        : u8,
+    pub lol             : u8,
+    pub lol_stable      : u8,
+    pub trig_rate       : u16,
     // Additional Info
-    pub fw_version  : String,
+    pub fw_version      : String,
+    pub readout_mask    : u16,
 }
 
 #[derive(Debug)]
 pub struct RBTemp {
-    pub zynq_temp   : f32,
-    pub drs_temp    : f32,
-    pub clk_temp    : f32,
-    pub adc_temp    : f32,
+    pub zynq_temp       : f32,
+    pub drs_temp        : f32,
+    pub clk_temp        : f32,
+    pub adc_temp        : f32,
+}
+
+#[derive(Debug)]
+pub struct RBVcp {
+    pub zynq_vcp        : [f32; 3],
+    pub p3v3_vcp        : [f32; 3],
+    pub p3v5_vcp        : [f32; 3],
+    pub n1v5_vcp        : [f32; 3],
+    pub drs_dvdd_vcp    : [f32; 3],
+    pub drs_avdd_vcp    : [f32; 3],
+    pub adc_dvdd_vcp    : [f32; 3],
+    pub adc_avdd_vcp    : [f32; 3],
 }
 
 /// RB Error Type
