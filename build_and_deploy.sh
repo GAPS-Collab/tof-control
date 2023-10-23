@@ -81,7 +81,7 @@ elif [ "$1" = "rb-control" ]; then
     CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
     cross build --release --bin rb-control --target=armv7-unknown-linux-musleabi
     scp target/armv7-unknown-linux-musleabi/release/rb-control tof-rb18:~/dev
-    # scp target/armv7-unknown-linux-musleabi/release/rb-control tof-rb09:~/dev
+    scp target/armv7-unknown-linux-musleabi/release/rb-control tof-rb09:~/dev
     # scp target/armv7-unknown-linux-musleabi/release/rb-control tof-rb25:~/dev
     # scp target/armv7-unknown-linux-musleabi/release/rb-control tof-rb16:~/dev
     # scp target/armv7-unknown-linux-musleabi/release/rb-control tof-rb00:~/dev

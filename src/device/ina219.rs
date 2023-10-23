@@ -75,37 +75,33 @@ impl INA219 {
             CONFIG_BRNG_32 | CONFIG_PG_320 | CONFIG_BADC_16S | CONFIG_SADC_16S | CONFIG_MODE_SBT;
         dev.smbus_write_i2c_block_data(CONFIG as u8, &config.to_be_bytes())
     }
-    fn calibrate(&self, dev: &mut LinuxI2CDevice) -> Result<(f32, f32), LinuxI2CError> {
+    fn calibrate(&self, dev: &mut LinuxI2CDevice) -> Result<[f32; 2], LinuxI2CError> {
         let c_lsb = self.mec / 2f32.powf(15.0);
         let p_lsb = 20.0 * c_lsb;
         let cal = 0.04096 / (c_lsb * self.rshunt);
 
         dev.smbus_write_i2c_block_data(CALIB as u8, &(cal as u16).to_be_bytes())?;
 
-        Ok((c_lsb, p_lsb))
+        let cal_lsb = [c_lsb, p_lsb];
+
+        Ok(cal_lsb)
     }
-    pub fn read_data(&self) -> Result<(f32, f32, f32), LinuxI2CError> {
+    pub fn read(&self) -> Result<[f32; 3], LinuxI2CError> {
         let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", self.bus), self.address)?;
 
-        let shunt_voltage = self
-            .read_shunt_voltage(&mut dev)
-            .expect("cannot read shunt voltage on INA219");
-        let bus_voltage = self
-            .read_bus_voltage(&mut dev)
-            .expect("cannot read bus voltage on INA219");
+        let shunt_voltage = self.read_shunt_voltage(&mut dev)?;
+        let bus_voltage = self.read_bus_voltage(&mut dev)?;
 
-        let (c_lsb, p_lsb) = self.calibrate(&mut dev).expect("cannot calibrate INA219");
+        let cal_lsb = self.calibrate(&mut dev)?;
 
-        let current = self
-            .read_current(&mut dev, c_lsb)
-            .expect("cannot read current on INA219");
-        let power = self
-            .read_power(&mut dev, p_lsb)
-            .expect("cannot read power on INA219");
+        let current = self.read_current(&mut dev, cal_lsb[0])?;
+        let power = self.read_power(&mut dev, cal_lsb[1])?;
 
-        Ok((bus_voltage, current, power))
+        let vcp = [bus_voltage, current, power];
+
+        Ok(vcp)
     }
-    fn read_shunt_voltage(&self, dev: &mut LinuxI2CDevice) -> Result<(f32), LinuxI2CError> {
+    fn read_shunt_voltage(&self, dev: &mut LinuxI2CDevice) -> Result<f32, LinuxI2CError> {
         let shunt_voltage_raw = dev.smbus_read_i2c_block_data(SHUNT as u8, 2)?;
         let mut shunt_voltage_adc =
             ((shunt_voltage_raw[0] as u16) << 8) | (shunt_voltage_raw[1] as u16);
@@ -119,7 +115,7 @@ impl INA219 {
 
         Ok(shunt_voltage)
     }
-    fn read_bus_voltage(&self, dev: &mut LinuxI2CDevice) -> Result<(f32), LinuxI2CError> {
+    fn read_bus_voltage(&self, dev: &mut LinuxI2CDevice) -> Result<f32, LinuxI2CError> {
         let bus_voltage_raw = dev.smbus_read_i2c_block_data(BUS as u8, 2)?;
         let bus_voltage_adc =
             (((bus_voltage_raw[0] as u16) << 8) | (bus_voltage_raw[1] as u16)) >> 3 & 0x1FFF;
@@ -127,7 +123,7 @@ impl INA219 {
 
         Ok(bus_voltage)
     }
-    fn read_current(&self, dev: &mut LinuxI2CDevice, c_lsb: f32) -> Result<(f32), LinuxI2CError> {
+    fn read_current(&self, dev: &mut LinuxI2CDevice, c_lsb: f32) -> Result<f32, LinuxI2CError> {
         let current_raw = dev.smbus_read_i2c_block_data(CURRENT as u8, 2)?;
         let mut current_adc = ((current_raw[0] as u16) << 8) | (current_raw[1] as u16);
         let mut sign: f32 = 1.0;
@@ -140,7 +136,7 @@ impl INA219 {
 
         Ok(current)
     }
-    fn read_power(&self, dev: &mut LinuxI2CDevice, p_lsb: f32) -> Result<(f32), LinuxI2CError> {
+    fn read_power(&self, dev: &mut LinuxI2CDevice, p_lsb: f32) -> Result<f32, LinuxI2CError> {
         let power_raw = dev.smbus_read_i2c_block_data(POWER as u8, 2)?;
         let power_adc = ((power_raw[0] as u16) << 8) | (power_raw[1] as u16);
         let power = (power_adc as f32) * p_lsb;

@@ -17,24 +17,12 @@ pub struct PBTemp {
 // PB VCP (Voltage, Current and Power) Sensor
 #[derive(Debug)]
 pub struct PBVcp {
-    pub p3v6_preamp_voltage: f32,
-    pub p3v6_preamp_current: f32,
-    pub p3v6_preamp_power: f32,
-    pub n1v6_preamp_voltage: f32,
-    pub n1v6_preamp_current: f32,
-    pub n1v6_preamp_power: f32,
-    pub p3v4f_ltb_voltage: f32,
-    pub p3v4f_ltb_current: f32,
-    pub p3v4f_ltb_power: f32,
-    pub p3v4d_ltb_voltage: f32,
-    pub p3v4d_ltb_current: f32,
-    pub p3v4d_ltb_power: f32,
-    pub p3v6_ltb_voltage: f32,
-    pub p3v6_ltb_current: f32,
-    pub p3v6_ltb_power: f32,
-    pub n1v6_ltb_voltage: f32,
-    pub n1v6_ltb_current: f32,
-    pub n1v6_ltb_power: f32,
+    pub p3v6_preamp_vcp:    [f32; 3],
+    pub n1v6_preamp_vcp:    [f32; 3],
+    pub p3v4f_ltb_vcp:      [f32; 3],
+    pub p3v4d_ltb_vcp:      [f32; 3],
+    pub p3v6_ltb_vcp:       [f32; 3],
+    pub n1v6_ltb_vcp:       [f32; 3],
 }
 
 /// PB Error Type
