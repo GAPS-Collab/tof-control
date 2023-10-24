@@ -67,6 +67,8 @@ impl MAX5825 {
     pub fn coden_loadn(&self, channel: u8, adc: u16) -> Result<(), LinuxI2CError> {
         let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", self.bus), self.address)?;
         let code_register_data = [((adc >> 4) as u8) & 0xFF, ((adc & 0x0F) as u8) << 4];
-        dev.smbus_write_i2c_block_data(((CODEN_LOADN as u8) | channel), &code_register_data)
+        dev.smbus_write_i2c_block_data(((CODEN_LOADN as u8) | channel), &code_register_data)?;
+
+        Ok(())
     }
 }

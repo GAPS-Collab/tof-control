@@ -1,5 +1,5 @@
 use crate::constant::*;
-use crate::helper::preamp_type::{PreampBias, PreampBiasError};
+use crate::helper::preamp_type::{PreampBias, PreampTemp, PreampBiasError};
 use crate::device::{max11615, max11617, max5825, pca9548a};
 
 impl PreampBias {
@@ -137,91 +137,6 @@ impl PreampBias {
     }
 }
 
-pub struct PreampBiasSet {}
-
-impl PreampBiasSet {
-    // pub fn reset_bias() {
-    //     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, PB_PCA9548A_ADDRESS);
-
-    //     i2c_mux
-    //         .select(PB_DAC_1_CHANNEL)
-    //         .expect("cannot access to PCA9548A");
-    //     let pb_dac_1 = max5825::MAX5825::new(I2C_BUS, PB_MAX5825_ADDRESS);
-    //     pb_dac_1.reset_dac().expect("cannot reset MAX5825(DAC1)");
-
-    //     i2c_mux
-    //         .select(PB_DAC_2_CHANNEL)
-    //         .expect("cannot access to PCA9548A");
-    //     let pb_dac_2 = max5825::MAX5825::new(I2C_BUS, PB_MAX5825_ADDRESS);
-
-    //     pb_dac_2.reset_dac().expect("cannot reset MAX5825(DAC2)");
-    // }
-
-    // pub fn set_bias_manual(bias_voltage: f32) {
-    //     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, PB_PCA9548A_ADDRESS);
-
-    //     i2c_mux
-    //         .select(PB_DAC_1_CHANNEL)
-    //         .expect("cannot access to PCA9548A");
-    //     let pb_dac_1 = max5825::MAX5825::new(I2C_BUS, PB_MAX5825_ADDRESS);
-    //     pb_dac_1
-    //         .coden_loadn(PREAMP_DAC_1_CHANNEL, Self::bias_to_adc(bias_voltage))
-    //         .expect("cannot set bias voltage 1 on MAX5825(DAC1)");
-    //     pb_dac_1
-    //         .coden_loadn(PREAMP_DAC_2_CHANNEL, Self::bias_to_adc(bias_voltage))
-    //         .expect("cannot set bias voltage 2 on MAX5825(DAC1)");
-    //     pb_dac_1
-    //         .coden_loadn(PREAMP_DAC_3_CHANNEL, Self::bias_to_adc(bias_voltage))
-    //         .expect("cannot set bias voltage 3 on MAX5825(DAC1)");
-    //     pb_dac_1
-    //         .coden_loadn(PREAMP_DAC_4_CHANNEL, Self::bias_to_adc(bias_voltage))
-    //         .expect("cannot set bias voltage 4 on MAX5825(DAC1)");
-    //     pb_dac_1
-    //         .coden_loadn(PREAMP_DAC_5_CHANNEL, Self::bias_to_adc(bias_voltage))
-    //         .expect("cannot set bias voltage 5 on MAX5825(DAC1)");
-    //     pb_dac_1
-    //         .coden_loadn(PREAMP_DAC_6_CHANNEL, Self::bias_to_adc(bias_voltage))
-    //         .expect("cannot set bias voltage 6 on MAX5825(DAC1)");
-    //     pb_dac_1
-    //         .coden_loadn(PREAMP_DAC_7_CHANNEL, Self::bias_to_adc(bias_voltage))
-    //         .expect("cannot set bias voltage 7 on MAX5825(DAC1)");
-    //     pb_dac_1
-    //         .coden_loadn(PREAMP_DAC_8_CHANNEL, Self::bias_to_adc(bias_voltage))
-    //         .expect("cannot set bias voltage 8 on MAX5825(DAC1)");
-
-    //     i2c_mux
-    //         .select(PB_DAC_2_CHANNEL)
-    //         .expect("cannot access to PCA9548A");
-    //     let pb_dac_2 = max5825::MAX5825::new(I2C_BUS, PB_MAX5825_ADDRESS);
-    //     pb_dac_2
-    //         .coden_loadn(PREAMP_DAC_9_CHANNEL, Self::bias_to_adc(bias_voltage))
-    //         .expect("cannot set bias voltage 9 on MAX5825(DAC2)");
-    //     pb_dac_2
-    //         .coden_loadn(PREAMP_DAC_10_CHANNEL, Self::bias_to_adc(bias_voltage))
-    //         .expect("cannot set bias voltage 10 on MAX5825(DAC2)");
-    //     pb_dac_2
-    //         .coden_loadn(PREAMP_DAC_11_CHANNEL, Self::bias_to_adc(bias_voltage))
-    //         .expect("cannot set bias voltage 11 on MAX5825(DAC2)");
-    //     pb_dac_2
-    //         .coden_loadn(PREAMP_DAC_12_CHANNEL, Self::bias_to_adc(bias_voltage))
-    //         .expect("cannot set bias voltage 12 on MAX5825(DAC2)");
-    //     pb_dac_2
-    //         .coden_loadn(PREAMP_DAC_13_CHANNEL, Self::bias_to_adc(bias_voltage))
-    //         .expect("cannot set bias voltage 13 on MAX5825(DAC2)");
-    //     pb_dac_2
-    //         .coden_loadn(PREAMP_DAC_14_CHANNEL, Self::bias_to_adc(bias_voltage))
-    //         .expect("cannot set bias voltage 14 on MAX5825(DAC2)");
-    //     pb_dac_2
-    //         .coden_loadn(PREAMP_DAC_15_CHANNEL, Self::bias_to_adc(bias_voltage))
-    //         .expect("cannot set bias voltage 15 on MAX5825(DAC2)");
-    //     pb_dac_2
-    //         .coden_loadn(PREAMP_DAC_16_CHANNEL, Self::bias_to_adc(bias_voltage))
-    //         .expect("cannot set bias voltage 16 on MAX5825(DAC2)");
-
-    //     i2c_mux.reset().expect("cannot reset PCA9548A");
-    // }
-}
-
 pub fn set_default_bias() -> Result<(), PreampBiasError> {
 
     let bias_voltage = bias_to_adc(PREAMP_DEFAULT_BIAS);
@@ -251,6 +166,64 @@ pub fn set_default_bias() -> Result<(), PreampBiasError> {
 
     Ok(())
 
+}
+
+pub fn set_bias() -> Result<(), PreampBiasError> {
+
+    // let mut bias_voltage = Default::default();
+
+    let preamp_bias_channels = [
+        PREAMP_DAC_1_CHANNEL, PREAMP_DAC_2_CHANNEL, PREAMP_DAC_3_CHANNEL, PREAMP_DAC_4_CHANNEL,
+        PREAMP_DAC_5_CHANNEL, PREAMP_DAC_6_CHANNEL, PREAMP_DAC_7_CHANNEL, PREAMP_DAC_8_CHANNEL,
+        PREAMP_DAC_9_CHANNEL, PREAMP_DAC_10_CHANNEL, PREAMP_DAC_11_CHANNEL, PREAMP_DAC_12_CHANNEL,
+        PREAMP_DAC_13_CHANNEL, PREAMP_DAC_14_CHANNEL, PREAMP_DAC_15_CHANNEL, PREAMP_DAC_16_CHANNEL,
+    ];
+
+    let mut bias_voltages: [u16; 16] = Default::default();
+
+    for i in 0..=15 {
+        bias_voltages[i] = bias_to_adc(sipm_temp_comp(i)?);
+    }
+
+    let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, PB_PCA9548A_ADDRESS);
+    
+    i2c_mux.select(PB_DAC_1_CHANNEL)?;
+    let pb_dac_1 = max5825::MAX5825::new(I2C_BUS, PB_MAX5825_ADDRESS);
+    for i in 0..=7 {
+        pb_dac_1.coden_loadn(preamp_bias_channels[i], bias_voltages[i])?;
+    }
+
+    i2c_mux.select(PB_DAC_2_CHANNEL)?;
+    let pb_dac_2 = max5825::MAX5825::new(I2C_BUS, PB_MAX5825_ADDRESS);
+    for i in 8..=15 {
+        pb_dac_2.coden_loadn(preamp_bias_channels[i], bias_voltages[i])?;
+    }
+
+    i2c_mux.reset()?;
+
+    Ok(())
+}
+
+pub fn sipm_temp_comp(ch: usize) -> Result<f32, PreampBiasError> {
+    let mut bias_voltage = Default::default();
+    
+    let preamp_temp = PreampTemp::read_signle_temp(ch)?;
+    if preamp_temp == f32::MAX {
+        bias_voltage = 0.0
+    } else {
+        if (0..=15).contains(&ch) {
+            bias_voltage = PREAMP_DEFAULT_BIAS + (preamp_temp - 20.0) * 0.054;
+        } else {
+            bias_voltage = 0.0;
+        }
+    }
+    // if (0..=15).contains(&ch) {
+    //     bias_voltage = PREAMP_DEFAULT_BIAS + (preamp_temp - 20.0) * 0.054;
+    // } else {
+    //     bias_voltage = 0.0;
+    // }
+
+    Ok(bias_voltage)
 }
 
 fn bias_to_adc(bias_voltage: f32) -> u16 {

@@ -3,7 +3,7 @@ use std::fs::OpenOptions;
 use std::io::prelude::*;
 use chrono::Utc;
 
-use tof_control::helper::rb_type::{RBInfo, RBTemp, RBVcp, RBPh, RBInitError};
+use tof_control::helper::rb_type::{RBInfo, RBTemp, RBVcp, RBPh, RBMag, RBInitError};
 use tof_control::rb_control::{rb_info, rb_init, rb_clk, rb_gpioe, rb_dac};
 use tof_control::constant::*;
 
@@ -44,6 +44,7 @@ enum Sensor {
     Temp,
     Vcp,
     Ph,
+    Mag,
 }
 
 fn main() {
@@ -67,6 +68,9 @@ fn main() {
                         Sensor::Ph => {
                             print_ph();
                         }
+                        Sensor::Mag => {
+                            print_mag();
+                        }
                     }
                 },
                 None => {
@@ -74,6 +78,7 @@ fn main() {
                     print_temp();
                     print_vcp();
                     print_ph();
+                    print_mag();
                 }
             }
         },
@@ -146,22 +151,31 @@ fn print_vcp() {
     let rb_vcp = RBVcp::new();
 
     println!("RB VCP (Voltage, Current and Power)");
-    println!("\tZYNQ VCP:          {:.3}[V] | {:.3}[A] | {:.3}[W]", rb_vcp.zynq_vcp[0], rb_vcp.zynq_vcp[1], rb_vcp.zynq_vcp[2]);
-    println!("\t3.3V VCP:          {:.3}[V] | {:.3}[A] | {:.3}[W]", rb_vcp.p3v3_vcp[0], rb_vcp.p3v3_vcp[1], rb_vcp.p3v3_vcp[2]);
-    println!("\t3.5V VCP:          {:.3}[V] | {:.3}[A] | {:.3}[W]", rb_vcp.p3v5_vcp[0], rb_vcp.p3v5_vcp[1], rb_vcp.p3v5_vcp[2]);
-    println!("\t-1.5V VCP:        {:.3}[V] | {:.3}[A] | {:.3}[W]", rb_vcp.n1v5_vcp[0], rb_vcp.n1v5_vcp[1], rb_vcp.n1v5_vcp[2]);
-    println!("\tDRS DVDD VCP:      {:.3}[V] | {:.3}[A] | {:.3}[W]", rb_vcp.drs_dvdd_vcp[0], rb_vcp.drs_dvdd_vcp[1], rb_vcp.drs_dvdd_vcp[2]);
-    println!("\tDRS AVDD VCP:      {:.3}[V] | {:.3}[A] | {:.3}[W]", rb_vcp.drs_avdd_vcp[0], rb_vcp.drs_avdd_vcp[1], rb_vcp.drs_avdd_vcp[2]);
-    println!("\tADC DVDD VCP:      {:.3}[V] | {:.3}[A] | {:.3}[W]", rb_vcp.adc_dvdd_vcp[0], rb_vcp.adc_dvdd_vcp[1], rb_vcp.adc_dvdd_vcp[2]);
-    println!("\tADC AVDD VCP:      {:.3}[V] | {:.3}[A] | {:.3}[W]", rb_vcp.adc_avdd_vcp[0], rb_vcp.adc_avdd_vcp[1], rb_vcp.adc_avdd_vcp[2]);
+    println!("\tZYNQ VCP:           {:.3}[V] | {:.3}[A] | {:.3}[W]", rb_vcp.zynq_vcp[0], rb_vcp.zynq_vcp[1], rb_vcp.zynq_vcp[2]);
+    println!("\t3.3V VCP:           {:.3}[V] | {:.3}[A] | {:.3}[W]", rb_vcp.p3v3_vcp[0], rb_vcp.p3v3_vcp[1], rb_vcp.p3v3_vcp[2]);
+    println!("\t3.5V VCP:           {:.3}[V] | {:.3}[A] | {:.3}[W]", rb_vcp.p3v5_vcp[0], rb_vcp.p3v5_vcp[1], rb_vcp.p3v5_vcp[2]);
+    println!("\t-1.5V VCP:         {:.3}[V] | {:.3}[A] | {:.3}[W]", rb_vcp.n1v5_vcp[0], rb_vcp.n1v5_vcp[1], rb_vcp.n1v5_vcp[2]);
+    println!("\tDRS DVDD VCP:       {:.3}[V] | {:.3}[A] | {:.3}[W]", rb_vcp.drs_dvdd_vcp[0], rb_vcp.drs_dvdd_vcp[1], rb_vcp.drs_dvdd_vcp[2]);
+    println!("\tDRS AVDD VCP:       {:.3}[V] | {:.3}[A] | {:.3}[W]", rb_vcp.drs_avdd_vcp[0], rb_vcp.drs_avdd_vcp[1], rb_vcp.drs_avdd_vcp[2]);
+    println!("\tADC DVDD VCP:       {:.3}[V] | {:.3}[A] | {:.3}[W]", rb_vcp.adc_dvdd_vcp[0], rb_vcp.adc_dvdd_vcp[1], rb_vcp.adc_dvdd_vcp[2]);
+    println!("\tADC AVDD VCP:       {:.3}[V] | {:.3}[A] | {:.3}[W]", rb_vcp.adc_avdd_vcp[0], rb_vcp.adc_avdd_vcp[1], rb_vcp.adc_avdd_vcp[2]);
 }
 
 fn print_ph() {
     let rb_ph = RBPh::new();
 
     println!("RB PH (Pressure and Humidity)");
-    println!("\tPressure:          {:.3}[hPa]", rb_ph.pressure);
-    println!("\tHumidity:          {:.3}[%]", rb_ph.humidity);
+    println!("\tPressure:           {:.3}[hPa]", rb_ph.pressure);
+    println!("\tHumidity:           {:.3}[%]", rb_ph.humidity);
+}
+
+fn print_mag() {
+    let rb_mag = RBMag::new();
+
+    println!("RB Magnetic Sensor");
+    println!("\tX-Axis:             {:.3}[G]", rb_mag.mag_xyz[0]);
+    println!("\tY-Axis:             {:.3}[G]", rb_mag.mag_xyz[1]);
+    println!("\tZ-Axis:             {:.3}[G]", rb_mag.mag_xyz[2]);
 }
 
 fn write_err_log(error: String) -> Result<(), std::io::Error> {

@@ -107,11 +107,8 @@ elif [ "$1" = "pb-control" ]; then
 elif [ "$1" = "preamp-control" ]; then
     CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
     cross build --release --bin preamp-control --target=armv7-unknown-linux-musleabi
-    scp target/armv7-unknown-linux-musleabi/release/preamp-control tof-rb19:~/dev
-    scp target/armv7-unknown-linux-musleabi/release/preamp-control tof-rb20:~/dev
-    scp target/armv7-unknown-linux-musleabi/release/preamp-control tof-rb22:~/dev
-    scp target/armv7-unknown-linux-musleabi/release/preamp-control tof-rb26:~/dev
-    # scp target/armv7-unknown-linux-musleabi/release/pb-control tof-rb26:~/dev
+    scp target/armv7-unknown-linux-musleabi/release/preamp-control tof-rb18:~/dev
+    scp target/armv7-unknown-linux-musleabi/release/preamp-control tof-rb09:~/dev
 
 elif [ "$1" = "rb-wd" ]; then
     rm -rf target/

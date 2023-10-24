@@ -79,10 +79,18 @@ impl From<i2cdev::linux::LinuxI2CError> for PreampTempError {
 pub enum PreampBiasError {
     /// I2C Error
     I2C(i2cdev::linux::LinuxI2CError),
+    /// Temp Error
+    Temp(PreampTempError),
 }
 
 impl From<i2cdev::linux::LinuxI2CError> for PreampBiasError {
     fn from(e: i2cdev::linux::LinuxI2CError) -> Self {
         PreampBiasError::I2C(e)
+    }
+}
+
+impl From<PreampTempError> for PreampBiasError {
+    fn from(e: PreampTempError) -> Self {
+        PreampBiasError::Temp(e)
     }
 }

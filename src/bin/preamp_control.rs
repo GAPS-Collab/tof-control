@@ -1,5 +1,8 @@
 use clap::{Parser, Subcommand, ValueEnum};
+use i2cdev::core::*;
+use i2cdev::linux::{LinuxI2CDevice, LinuxI2CError};
 
+use tof_control::constant::{I2C_BUS, PB_PCA9548A_ADDRESS};
 use tof_control::helper::preamp_type::{PreampTemp, PreampBias};
 use tof_control::preamp_control::preamp_bias;
 
@@ -42,6 +45,11 @@ enum Sensor {
 
 fn main() {
 
+    // Check if PB is connected
+    if check_i2c(I2C_BUS, PB_PCA9548A_ADDRESS).is_err() {
+        std::process::exit(0);
+    }
+
     let cli = Cli::parse();
 
     match cli.command {
@@ -68,14 +76,15 @@ fn main() {
                 (Some(c), Some(b)) => {
                     todo!();
                 },
-                (Some(_), None) => {
+                (Some(c), None) => {
                     todo!();
                 },
                 (None, Some(_)) => {
                     todo!();
                 },
                 (None, None) => {
-                    set_default_bias();
+                    // set_default_bias();
+                    set_bias();
                 }
             }
         },
@@ -137,9 +146,27 @@ fn set_default_bias() {
     }
 }
 
+fn set_bias() {
+    // match preamp_bias::sipm_temp_comp(ch) {
+    //     Ok(b) => println!("{}[V]", b),
+    //     Err(e) => eprintln!("{:?}", e),
+    // }
+    match preamp_bias::set_bias() {
+        Ok(_) => {},
+        Err(e) => eprintln!("{:?}", e),
+    }
+}
+
 fn reset_bias() {
     match preamp_bias::reset_bias() {
         Ok(_) => {},
         Err(e) => eprintln!("{:?}", e),
      }
+}
+
+fn check_i2c(bus: u8, address: u16) -> Result<(), LinuxI2CError> {
+    let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", bus), address)?;
+    dev.smbus_read_byte()?;
+
+    Ok(())
 }
