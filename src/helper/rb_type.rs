@@ -84,6 +84,11 @@ pub struct RBPh {
     pub humidity        : f32,
 }
 
+#[derive(Debug)]
+pub struct RBMag {
+    pub mag_xyz         : [f32; 3],
+}
+
 /// RB Error Type
 #[derive(Debug)]
 pub enum RBError {

@@ -3,7 +3,7 @@ use std::fs::OpenOptions;
 use std::io::prelude::*;
 use chrono::Utc;
 
-use tof_control::helper::rb_type::{RBInfo, RBTemp, RBVcp, RBInitError};
+use tof_control::helper::rb_type::{RBInfo, RBTemp, RBVcp, RBPh, RBInitError};
 use tof_control::rb_control::{rb_info, rb_init, rb_clk, rb_gpioe, rb_dac};
 use tof_control::constant::*;
 
@@ -43,6 +43,7 @@ enum Sensor {
     Info,
     Temp,
     Vcp,
+    Ph,
 }
 
 fn main() {
@@ -63,12 +64,16 @@ fn main() {
                         Sensor::Vcp => {
                             print_vcp();
                         }
+                        Sensor::Ph => {
+                            print_ph();
+                        }
                     }
                 },
                 None => {
                     print_info();
                     print_temp();
                     print_vcp();
+                    print_ph();
                 }
             }
         },
@@ -140,7 +145,7 @@ fn print_temp() {
 fn print_vcp() {
     let rb_vcp = RBVcp::new();
 
-    println!("RB VCP (Voltage, Current, Power)");
+    println!("RB VCP (Voltage, Current and Power)");
     println!("\tZYNQ VCP:          {:.3}[V] | {:.3}[A] | {:.3}[W]", rb_vcp.zynq_vcp[0], rb_vcp.zynq_vcp[1], rb_vcp.zynq_vcp[2]);
     println!("\t3.3V VCP:          {:.3}[V] | {:.3}[A] | {:.3}[W]", rb_vcp.p3v3_vcp[0], rb_vcp.p3v3_vcp[1], rb_vcp.p3v3_vcp[2]);
     println!("\t3.5V VCP:          {:.3}[V] | {:.3}[A] | {:.3}[W]", rb_vcp.p3v5_vcp[0], rb_vcp.p3v5_vcp[1], rb_vcp.p3v5_vcp[2]);
@@ -149,6 +154,14 @@ fn print_vcp() {
     println!("\tDRS AVDD VCP:      {:.3}[V] | {:.3}[A] | {:.3}[W]", rb_vcp.drs_avdd_vcp[0], rb_vcp.drs_avdd_vcp[1], rb_vcp.drs_avdd_vcp[2]);
     println!("\tADC DVDD VCP:      {:.3}[V] | {:.3}[A] | {:.3}[W]", rb_vcp.adc_dvdd_vcp[0], rb_vcp.adc_dvdd_vcp[1], rb_vcp.adc_dvdd_vcp[2]);
     println!("\tADC AVDD VCP:      {:.3}[V] | {:.3}[A] | {:.3}[W]", rb_vcp.adc_avdd_vcp[0], rb_vcp.adc_avdd_vcp[1], rb_vcp.adc_avdd_vcp[2]);
+}
+
+fn print_ph() {
+    let rb_ph = RBPh::new();
+
+    println!("RB PH (Pressure and Humidity)");
+    println!("\tPressure:          {:.3}[hPa]", rb_ph.pressure);
+    println!("\tHumidity:          {:.3}[%]", rb_ph.humidity);
 }
 
 fn write_err_log(error: String) -> Result<(), std::io::Error> {

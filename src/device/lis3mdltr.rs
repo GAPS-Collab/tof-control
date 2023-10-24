@@ -87,23 +87,6 @@ impl LIS3MDLTR {
     pub fn new(bus: u8, address: u16) -> Self {
         Self { bus, address }
     }
-    // pub fn configure(&self) {
-    //     let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", self.bus), self.address)
-    //         .expect("cannot access to i2c");
-
-    //     self.configure_2(&mut dev, true)
-    //         .expect("cannot configure LIS3MDLTR (CTRL_REG2)");
-    //     self.configure_1(&mut dev)
-    //         .expect("cannot configure LIS3MDLTR (CTRL_REG1)");
-    //     self.configure_2(&mut dev, false)
-    //         .expect("cannot configure LIS3MDLTR (CTRL_REG2)");
-    //     self.configure_3(&mut dev)
-    //         .expect("cannot configure LIS3MDLTR (CTRL_REG3)");
-    //     self.configure_4(&mut dev)
-    //         .expect("cannot configure LIS3MDLTR (CTRL_REG4)");
-    //     self.configure_5(&mut dev)
-    //         .expect("cannot configure LIS3MDLTR (CTRL_REG5)");
-    // }
     pub fn configure(&self) -> Result<(), LinuxI2CError> {
         let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", self.bus), self.address)?;
 
@@ -118,7 +101,9 @@ impl LIS3MDLTR {
     }
     fn configure_1(&self, dev: &mut LinuxI2CDevice) -> Result<(), LinuxI2CError> {
         let config = TEMP_EN | OM_MPM | DO_10 | FAST_ODR_DI | ST_DI;
-        dev.smbus_write_byte_data(CTRL_REG1 as u8, config as u8)
+        dev.smbus_write_byte_data(CTRL_REG1 as u8, config as u8)?;
+
+        Ok(())
     }
     fn configure_2(&self, dev: &mut LinuxI2CDevice, reset: bool) -> Result<(), LinuxI2CError> {
         let mut config: u16;
@@ -127,62 +112,63 @@ impl LIS3MDLTR {
         } else {
             config = FS_4 | REBOOT_NM;
         }
-        dev.smbus_write_byte_data(CTRL_REG2 as u8, config as u8)
+        dev.smbus_write_byte_data(CTRL_REG2 as u8, config as u8)?;
+
+        Ok(())
     }
     fn configure_3(&self, dev: &mut LinuxI2CDevice) -> Result<(), LinuxI2CError> {
         let config = MD_CCM;
-        dev.smbus_write_byte_data(CTRL_REG3 as u8, config as u8)
+        dev.smbus_write_byte_data(CTRL_REG3 as u8, config as u8)?;
+
+        Ok(())
     }
     fn configure_4(&self, dev: &mut LinuxI2CDevice) -> Result<(), LinuxI2CError> {
         let config = OMZ_MPM | BLE_LSB;
-        dev.smbus_write_byte_data(CTRL_REG4 as u8, config as u8)
+        dev.smbus_write_byte_data(CTRL_REG4 as u8, config as u8)?;
+
+        Ok(())
     }
     fn configure_5(&self, dev: &mut LinuxI2CDevice) -> Result<(), LinuxI2CError> {
         let config = FAST_READ_DI | BDU_CU;
-        dev.smbus_write_byte_data(CTRL_REG5 as u8, config as u8)
+        dev.smbus_write_byte_data(CTRL_REG5 as u8, config as u8)?;
+
+        Ok(())
     }
-    fn read_magnetic_field_x(&self) -> Result<f32, LinuxI2CError> {
+    fn read_mag_x(&self) -> Result<f32, LinuxI2CError> {
         let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", self.bus), self.address)?;
         let out_x_h = dev.smbus_read_byte_data(OUT_X_H as u8)?;
         let out_x_l = dev.smbus_read_byte_data(OUT_X_L as u8)?;
         let out_x_adc = (((out_x_h as u16) << 8) | out_x_l as u16) & 0xFFFF;
-        let magnetic_x = self.adc_to_gauss(out_x_adc, SENSITIVITY_4);
+        let mag_x = self.adc_to_gauss(out_x_adc, SENSITIVITY_4);
 
-        Ok(magnetic_x)
+        Ok(mag_x)
     }
-    fn read_magnetic_field_y(&self) -> Result<f32, LinuxI2CError> {
+    fn read_mag_y(&self) -> Result<f32, LinuxI2CError> {
         let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", self.bus), self.address)?;
         let out_y_h = dev.smbus_read_byte_data(OUT_Y_H as u8)?;
         let out_y_l = dev.smbus_read_byte_data(OUT_Y_L as u8)?;
         let out_y_adc = (((out_y_h as u16) << 8) | out_y_l as u16) & 0xFFFF;
-        let magnetic_y = self.adc_to_gauss(out_y_adc, SENSITIVITY_4);
+        let mag_y = self.adc_to_gauss(out_y_adc, SENSITIVITY_4);
 
-        Ok(magnetic_y)
+        Ok(mag_y)
     }
-    fn read_magnetic_field_z(&self) -> Result<f32, LinuxI2CError> {
+    fn read_mag_z(&self) -> Result<f32, LinuxI2CError> {
         let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", self.bus), self.address)?;
         let out_z_h = dev.smbus_read_byte_data(OUT_Z_H as u8)?;
         let out_z_l = dev.smbus_read_byte_data(OUT_Z_L as u8)?;
         let out_z_adc = (((out_z_h as u16) << 8) | out_z_l as u16) & 0xFFFF;
-        let magnetic_z = self.adc_to_gauss(out_z_adc, SENSITIVITY_4);
+        let mag_z = self.adc_to_gauss(out_z_adc, SENSITIVITY_4);
 
-        Ok(magnetic_z)
+        Ok(mag_z)
     }
-    pub fn read_magnetic_field(&self) -> Result<[f32; 4], LinuxI2CError> {
-        let magnetic_x = self
-            .read_magnetic_field_x()
-            .expect("cannot read magnetic field x");
-        let magnetic_y = self
-            .read_magnetic_field_y()
-            .expect("cannot read magnetic field y");
-        let magnetic_z = self
-            .read_magnetic_field_z()
-            .expect("cannot read magnetic field z");
-        let magnetic_t =
-            (magnetic_x.powf(2.0) + magnetic_y.powf(2.0) + magnetic_z.powf(2.0)).sqrt();
-        let magnetic_field: [f32; 4] = [magnetic_x, magnetic_y, magnetic_z, magnetic_t];
+    pub fn read_mag(&self) -> Result<[f32; 3], LinuxI2CError> {
+        let mag_x = self.read_mag_x()?;
+        let mag_y = self.read_mag_y()?;
+        let mag_z = self.read_mag_z()?;
+        // let mag_t = (mag_x.powf(2.0) + mag_y.powf(2.0) + mag_z.powf(2.0)).sqrt();
+        let mag = [mag_x, mag_y, mag_z];
 
-        Ok(magnetic_field)
+        Ok(mag)
     }
     fn adc_to_gauss(&self, mut adc: u16, sensitifity: u16) -> f32 {
         let mut sign: f32 = 1.0;
@@ -199,7 +185,7 @@ impl LIS3MDLTR {
 
         Ok(id)
     }
-    pub fn read_temperature(&self) -> Result<f32, LinuxI2CError> {
+    pub fn read_temp(&self) -> Result<f32, LinuxI2CError> {
         let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", self.bus), self.address)?;
         let temp_h = dev.smbus_read_byte_data(TEMP_OUT_H as u8)?;
         let temp_l = dev.smbus_read_byte_data(TEMP_OUT_L as u8)?;
