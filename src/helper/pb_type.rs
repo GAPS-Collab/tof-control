@@ -34,6 +34,8 @@ pub enum PBError {
     Temp(PBTempError),
     /// VCP (Voltage, Current and Power) Error
     Vcp(PBVcpError),
+    /// LTB Power Switch
+    LTBPwrSwitch(LTBPwrSwitchError),
 }
 
 impl From<PBInitError> for PBError {
@@ -51,6 +53,12 @@ impl From<PBTempError> for PBError {
 impl From<PBVcpError> for PBError {
     fn from(e: PBVcpError) -> Self {
         PBError::Vcp(e)
+    }
+}
+
+impl From<LTBPwrSwitchError> for PBError {
+    fn from(e: LTBPwrSwitchError) -> Self {
+        PBError::LTBPwrSwitch(e)
     }
 }
 
@@ -101,5 +109,17 @@ pub enum PBVcpError {
 impl From<i2cdev::linux::LinuxI2CError> for PBVcpError {
     fn from(e: i2cdev::linux::LinuxI2CError) -> Self {
         PBVcpError::I2C(e)
+    }
+}
+
+#[derive(Debug)]
+pub enum LTBPwrSwitchError {
+    /// I2C Error
+    I2C(i2cdev::linux::LinuxI2CError),
+}
+
+impl From<i2cdev::linux::LinuxI2CError> for LTBPwrSwitchError {
+    fn from(e: i2cdev::linux::LinuxI2CError) -> Self {
+        LTBPwrSwitchError::I2C(e)
     }
 }

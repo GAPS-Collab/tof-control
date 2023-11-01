@@ -1,11 +1,16 @@
 use clap::{Parser, Subcommand, ValueEnum};
+use i2cdev::core::*;
+use i2cdev::linux::{LinuxI2CDevice, LinuxI2CError};
 
+use tof_control::constant::{I2C_BUS, LTB_TRENZ_ADDRESS};
 use tof_control::helper::ltb_type::{LTBTemp, LTBThreshold};
 use tof_control::ltb_control::ltb_threshold;
 
 #[derive(Parser, Debug)]
-#[command(author = "Takeru Hayashi", version = "0.1.0", about, long_about = None)]
+#[command(author = "Takeru Hayashi", version = "0.2.0", about, long_about = None)]
 struct Cli {
+    #[clap(short, long, global = true, help = "Verbose mode")]
+    verbose: bool,
     #[clap(subcommand)]
     command: Commands,
 }
@@ -19,14 +24,11 @@ enum Commands {
     },
     #[clap(short_flag = 's')]
     Set {
-        // #[arg(short = 'c', long = "channel")]
         channel: Option<u8>,
-        // #[arg(short = 't', long = "threshold")]
         threshold: Option<f32>,
     },
     #[clap(short_flag = 'R')]
     Reset {
-        // #[arg(short = 'c', long = "channel")]
         channel: Option<u8>,
     },
     #[clap(short_flag = 'i')]
@@ -42,6 +44,11 @@ enum Sensor {
 
 fn main() {
 
+    // Check if LTB is connected
+    if check_i2c(I2C_BUS, LTB_TRENZ_ADDRESS).is_err() {
+        std::process::exit(0);
+    }
+
     let cli = Cli::parse();
 
     match cli.command {
@@ -50,16 +57,16 @@ fn main() {
                 Some(s) => {
                     match s {
                         Sensor::Temp => {
-                            read_temp();
+                            print_temp();
                         },
                         Sensor::Threshold => {
-                            read_threshold();
+                            print_thresholds();
                         },
                     }
                 },
                 None => {
-                    read_temp();
-                    read_threshold();
+                    print_temp();
+                    print_thresholds();
                 }
             }
         },
@@ -96,23 +103,33 @@ fn main() {
 
 }
 
-fn read_temp() {
-    let temperature = LTBTemp::new();
-    let ltb_temp = temperature.ltb_temp;
-    let trenz_temp = temperature.trenz_temp;
+fn check_i2c(bus: u8, address: u16) -> Result<(), LinuxI2CError> {
+    let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", bus), address)?;
+    dev.smbus_read_byte()?;
 
-    println!("LTB Temperature");
-    println!("\tBoard Temperature: {:.3}[°C]", ltb_temp);
-    println!("\tTrenz Temperature: {:.3}[°C]", trenz_temp);
+    Ok(())
 }
 
-fn read_threshold() {
+fn print_temp() {
+    let temperature = LTBTemp::new();
+    let trenz_temp = temperature.trenz_temp;
+    let board_temp = temperature.board_temp;
+
+    println!("LTB Temperature");
+    println!("\tTrenz Temperature       : {:.3}[°C]", trenz_temp);
+    println!("\tBoard Temperature       : {:.3}[°C]", board_temp);
+}
+
+fn print_thresholds() {
     let thresholds = LTBThreshold::new().thresholds;
 
     println!("LTB Threshold");
-    for (i, threshold) in thresholds.iter().enumerate() {
-        println!("\tThreshold {}: {:.3}[mV]", i, threshold);
-    }
+    // for (i, threshold) in thresholds.iter().enumerate() {
+    //     println!("\tThreshold {}             : {:.3}[mV]", i, threshold);
+    // }
+    println!("\tThreshold 0             : {:.3}[mV]", thresholds[0]);
+    println!("\tThreshold 1             : {:.3}[mV]", thresholds[1]);
+    println!("\tThreshold 2             : {:.3}[mV]", thresholds[2]);
 }
 
 fn set_default_threshold() {
@@ -129,7 +146,6 @@ fn set_threshold(channel: u8, threshold: f32) {
     }
 }
 
-// No error even with RB without LTB
 fn reset_threshold() {
     match ltb_threshold::reset_threshold() {
         Ok(_) => {},

@@ -25,22 +25,22 @@ impl PBTemp {
 
         // Positive Degital Supply DC-DC Converter Temperature
         let pds_tmp1075 = tmp1075::TMP1075::new(I2C_BUS, PB_PDS_TMP1075_ADDRESS);
-        // pds_tmp1075.config()?;
+        pds_tmp1075.config()?;
         let pds_temp = pds_tmp1075.read()?;
 
         // Positive Analog Supply DC-DC Converter Temperature
         let pas_tmp1075 = tmp1075::TMP1075::new(I2C_BUS, PB_PAS_TMP1075_ADDRESS);
-        // pas_tmp1075.config()?;
+        pas_tmp1075.config()?;
         let pas_temp = pas_tmp1075.read()?;
 
         // Negative Analog Supply DC-DC Converter Temperature
         let nas_tmp1075 = tmp1075::TMP1075::new(I2C_BUS, PB_NAS_TMP1075_ADDRESS);
-        // nas_tmp1075.config()?;
+        nas_tmp1075.config()?;
         let nas_temp = nas_tmp1075.read()?;
 
         // SiPM High Voltage Supply DC-DC Converter Temperature
         let shv_tmp1075 = tmp1075::TMP1075::new(I2C_BUS, PB_SHV_TMP1075_ADDRESS);
-        // shv_tmp1075.config()?;
+        shv_tmp1075.config()?;
         let shv_temp = shv_tmp1075.read()?;
 
         i2c_mux.reset()?;
@@ -76,4 +76,17 @@ pub fn config_temp() -> Result<(), PBTempError> {
     i2c_mux.reset()?;
 
     Ok(())
+}
+
+pub fn read_pds_temp() -> Result<f32, PBTempError> {
+    let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, PB_PCA9548A_ADDRESS);
+    i2c_mux.select(PB_TMP1075_CHANNEL)?;
+
+    let pds_tmp1075 = tmp1075::TMP1075::new(I2C_BUS, PB_PDS_TMP1075_ADDRESS);
+    pds_tmp1075.config()?;
+    let pds_temp = pds_tmp1075.read()?;
+
+    i2c_mux.reset()?;
+
+    Ok(pds_temp)
 }

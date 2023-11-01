@@ -38,23 +38,74 @@ fn set_board_id() -> Result<(), RBInitError> {
 
 fn initialize_daq() -> Result<(), RBInitError> {
     let mut value: u32;
-    // Disable DAQ Fragment
-    value = read_control_reg(DAQ_FRAGMENT_EN)?;
-    value = value | 0x00;
-    write_control_reg(DAQ_FRAGMENT_EN, value)?;
+    /// Disable DAQ Fragment
+    // value = read_control_reg(DAQ_FRAGMENT_EN)?;
+    // value = value | 0x00;
+    // write_control_reg(DAQ_FRAGMENT_EN, value)?;
+    disable_daq_fragment()?;
 
-    // Enable Spike Clean
-    value = read_control_reg(EN_SPIKE_REMOVAL)?;
-    value = value | 0x400000;
-    write_control_reg(EN_SPIKE_REMOVAL, value)?;
+    /// Enable Spike Clean
+    // value = read_control_reg(EN_SPIKE_REMOVAL)?;
+    // value = value | 0x400000;
+    // write_control_reg(EN_SPIKE_REMOVAL, value)?;
+    enable_spike_clean()?;
 
-    // Enable All Channels
-    value = read_control_reg(READOUT_MASK)?;
-    // value = value | 0x1FF;
-    value = value & 0x1FF;
-    write_control_reg(READOUT_MASK, value)?;
+    /// Enable 1-8 Channels
+    // value = read_control_reg(READOUT_MASK)?;
+    // value = value & 0x1FF;
+    // write_control_reg(READOUT_MASK, value)?;
+    enable_8_channels()?;
+
+    /// Enable 9th Channel
+    enable_9th_channel()?;
 
     // Start DRS Chip
+    // write_control_reg(START, 0x01)?;
+    start_drs()?;
+
+    Ok(())
+}
+
+fn disable_daq_fragment() -> Result<(), RBInitError> {
+    let mut value = read_control_reg(DAQ_FRAGMENT_EN)?;
+    if (value & 0x01) == 0x01 {
+        write_control_reg(DAQ_FRAGMENT_EN, 0x00)?;
+    }
+
+    Ok(())
+} 
+
+fn enable_spike_clean() -> Result<(), RBInitError> {
+    let mut value = read_control_reg(EN_SPIKE_REMOVAL)?;
+    value = value | 0x400000;
+    if ((value >> 22) & 0x01) != 0x01 {
+        write_control_reg(EN_SPIKE_REMOVAL, value)?;
+    }
+
+    Ok(())
+}
+
+fn enable_8_channels() -> Result<(), RBInitError> {
+    let mut value = read_control_reg(READOUT_MASK)?;
+    value = value | 0x1FF;
+    if (value & 0x1FF) != 0x1FF {
+        write_control_reg(READOUT_MASK, value)?;
+    }
+
+    Ok(())
+}
+
+fn enable_9th_channel() -> Result<(), RBInitError> {
+    let mut value = read_control_reg(READOUT_MASK)?;
+    value = value | 0x3FF;
+    if ((value >> 9) & 0x01) != 0x01 {
+        write_control_reg(READOUT_MASK, value)?;
+    }
+
+    Ok(())
+}
+
+fn start_drs() -> Result<(), RBInitError> {
     write_control_reg(START, 0x01)?;
 
     Ok(())

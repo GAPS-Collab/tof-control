@@ -2,8 +2,8 @@
 pub struct PreampMoniData {
     // Preamp Temperature Sensors
     pub temperature: PreampTemp,
-    // Preamp Bias Voltages
-    pub bias: PreampBias,
+    // Preamp Read Bias Voltages
+    pub read_bias: PreampReadBias,
 }
 
 #[derive(Debug)]
@@ -12,8 +12,8 @@ pub struct PreampTemp {
 }
 
 #[derive(Debug)]
-pub struct PreampBias {
-    pub preamp_biases: [f32; 16],
+pub struct PreampReadBias {
+    pub read_biases: [f32; 16],
 }
 
 /// Preamp Error Type

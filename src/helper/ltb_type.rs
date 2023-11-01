@@ -9,7 +9,7 @@ pub struct LTBMoniData {
 #[derive(Debug)]
 pub struct LTBTemp {
     pub trenz_temp: f32,
-    pub ltb_temp: f32,
+    pub board_temp: f32,
 }
 
 // LTB Threshold Voltages

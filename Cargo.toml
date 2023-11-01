@@ -13,6 +13,10 @@ edition = "2021"
 opt-level = "z"
 
 [[bin]]
+name = "switch-control"
+path = "src/bin/switch_control.rs"
+
+[[bin]]
 name = "cpu-control"
 path = "src/bin/cpu_control.rs"
 
@@ -104,7 +108,7 @@ memmap = "0.7"
 log = "0.4"
 clap = { version = "4.1", features = ["derive"] }
 csv = "1.1"
-comfy-table = "6.1.4"
+# comfy-table = "6.1.4"
 gethostname = "0.4.1"
 libc = "0.2.140"
 # openssl = { version = "0.10", features = ["vendored"] }
@@ -115,6 +119,7 @@ chrono = "0.4.24"
 sysfs_gpio = "0.6.1"
 systemstat = "0.2.3"
 sysinfo = "0.29.10"
+snmp = "0.2.2"
 
 [build-dependencies]
 bindgen = "0.64.0"

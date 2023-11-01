@@ -3,7 +3,7 @@ use i2cdev::core::*;
 use i2cdev::linux::{LinuxI2CDevice, LinuxI2CError};
 
 use tof_control::constant::{I2C_BUS, PB_PCA9548A_ADDRESS};
-use tof_control::helper::preamp_type::{PreampTemp, PreampBias};
+use tof_control::helper::preamp_type::{PreampTemp, PreampReadBias};
 use tof_control::preamp_control::preamp_bias;
 
 #[derive(Parser, Debug)]
@@ -11,6 +11,8 @@ use tof_control::preamp_control::preamp_bias;
 struct Cli {
     #[clap(subcommand)]
     command: Commands,
+    #[arg(short, long, help = "Verbose mode")]
+    verbose: bool,
 }
 
 #[derive(Subcommand, Debug)]
@@ -58,16 +60,21 @@ fn main() {
                 Some(s) => {
                     match s {
                         Sensor::Temp => {
-                            read_temp();
+                            print_temp();
                         },
                         Sensor::Bias => {
-                            read_bias();
+                            print_bias();
                         },
                     }
                 },
                 None => {
-                    read_temp();
-                    read_bias();
+                    if cli.verbose {
+                        // read_all();
+                        todo!();
+                    } else {
+                        print_temp();
+                        print_bias();
+                    }
                 }
             }
         },
@@ -104,40 +111,80 @@ fn main() {
     }
 }
 
-fn read_temp() {
+fn print_temp() {
     let temperatures = PreampTemp::new().preamp_temps;
 
-    if temperatures == [f32::MAX; 16] {
-        println!("Preamps are not connected");
-    } else {
-        println!("Preamp Temperature");
-        // for i in 1..=16 {
-        for (i, temp) in temperatures.iter().enumerate() {
-            if *temp == f32::MAX {
-                println!("\tPreamp {} Temperature: NC", i+1);
-            } else {
-                println!("\tPreamp {} Temperature: {:.3}[°C]", i+1, temp);
+    println!("Preamp Temperature");
+    // for (i, temp) in temperatures.iter().enumerate() {
+    //         println!("\tPreamp {} Temperature       : {:.3}[°C]", i+1, temp);
+    // }
+    println!("\tPreamp 1 Temperature    : {:.3}[°C]", temperatures[0]);
+    // println!("\tPreamp 2 Temperature    : {:.3}[°C]", temperatures[1]);
+    // println!("\tPreamp 3 Temperature    : {:.3}[°C]", temperatures[2]);
+    println!("\tPreamp 4 Temperature    : {:.3}[°C]", temperatures[3]);
+    // println!("\tPreamp 5 Temperature    : {:.3}[°C]", temperatures[4]);
+    // println!("\tPreamp 6 Temperature    : {:.3}[°C]", temperatures[5]);
+    // println!("\tPreamp 7 Temperature    : {:.3}[°C]", temperatures[6]);
+    println!("\tPreamp 8 Temperature    : {:.3}[°C]", temperatures[7]);
+    println!("\tPreamp 9 Temperature    : {:.3}[°C]", temperatures[8]);
+    // println!("\tPreamp 10 Temperature   : {:.3}[°C]", temperatures[9]);
+    // println!("\tPreamp 11 Temperature   : {:.3}[°C]", temperatures[10]);
+    println!("\tPreamp 12 Temperature   : {:.3}[°C]", temperatures[11]);
+    // println!("\tPreamp 13 Temperature   : {:.3}[°C]", temperatures[12]);
+    // println!("\tPreamp 14 Temperature   : {:.3}[°C]", temperatures[13]);
+    println!("\tPreamp 15 Temperature   : {:.3}[°C]", temperatures[14]);
+    // println!("\tPreamp 16 Temperature   : {:.3}[°C]", temperatures[15]);
+}
+
+fn print_bias() {
+    let read_biases = PreampReadBias::new().read_biases;
+
+    println!("Preamp Bias Voltages");
+    // for (i, bias) in read_biases.iter().enumerate() {
+    //         println!("\tPreamp {} Bias       : {:.3}[V]", i+1, bias);
+    // }
+    println!("\tPreamp 1 Bias           : {:.3}[°C]", read_biases[0]);
+    println!("\tPreamp 2 Bias           : {:.3}[°C]", read_biases[1]);
+    println!("\tPreamp 3 Bias           : {:.3}[°C]", read_biases[2]);
+    println!("\tPreamp 4 Bias           : {:.3}[°C]", read_biases[3]);
+    println!("\tPreamp 5 Bias           : {:.3}[°C]", read_biases[4]);
+    println!("\tPreamp 6 Bias           : {:.3}[°C]", read_biases[5]);
+    println!("\tPreamp 7 Bias           : {:.3}[°C]", read_biases[6]);
+    println!("\tPreamp 8 Bias           : {:.3}[°C]", read_biases[7]);
+    println!("\tPreamp 9 Bias           : {:.3}[°C]", read_biases[8]);
+    println!("\tPreamp 10 Bias          : {:.3}[°C]", read_biases[9]);
+    println!("\tPreamp 11 Bias          : {:.3}[°C]", read_biases[10]);
+    println!("\tPreamp 12 Bias          : {:.3}[°C]", read_biases[11]);
+    println!("\tPreamp 13 Bias          : {:.3}[°C]", read_biases[12]);
+    println!("\tPreamp 14 Bias          : {:.3}[°C]", read_biases[13]);
+    println!("\tPreamp 15 Bias          : {:.3}[°C]", read_biases[14]);
+    println!("\tPreamp 16 Bias          : {:.3}[°C]", read_biases[15]);
+}
+
+fn read_set_bias() {
+    match preamp_bias::read_set_bias() {
+        Ok(set_voltages) => {
+            println!("Preamp Bias Set Voltages");
+            for (i, set_voltage) in set_voltages.iter().enumerate() {
+                println!("\tPreamp {} Set Bias Voltage: {:.3}[V]", i+1, set_voltage);
             }
+        }
+        Err(e) => {
+            eprintln!("{:?}", e);
         }
     }
 }
 
-fn read_bias() {
-    let bias_voltages = PreampBias::new().preamp_biases;
+// fn read_all() {
+//     let sipm_temps = PreampTemp::read_temp().unwrap();
+//     let read_bias_voltages = PreampBias::read_bias().unwrap();
+//     let set_bias_voltages = preamp_bias::read_set_bias().unwrap();
 
-    if bias_voltages == [f32::MAX; 16] {
-        println!("Preamps are not connected");
-    } else {
-        println!("Preamp Bias Voltages");
-        for (i, bias) in bias_voltages.iter().enumerate() {
-            if *bias == f32::MAX {
-                println!("\tPreamp {} Bias Voltage: NC", i+1);
-            } else {
-                println!("\tPreamp {} Bias Voltage: {:.3}[V]", i+1, bias);
-            }
-        }
-    }
-}
+//     println!("TEMP   SET   READ");
+//     for i in 0..=15 {
+//         println!("{:.3}[°C]   {:.3}[V]   {:.3}[V]", sipm_temps[i], set_bias_voltages[i], read_bias_voltages[i]);
+//     }
+// }
 
 fn set_default_bias() {
     match preamp_bias::set_default_bias() {

@@ -62,22 +62,12 @@ impl RBInfo {
     pub fn read_lol() -> Result<u8, RBInfoError> {
         let mut lol = read_control_reg(LOSS_OF_LOCK)? as u8;
         lol = lol & 0x01;
-        if lol == 0x01 {
-            lol = 0x00
-        } else {
-            lol = 0x01
-        }
 
         Ok(lol)
     }
     pub fn read_lol_stable() -> Result<u8, RBInfoError> {
         let mut lol_stable = read_control_reg(LOSS_OF_LOCK_STABLE)? as u8;
         lol_stable = (lol_stable >> 1) & 0x01;
-        if lol_stable == 0x01 {
-            lol_stable = 0x00
-        } else {
-            lol_stable = 0x01
-        }
 
         Ok(lol_stable)
     }
