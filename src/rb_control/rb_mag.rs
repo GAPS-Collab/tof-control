@@ -1,5 +1,6 @@
 use crate::constant::*;
 use crate::device::{pca9548a, lis3mdltr};
+use log::error;
 
 pub struct RBmag {
     pub magnetic_x: f32,
@@ -11,14 +12,31 @@ pub struct RBmag {
 impl RBmag {
     pub fn new() -> Self {
         let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_1);
-        i2c_mux.select(RB_LIS3MDLTR_CHANNEL).expect("cannot accesss to PCA9548A");
+        match i2c_mux.select(RB_LIS3MDLTR_CHANNEL) {
+          Err(err) => {
+            error!("cannot accesss to PCA9548A, {err}");
+          },
+          Ok(_) => () 
+        }
 
         let lis3mdltr = lis3mdltr::LIS3MDLTR::new(I2C_BUS, RB_LIS3MDLTR_ADDRESS);
         lis3mdltr.configure();
-        let magnetic_field = lis3mdltr.read_magnetic_field().expect("cannot read LIS3MDLTR");
+        let mut magnetic_field = [f32::MAX, f32::MAX, f32::MAX, f32::MAX];
+        match lis3mdltr.read_magnetic_field() {
+          Err(err) => {
+            error!("Can not read LIS3MDLTR, {err}");
+          },
+          Ok(_mag_field) => {
+            magnetic_field = _mag_field;
+          }
+        }
 
-        i2c_mux.reset().expect("cannot reset PCA9548A");
-
+        match i2c_mux.reset() {
+          Err(err) => {
+            error!("cannot reset PCA9548A");
+          },
+          Ok(_) => ()
+        }
         Self {
             magnetic_x: magnetic_field[0],
             magnetic_y: magnetic_field[1],
