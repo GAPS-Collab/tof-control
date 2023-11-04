@@ -1,6 +1,8 @@
 use std::error::Error;
 use std::fs::File;
+use std::fmt;
 use log::{warn, trace};
+
 
 use memmap::{Mmap, MmapMut};
 
@@ -11,6 +13,16 @@ pub const SIZEOF_U32: usize = 4;
 #[derive(Debug, Copy, Clone)]
 pub struct RegisterError {
 }
+
+impl fmt::Display for RegisterError {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "<RegisterError>")
+  }
+}
+
+impl Error for RegisterError {
+}
+
 
 pub fn map_physical_mem_read(addr_space: &str, addr: u32, len: usize) -> Result<Mmap, Box<dyn Error>> {
     let m = unsafe {
