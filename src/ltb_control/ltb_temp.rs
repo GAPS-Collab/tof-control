@@ -4,6 +4,8 @@ use i2cdev::linux::{LinuxI2CDevice, LinuxI2CError};
 use crate::constant::*;
 use crate::device::tmp112;
 
+use log::error;
+
 pub struct LTBtemp {
     pub trenz_temp: f32,
     pub ltb_temp: f32,
@@ -11,7 +13,15 @@ pub struct LTBtemp {
 
 impl LTBtemp {
     pub fn new() -> Self {
-        let trenz_temp = Self::trenz_temp().expect("cannot read Trenz board (0x3C)");
+        let mut trenz_temp = f32::MAX;
+        match Self::trenz_temp() {
+          Err(err) => {
+            error!("cannot read Trenz board (0x3C), {err}");
+          },
+          Ok(_trenz_temp) => {
+            trenz_temp = _trenz_temp;
+          }
+        }
         let ltb_temp = Self::ltb_temp();
         Self {
             trenz_temp,
@@ -22,7 +32,6 @@ impl LTBtemp {
         let ltb_tmp112 = tmp112::TMP112::new(I2C_BUS, LTB_TMP112_ADDRESS);
         ltb_tmp112.config().expect("cannot configure TMP112");
         let ltb_temp = ltb_tmp112.read().expect("cannot read TMP112");
-
         ltb_temp
     }
     fn trenz_temp() -> Result<f32, LinuxI2CError> {
