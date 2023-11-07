@@ -1,53 +1,165 @@
-use i2cdev::linux::LinuxI2CError;
-use std::process::exit;
+use tof_control::helper::rb_type::{RBGPIOeError, RBClkError};
+use tof_control::rb_control::{rb_clk, rb_gpioe};
 
-use tof_control::constant::*;
-use tof_control::device::{pca9548a, si5345b, cy8c9560a};
+use clap::Parser;
+
+#[derive(Parser)]
+struct Args {
+    #[arg(short, long, help = "run verbose mode")]
+    verbose: bool,
+}
 
 fn main() {
-    let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
-    i2c_mux.select(RB_CY8C9560A_CHANNEL).unwrap_or_else(|e| {
-        eprintln!("PCA9548A Programming Error: {}", e);
-        exit(1);
-    });
 
-    enable_si5345b().unwrap_or_else(|e| {
-        eprintln!("CY8C9560A Programming Error: {}", e);
-        exit(1);
-    });
+    let args = Args::parse();
 
-    i2c_mux.select(RB_SI5345B_CHANNEL).unwrap_or_else(|e| {
-        eprintln!("PCA9548A Programming Error: {}", e);
-        exit(1);
-    });
+    // Reset GPIO Expander
+    if args.verbose { println!("Start resetting GPIO Expander...") };
+    match reset_gpio(args.verbose) {
+        Ok(_) => {
+            if args.verbose { println!("Done resetting GPIO Expander") };
+        }
+        Err(e) => {
+            eprintln!("Failed to reset GPIO Expander: {:?}", e);
+            std::process::exit(1);
+        }
+    }
 
-    program_nvm_si5345b().unwrap_or_else(|e| {
-        eprintln!("SI5345B Programming Error: {}", e);
-        exit(1);
-    });
+    // Reset Clock Synthesizer
+    if args.verbose { println!("Start resetting clock synthesizer...") };
+    match reset_clk_synth(args.verbose) {
+        Ok(_) => {
+            if args.verbose { println!("Done resetting clock synthesizer") };
+        }
+        Err(e) => {
+            eprintln!("Failed to reset clock synthesizer: {:?}", e);
+            std::process::exit(1);
+        }
+    }
 
-    i2c_mux.reset().unwrap_or_else(|e| {
-        eprintln!("Cannot Reset PCA9548A: {}", e);
-        exit(1);
-    });
+    // Configure GPIO Expander
+    if args.verbose { println!("Start configuring GPIO Expander...") };
+    match program_gpioe(args.verbose) {
+        Ok(_) => {
+            if args.verbose { println!("Done configuring GPIO Expander") };
+        }
+        Err(e) => {
+            eprintln!("Failed to configure GPIO Expander: {:?}", e);
+            std::process::exit(1);
+        }
+    }
 
-    println!("Successfully written clock configuration to SI5345B NVM!");
+    // configure Clock Synthesizer
+    if args.verbose { println!("Start configuring clock synthesizer...") };
+    match program_clk_synth(args.verbose) {
+        Ok(_) => {
+            if args.verbose { println!("Done configuring clock synthesizer") };
+        },
+        Err(e) => {
+            eprintln!("Failed to configure clock synthesizer: {:?}", e);
+            std::process::exit(1);
+        }
+    }
 
+    // Completion message
+    if args.verbose { println!("Congratulations! RB was successfully programmed!") };
 }
 
-fn enable_si5345b() -> Result<(), LinuxI2CError> {
-    let cy8c9560a = cy8c9560a::CY8C9560A::new(I2C_BUS, RB_CY8C9560A_ADDRESS);
-    let mut value = cy8c9560a.read_port_status(3)?;
-    value = (value & !0x02) | 0 << 1;
-    cy8c9560a.set_output_port(3, value)?;
+fn program_gpioe(verbose: bool) -> Result<(), RBGPIOeError> {
+    // Initialize GPIO Expander
+    if verbose { println!("Initializing GPIO Expander...") }
+    rb_gpioe::initialize_gpioe()?;
+    if verbose { println!("Done initializing GPIO Expander") }
+
+    // Set SMA for DRS Input
+    if verbose { println!("Setting SMA for DRS input...") }
+    rb_gpioe::rf_input_select_gpioe(2)?;
+    if verbose { println!("Done setting for DRS input") }
+
+    // Enable clock synthesizer output
+    if verbose { println!("Enabling clock synthesizer output...") }
+    rb_gpioe::enable_si5345b_gpioe()?;
+    if verbose { println!("Done enabling clock synthesizer output") }
+
+    // Program EEPROM
+    // Ask user to ensure to proceed
+    let mut input = String::new();
+    use std::io::Write;
+    while input != "YES" {
+        print!("Enter \"YES\" to proceed to program GPIO Expander EEPROM: ");
+        let _ = std::io::stdout().flush();
+        input.clear();
+        std::io::stdin().read_line(&mut input).ok();
+        input = input.trim().to_string();
+    }
+    if verbose { println!("Programming EEPROM...") }
+    rb_gpioe::program_eeprom_gpioe()?;
+    if verbose { println!("Done programming EEPROM") }
 
     Ok(())
 }
 
-fn program_nvm_si5345b() -> Result<(), LinuxI2CError> {
-    let si5345b = si5345b::SI5345B::new(I2C_BUS, RB_SI5345B_ADDRESS);
-    si5345b.configure_nvm_si5345b()?;
+fn reset_gpio(verbose: bool) -> Result<(), RBGPIOeError> {
+    // Ask user to ensure to proceed
+    let mut input = String::new();
+    use std::io::Write;
+    while input != "YES" {
+        print!("Enter \"YES\" to proceed to reset GPIO Expander: ");
+        let _ = std::io::stdout().flush();
+        input.clear();
+        std::io::stdin().read_line(&mut input).ok();
+        input = input.trim().to_string();
+    }
+    // Reset current GPIOe configuration
+    if verbose { println!("Resetting current GPIO Expander configuration...") }
+    rb_gpioe::reset_gpioe()?;
+    if verbose { println!("Done resetting GPIO Expander configuration") }
+
+    // Reset currnet GPIOe EEPROM configuration
+    if verbose { println!("Resetting current GPIO Expander EEPROM configuration...") }
+    rb_gpioe::reset_eeprom_gpioe()?;
+    if verbose { println!("Done resetting GPIO Expander EEPROM configuration") }
 
     Ok(())
+}
 
+fn program_clk_synth(verbose: bool) -> Result<(), RBClkError> {
+    // Initialize Clock Synthesizer
+    if verbose { println!("Initializing clock synthesizer...") }
+    rb_clk::configure_clk_synth()?;
+    if verbose { println!("Done initializing clock synthesizer") }
+
+    // Program NVM
+    // Ask user to ensure to proceed
+    let mut input = String::new();
+    use std::io::Write;
+    while input != "YES" {
+        print!("Enter \"YES\" to proceed to program clock synthesizer NVM: ");
+        let _ = std::io::stdout().flush();
+        input.clear();
+        std::io::stdin().read_line(&mut input).ok();
+        input = input.trim().to_string();
+    }
+    rb_clk::program_nvm_clk_synth(verbose)?;
+
+    Ok(())
+}
+
+fn reset_clk_synth(verbose: bool) -> Result<(), RBClkError> {
+    // Ask user to ensure to proceed
+    let mut input = String::new();
+    use std::io::Write;
+    while input != "YES" {
+        print!("Enter \"YES\" to proceed to reset clock synthesizer: ");
+        let _ = std::io::stdout().flush();
+        input.clear();
+        std::io::stdin().read_line(&mut input).ok();
+        input = input.trim().to_string();
+    }
+    // Reset current Clock Synthesizer configuration (Soft Reset)
+    if verbose { println!("Resetting current clock synthesizer configuration...") }
+    rb_clk::reset_clk_synth(0)?;
+    if verbose { println!("Done resetting clock synthesizer configuration") }
+
+    Ok(())
 }

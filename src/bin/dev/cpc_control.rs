@@ -1,12 +1,17 @@
 use std::process::Command;
 
 use tof_control::constant::*;
-use tof_control::device::{tmp1075, ina219, max7320};
+use tof_control::device::{ina219, max7320, tmp1075};
 
 fn main() {
     // check_i2cdev_number();
     println!("CPC Temperature:          {:.3} [°C]", cpc_temperature());
-    println!("CPC Power:                {:.3} [V] | {:.3} [A] | {:.3} [W]", cpc_vcp().0, cpc_vcp().1, cpc_vcp().2);
+    println!(
+        "CPC Power:                {:.3} [V] | {:.3} [A] | {:.3} [W]",
+        cpc_vcp().0,
+        cpc_vcp().1,
+        cpc_vcp().2
+    );
 }
 
 fn cpc_temperature() -> f32 {
@@ -31,5 +36,5 @@ fn cpc_vcp() -> (f32, f32, f32) {
 //                                 .arg("|")
 //                                 .arg("grep")
 //                                 .arg("'iManager SMB 1 adapter'").output().unwrap();
-//     println!("{:?}", output);   
+//     println!("{:?}", output);
 // }

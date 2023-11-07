@@ -76,39 +76,41 @@ pub const RB_SI5345B_CHANNEL: u8 = 1;
 // GPIO Expander (CY8C9560A)
 // PCA9548A_ADDRESS_2
 pub const RB_CY8C9560A_ADDRESS: u16 = 0x20;
+pub const RB_CY8C9560A_EEPROM_ADDRESS: u16 = 0x50;
 pub const RB_CY8C9560A_CHANNEL: u8 = 7;
 
-// DAC (AD5675)
+/// DAC (AD5675)
 // PCA9548A_ADDRESS_2
 pub const RB_AD5675_ADDRESS: u16 = 0xC;
 pub const RB_AD5675_CHANNEL: u8 = 2;
 
-// RB Internal Address Table
+/// RB Internal Address Table
 pub const RB_UIO0: &'static str = "/dev/uio0";
 
-// DRS.CHIP (Registers for configuring the DRS ASIC Directly)
+/// DRS.CHIP (Registers for configuring the DRS ASIC Directly)
 pub const DRS_PLL_LOCK: u32 = 0x00; // Bits: 4, Perm: r, Description: DRS PLL Locked
 pub const LOSS_OF_LOCK: u32 = 0x10; // Bits: 0, Perm: r, Description: Raw reading of LOL signal
 pub const LOSS_OF_LOCK_STABLE: u32 = 0x10; // Bits: 1, Perm: r, Description: Loss of lock stable over the past ~second
-// DRS.FPGA.XADC (Zynq XADC)
+/// DRS.FPGA.XADC (Zynq XADC)
 pub const RB_TEMP: u32 = 0xA0; // Bits: [11:0], Perm: r, XADC Temperature
-// DRS.FPGA (FPGA Status)
+/// DRS.FPGA (FPGA Status)
 pub const BOARD_ID: u32 = 0xA8; // Bits: [7:0], Perm: rw, Board ID Number
-// DRS.DAQ (DAQ)
+/// DRS.DAQ (DAQ)
 pub const DAQ_FRAGMENT_EN: u32 = 0xC4; // Bits: 0, Perm: rw, 1 to enable daq fragments (header only packets) when the DRS is busy
-// DRS.READOUT (Registers for configuring the readout state machine)
+/// DRS.READOUT (Registers for configuring the readout state machine)
 pub const EN_SPIKE_REMOVAL: u32 = 0x40; // Bits: 22, Perm: rw, Description: set 1 to enable spike removal
 pub const READOUT_MASK: u32 = 0x44; // Bits: [8:0], Perm: rw, 8 bit mask, set a bit to 1 to enable readout of that channel. 9th is auto-read if any channel is enabled and AUTO_9TH_CHANNEL set to 1
 pub const START: u32 = 0x48; // Bits: 0, Perm: w, Description: Write 1 to take the state machine out of idle mode
-// DRS.TRIGGER
+/// DRS.TRIGGER
 pub const TRIGGER_ENABLE: u32 = 0x11C; // Bits: 0, Perm: rw, Description: Set to 0 to stop all triggers. 1 to enable triggers.
-pub const MT_EVENT_CNT : u32 = 0x120; // Bits: [31:0], Perm: r, Description: Recevied event counter
-// DRS.COUNTERS
+pub const MT_EVENT_CNT: u32 = 0x120; // Bits: [31:0], Perm: r, Description: Recevied event counter
+pub const MT_TRIGGER_RATE: u32 = 0x124; // Bits: [31:0], Perm: r, Description: Rate of triggers received from the MTB in Hz
+/// DRS.COUNTERS
 pub const CNT_LOST_EVENT: u32 = 0x150; // Bits: [31:16], Perm: r, Description: Number of trigger lost due to deadtime
 pub const CNT_EVENT: u32 = 0x154; // Bits: [31:0], Perm: r, Description: Number of triggers received
 pub const TRIGGER_RATE: u32 = 0x158; // Bits: [31:0], Perm: r, Description: Rate of triggers in Hz
 pub const LOST_TRIGGER_RATE: u32 = 0x15C; // Bits: [31:0], Perm: r, Description: Rate of lost triggers in Hz
-// DRS.HOG (HOG Parameters)
+/// DRS.HOG (HOG Parameters)
 pub const GLOBAL_VER: u32 = 0x188; // Bits: [31:0], Perm: r, Description: HOG Global Version
 pub const GLOBAL_SHA: u32 = 0x18C; // Bits: [31:0], Perm: r, Description: HOG Global SHA
 
@@ -165,11 +167,11 @@ pub const LTB_TMP112_ADDRESS: u16 = 0x49;
 pub const LTB_DAC_REF_VOLTAGE: f32 = 2.5;
 pub const LTB_MAX5815_ADDRESS: u16 = 0x1A;
 pub const LTB_DAC_THRESHOLD_0: f32 = 40.0; // 40.0mV
-// pub const LTB_DAC_THRESHOLD_0: f32 = 50.0; // 50.0mV
+                                           // pub const LTB_DAC_THRESHOLD_0: f32 = 50.0; // 50.0mV
 pub const LTB_DAC_THRESHOLD_1: f32 = 32.0; // 32.0mV
-// pub const LTB_DAC_THRESHOLD_1: f32 = 50.0; // 50.0mV
+                                           // pub const LTB_DAC_THRESHOLD_1: f32 = 50.0; // 50.0mV
 pub const LTB_DAC_THRESHOLD_2: f32 = 375.0; // 375.0mV
-// pub const LTB_DAC_THRESHOLD_2: f32 = 150.0; // 150.0mV
+                                            // pub const LTB_DAC_THRESHOLD_2: f32 = 150.0; // 150.0mV
 
 // I2C Options for Preamp Board
 pub const PREAMP_TEMP_1_CHNANNEL: u8 = 7; // ADC 1, MAX11615
@@ -223,22 +225,7 @@ pub const PREAMP_DAC_14_CHANNEL: u8 = 5; // DAC2, MAX5825
 pub const PREAMP_DAC_15_CHANNEL: u8 = 6; // DAC2, MAX5825
 pub const PREAMP_DAC_16_CHANNEL: u8 = 7; // DAC2, MAX5825
 
-pub const PREAMP_DAC_1_VOLTAGE: f32 = 58.0; // DAC1, MAX5825
-pub const PREAMP_DAC_2_VOLTAGE: f32 = 58.0; // DAC1, MAX5825
-pub const PREAMP_DAC_3_VOLTAGE: f32 = 58.0; // DAC1, MAX5825
-pub const PREAMP_DAC_4_VOLTAGE: f32 = 58.0; // DAC1, MAX5825
-pub const PREAMP_DAC_5_VOLTAGE: f32 = 58.0; // DAC1, MAX5825
-pub const PREAMP_DAC_6_VOLTAGE: f32 = 58.0; // DAC1, MAX5825
-pub const PREAMP_DAC_7_VOLTAGE: f32 = 58.0; // DAC1, MAX5825
-pub const PREAMP_DAC_8_VOLTAGE: f32 = 58.0; // DAC1, MAX5825
-pub const PREAMP_DAC_9_VOLTAGE: f32 = 58.0; // DAC2, MAX5825
-pub const PREAMP_DAC_10_VOLTAGE: f32 = 58.0; // DAC2, MAX5825
-pub const PREAMP_DAC_11_VOLTAGE: f32 = 58.0; // DAC2, MAX5825
-pub const PREAMP_DAC_12_VOLTAGE: f32 = 58.0; // DAC2, MAX5825
-pub const PREAMP_DAC_13_VOLTAGE: f32 = 58.0; // DAC2, MAX5825
-pub const PREAMP_DAC_14_VOLTAGE: f32 = 58.0; // DAC2, MAX5825
-pub const PREAMP_DAC_15_VOLTAGE: f32 = 58.0; // DAC2, MAX5825
-pub const PREAMP_DAC_16_VOLTAGE: f32 = 58.0; // DAC2, MAX5825
+pub const PREAMP_DEFAULT_BIAS: f32 = 58.0;
 
 // I2C Options for CPC
 pub const CPC_TMP1075_ADDRESS: u16 = 0x48;
@@ -257,10 +244,3 @@ pub const TCPC_INA219_RSHUNT: f32 = 0.03;
 pub const TCPC_INA219_MEC: f32 = 1.25;
 
 pub const TCPC_MAX7320_ADDRESS: u16 = 0x59;
-
-// InfluxDB Options
-pub const INFLUXDB_ORG: &'static str = "gaps";
-pub const INFLUXDB_URL: &'static str = "http://10.0.1.1:8086";
-pub const INFLUXDB_URL_UCLA: &'static str = "http://10.0.1.5:8086";
-pub const INFLUXDB_TOKEN: &'static str = "x4aIWRXyDX6gppuY7ByYaNeIhxSEpwGQbEv4D3SRDfN4-hyE3zmunrtjcyNIx7mq10wSqAJLklrLiAGq61V1Vg==";
-pub const INFLUXDB_TOKEN_UCLA: &'static str = "WXqbeoDBq0euIIK-1OyBKrJ0R4XwOq5TZaZiIEtKTlcXgqTLo8tMIZgkft3OTgTQD2LQyejRo8h3mrMWsCTfYw==";
