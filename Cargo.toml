@@ -29,6 +29,10 @@ name = "rb-control"
 path = "src/bin/rb_control.rs"
 
 [[bin]]
+name = "rb-clk-rst"
+path = "src/bin/rb_clk_rst.rs"
+
+[[bin]]
 name = "rb-wd"
 path = "src/bin/rb_wd.rs"
 

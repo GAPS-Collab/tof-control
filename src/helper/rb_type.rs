@@ -100,6 +100,8 @@ pub enum RBError {
     Vcp(RBVcpError),
     Ph(RBPhError),
     Mag(RBMagError),
+    Input(RBInputError),
+    Mode(RBModeError),
 }
 
 impl From<RBInfoError> for RBError {
@@ -141,6 +143,18 @@ impl From<RBPhError> for RBError {
 impl From<RBMagError> for RBError {
     fn from(e: RBMagError) -> Self {
         RBError::Mag(e)
+    }
+}
+
+impl From<RBInputError> for RBError {
+    fn from(e: RBInputError) -> Self {
+        RBError::Input(e)
+    }
+}
+
+impl From<RBModeError> for RBError {
+    fn from(e: RBModeError) -> Self {
+        RBError::Mode(e)
     }
 }
 
@@ -321,5 +335,45 @@ pub enum RBMagError {
 impl From<i2cdev::linux::LinuxI2CError> for RBMagError {
     fn from(e: i2cdev::linux::LinuxI2CError) -> Self {
         RBMagError::I2C(e)
+    }
+}
+
+#[derive(Debug)]
+pub enum RBInputError {
+    /// I2C Error
+    I2C(i2cdev::linux::LinuxI2CError),
+    /// RB GPIOe Error
+    GPIOe(RBGPIOeError),
+}
+
+impl From<i2cdev::linux::LinuxI2CError> for RBInputError {
+    fn from(e: i2cdev::linux::LinuxI2CError) -> Self {
+        RBInputError::I2C(e)
+    }
+}
+
+impl From<RBGPIOeError> for RBInputError {
+    fn from(e: RBGPIOeError) -> Self {
+        RBInputError::GPIOe(e)
+    }
+}
+
+#[derive(Debug)]
+pub enum RBModeError {
+    /// RB DAC Error
+    Dac(RBDacError),
+    /// RB Input Error
+    Input(RBInputError),
+}
+
+impl From<RBDacError> for RBModeError {
+    fn from(e: RBDacError) -> Self {
+        RBModeError::Dac(e)
+    }
+}
+
+impl From<RBInputError> for RBModeError {
+    fn from(e: RBInputError) -> Self {
+        RBModeError::Input(e)
     }
 }

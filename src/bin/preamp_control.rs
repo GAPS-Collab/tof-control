@@ -3,11 +3,10 @@ use i2cdev::core::*;
 use i2cdev::linux::{LinuxI2CDevice, LinuxI2CError};
 
 use tof_control::constant::{I2C_BUS, PB_PCA9548A_ADDRESS};
-use tof_control::helper::preamp_type::{PreampTemp, PreampReadBias};
-use tof_control::preamp_control::preamp_bias;
+use tof_control::helper::preamp_type::{PreampTemp, PreampReadBias, PreampSetBias};
 
 #[derive(Parser, Debug)]
-#[command(author = "Takeru Hayashi", version = "0.1.0", about, long_about = None)]
+#[command(author = "Takeru Hayashi", version = "0.2.0", about, long_about = None)]
 struct Cli {
     #[clap(subcommand)]
     command: Commands,
@@ -69,8 +68,7 @@ fn main() {
                 },
                 None => {
                     if cli.verbose {
-                        // read_all();
-                        todo!();
+                        print_all();
                     } else {
                         print_temp();
                         print_bias();
@@ -81,16 +79,15 @@ fn main() {
         Commands::Set { channel, bias } => {
             match (channel, bias) {
                 (Some(c), Some(b)) => {
-                    todo!();
+                    set_manual_bias(Some(c), b);
                 },
-                (Some(c), None) => {
-                    todo!();
+                (Some(_), None) => {
+                    println!("Nothing is set");
                 },
-                (None, Some(_)) => {
-                    todo!();
+                (None, Some(b)) => {
+                    set_manual_bias(None, b);
                 },
                 (None, None) => {
-                    // set_default_bias();
                     set_bias();
                 }
             }
@@ -98,7 +95,7 @@ fn main() {
         Commands::Reset { channel } => {
             match channel {
                 Some(c) => {
-                    todo!();
+                    set_manual_bias(Some(c), 0.0);
                 }
                 None => {
                     reset_bias();
@@ -161,33 +158,23 @@ fn print_bias() {
     println!("\tPreamp 16 Bias          : {:.3}[°C]", read_biases[15]);
 }
 
-fn read_set_bias() {
-    match preamp_bias::read_set_bias() {
-        Ok(set_voltages) => {
-            println!("Preamp Bias Set Voltages");
-            for (i, set_voltage) in set_voltages.iter().enumerate() {
-                println!("\tPreamp {} Set Bias Voltage: {:.3}[V]", i+1, set_voltage);
-            }
-        }
-        Err(e) => {
-            eprintln!("{:?}", e);
-        }
+fn print_all() {
+    let sipm_temps = PreampTemp::read_temp().unwrap().preamp_temps;
+    let read_bias_voltages = PreampReadBias::read_bias().unwrap().read_biases;
+    let set_bias_voltages = PreampSetBias::read_set_bias().unwrap().set_biases;
+
+    println!("{:<13}{:<12}{:<12}{}", "TEMP", "SET", "READ", "DELTA");
+    // for i in 0..=15 {
+    //     println!("{:.3}[°C]   {:.3}[V]   {:.3}[V]", sipm_temps[i], set_bias_voltages[i], read_bias_voltages[i]);
+    // }
+    for i in [0, 3, 7, 8, 11, 14] {
+        let delta = (set_bias_voltages[i] - read_bias_voltages[i]).abs();
+        println!("{:.3}[°C]   {:.3}[V]   {:.3}[V]   {:.3}[V]", sipm_temps[i], set_bias_voltages[i], read_bias_voltages[i], delta);
     }
 }
 
-// fn read_all() {
-//     let sipm_temps = PreampTemp::read_temp().unwrap();
-//     let read_bias_voltages = PreampBias::read_bias().unwrap();
-//     let set_bias_voltages = preamp_bias::read_set_bias().unwrap();
-
-//     println!("TEMP   SET   READ");
-//     for i in 0..=15 {
-//         println!("{:.3}[°C]   {:.3}[V]   {:.3}[V]", sipm_temps[i], set_bias_voltages[i], read_bias_voltages[i]);
-//     }
-// }
-
 fn set_default_bias() {
-    match preamp_bias::set_default_bias() {
+    match PreampSetBias::set_default_bias() {
         Ok(_) => {},
         Err(e) => eprintln!("{:?}", e),
     }
@@ -198,14 +185,21 @@ fn set_bias() {
     //     Ok(b) => println!("{}[V]", b),
     //     Err(e) => eprintln!("{:?}", e),
     // }
-    match preamp_bias::set_bias() {
+    match PreampSetBias::set_bias() {
+        Ok(_) => {},
+        Err(e) => eprintln!("{:?}", e),
+    }
+}
+
+fn set_manual_bias(channel: Option<u8>, bias: f32) {
+    match PreampSetBias::set_manual_bias(channel, bias) {
         Ok(_) => {},
         Err(e) => eprintln!("{:?}", e),
     }
 }
 
 fn reset_bias() {
-    match preamp_bias::reset_bias() {
+    match PreampSetBias::reset_bias() {
         Ok(_) => {},
         Err(e) => eprintln!("{:?}", e),
      }

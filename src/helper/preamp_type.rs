@@ -16,6 +16,11 @@ pub struct PreampReadBias {
     pub read_biases: [f32; 16],
 }
 
+#[derive(Debug)]
+pub struct PreampSetBias {
+    pub set_biases: [f32; 16],
+}
+
 /// Preamp Error Type
 #[derive(Debug)]
 pub enum PreampError {
@@ -81,6 +86,8 @@ pub enum PreampBiasError {
     I2C(i2cdev::linux::LinuxI2CError),
     /// Temp Error
     Temp(PreampTempError),
+    /// PB Temp Error
+    PBTemp(crate::helper::pb_type::PBTempError),
 }
 
 impl From<i2cdev::linux::LinuxI2CError> for PreampBiasError {
@@ -92,5 +99,11 @@ impl From<i2cdev::linux::LinuxI2CError> for PreampBiasError {
 impl From<PreampTempError> for PreampBiasError {
     fn from(e: PreampTempError) -> Self {
         PreampBiasError::Temp(e)
+    }
+}
+
+impl From<crate::helper::pb_type::PBTempError> for PreampBiasError {
+    fn from(e: crate::helper::pb_type::PBTempError) -> Self {
+        PreampBiasError::PBTemp(e)
     }
 }

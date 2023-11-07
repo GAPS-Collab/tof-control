@@ -31,17 +31,17 @@ impl RBTemp {
 
         i2c_mux_1.select(RB_DRS_TMP112_CHANNEL)?;
         let drs_tmp112 = tmp112::TMP112::new(I2C_BUS, RB_DRS_TMP112_ADDRESS);
-        // drs_tmp112.config()?;
+        drs_tmp112.config()?;
         let drs_temp = drs_tmp112.read()?;
 
         i2c_mux_2.select(RB_CLK_TMP112_CHANNEL)?;
         let clk_tmp112 = tmp112::TMP112::new(I2C_BUS, RB_CLK_TMP112_ADDRESS);
-        // clk_tmp112.config()?;
+        clk_tmp112.config()?;
         let clk_temp = clk_tmp112.read()?;
 
         i2c_mux_2.select(RB_ADC_TMP112_CHANNEL)?;
         let adc_tmp112 = tmp112::TMP112::new(I2C_BUS, RB_ADC_TMP112_ADDRESS);
-        // adc_tmp112.config()?;
+        adc_tmp112.config()?;
         let adc_temp = adc_tmp112.read()?;
 
         i2c_mux_1.reset()?;

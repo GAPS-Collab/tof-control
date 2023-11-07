@@ -8,7 +8,5 @@ pub mod rb_input;
 pub mod rb_mag;
 pub mod rb_mode;
 pub mod rb_ph;
-pub mod rb_reset;
-pub mod rb_table;
 pub mod rb_temp;
 pub mod rb_vcp;
