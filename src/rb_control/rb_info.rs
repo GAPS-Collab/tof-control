@@ -1,18 +1,14 @@
 #![allow(unused)]
+use sysinfo::{DiskExt, System, SystemExt};
+
 use crate::constant::*;
 use crate::memory::*;
 
 use crate::helper::rb_type::{RBInfo, RBInfoError};
+use crate::rb_control::rb_mode;
 
 impl RBInfo {
     pub fn new() -> Self {
-
-        // // write_control_reg(TRIGGER_ENABLE, 1).expect("cannot write TRIGGER_ENABLE register");
-        // // let event_counter = read_control_reg(MT_EVENT_CNT).expect("cannot write MT_EVENT_CNT register");
-        // // let cnt_lost_event = (read_control_reg(CNT_LOST_EVENT).expect("cannot read CNT_LOST_EVENT register") >> 16) as u16;
-        // // let trig_received = read_control_reg(CNT_EVENT).expect("cannot read CNT_EVENT register");
-        // // let trigger_rate = read_control_reg(TRIGGER_RATE).expect("cannot read TRIGGER_RATE register");
-        // // let lost_trigger_rate = read_control_reg(LOST_TRIGGER_RATE).expect("cannot read LOST_TRIGGER_RATE register");
 
         match Self::read_all_info() {
             Ok(rb_info) => {
@@ -25,7 +21,9 @@ impl RBInfo {
                     lol_stable: u8::MAX,
                     trig_rate: u16::MAX,
                     fw_version: "0.0.0".to_string(),
-                    readout_mask: u16::MAX,
+                    uptime: u32::MAX,
+                    sd_usage: u8::MAX,
+                    input_mode: "Input Mode Error".to_string(),
                 }
             }
         }
@@ -38,7 +36,9 @@ impl RBInfo {
         let trig_rate = Self::read_trig_rate()?;
         // Additional Info
         let fw_version = Self::read_fw_version()?;
-        let readout_mask = Self::read_readout_mask()?;
+        let uptime = Self::read_uptime();
+        let sd_usage = Self::read_sd_usage();
+        let input_mode = Self::read_input_mode()?;
 
         Ok(
             RBInfo {
@@ -47,7 +47,9 @@ impl RBInfo {
                 lol_stable,
                 trig_rate,
                 fw_version,
-                readout_mask,
+                uptime,
+                sd_usage,
+                input_mode,
             }
         )
     }
@@ -87,17 +89,29 @@ impl RBInfo {
 
         Ok(fw_version)
     }
-    pub fn read_readout_mask() -> Result<u16, RBInfoError> {
-        let readout_mask = read_control_reg(READOUT_MASK)? as u16;
+    pub fn read_uptime() -> u32 {
+        let sys = System::new_all();
+        let uptime = sys.uptime();
 
-        Ok(readout_mask)
+        return uptime as u32
     }
+    pub fn read_sd_usage() -> u8 {
+        let sys = System::new_all();
 
-    // pub fn print_rb_info() {
-    //     // println!("Event Counter from MTB:   {}", rb_info.event_counter);
-    //     // println!("Number of Trigger Lost:   {}", rb_info.cnt_lost_event);
-    //     // println!("Number of Trig Received:  {}", rb_info.trig_received);
-    //     // println!("Trigger Rate:             {} [Hz]", rb_info.trigger_rate);
-    //     // println!("Lost Trigger Rate:        {} [Hz]", rb_info.lost_trigger_rate);
-    // }
+        let mut available_space = Default::default();
+        let mut total_space = Default::default();
+        for disk in sys.disks() {
+            available_space = disk.available_space();
+            total_space = disk.total_space();
+        }
+
+        let sd_usage: f32 = (1.0 - (available_space as f32 / total_space as f32)) * 100.0;
+
+        return sd_usage as u8
+    }
+    pub fn read_input_mode() -> Result<String, RBInfoError> {
+        let input_mode = rb_mode::read_input_mode()?;
+
+        Ok((input_mode))
+    }
 }

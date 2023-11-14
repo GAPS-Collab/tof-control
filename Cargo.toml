@@ -53,52 +53,12 @@ name = "i2c-check"
 path = "src/bin/i2c_check.rs"
 
 [[bin]]
-name = "rb-watchdog"
-path = "src/bin/rb_watchdog.rs"
-
-[[bin]]
-name = "dac-test"
-path = "src/bin/dac_test.rs"
-
-[[bin]]
-name = "rb-test"
-path = "src/bin/rb_test.rs"
-
-[[bin]]
-name = "gpioe-watchdog"
-path = "src/bin/gpioe_watchdog.rs"
-
-[[bin]]
-name = "board-id"
-path = "src/bin/board_id.rs"
-
-[[bin]]
-name = "sma-input"
-path = "src/bin/sma_input.rs"
-
-[[bin]]
-name = "clk-synth"
-path = "src/bin/clk_synth.rs"
-
-[[bin]]
-name = "tof-influxdb"
-path = "src/bin/tof_influxdb.rs"
-
-[[bin]]
 name = "cpc-control"
 path = "src/bin/cpc_control.rs"
 
 [[bin]]
-name = "cpc-influxdb"
-path = "src/bin/cpc_influxdb.rs"
-
-[[bin]]
 name = "tcpc-control"
 path = "src/bin/tcpc_control.rs"
-
-[[bin]]
-name = "tcpc-influxdb"
-path = "src/bin/tcpc_influxdb.rs"
 
 [[bin]]
 name = "rb-clk-nvm"

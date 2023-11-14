@@ -55,7 +55,9 @@ pub struct RBInfo {
     pub trig_rate       : u16,
     // Additional Info
     pub fw_version      : String,
-    pub readout_mask    : u16,
+    pub uptime          : u32,
+    pub sd_usage        : u8,
+    pub input_mode      : String,
 }
 
 #[derive(Debug)]
@@ -164,6 +166,10 @@ pub enum RBInfoError {
     Register(crate::memory::RegisterError),
     // Parse Integer Error
     ParseInt(std::num::ParseIntError),
+    // GPIOe Error
+    GPIOe(RBGPIOeError),
+    // Mode Error
+    Mode(RBModeError),
 }
 
 impl From<crate::memory::RegisterError> for RBInfoError {
@@ -175,6 +181,18 @@ impl From<crate::memory::RegisterError> for RBInfoError {
 impl From<std::num::ParseIntError> for RBInfoError {
     fn from(e: std::num::ParseIntError) -> Self {
         RBInfoError::ParseInt(e)
+    }
+}
+
+impl From<RBGPIOeError> for RBInfoError {
+    fn from(e: RBGPIOeError) -> Self {
+        RBInfoError::GPIOe(e)
+    }
+}
+
+impl From<RBModeError> for RBInfoError {
+    fn from(e: RBModeError) -> Self {
+        RBInfoError::Mode(e)
     }
 }
 
@@ -364,6 +382,8 @@ pub enum RBModeError {
     Dac(RBDacError),
     /// RB Input Error
     Input(RBInputError),
+    /// GPIO Expander Error
+    GPIOe(RBGPIOeError),
 }
 
 impl From<RBDacError> for RBModeError {
@@ -375,5 +395,11 @@ impl From<RBDacError> for RBModeError {
 impl From<RBInputError> for RBModeError {
     fn from(e: RBInputError) -> Self {
         RBModeError::Input(e)
+    }
+}
+
+impl From<RBGPIOeError> for RBModeError {
+    fn from(e: RBGPIOeError) -> Self {
+        RBModeError::GPIOe(e)
     }
 }

@@ -1,63 +1,68 @@
-// use systemstat::{System, Platform};
+use clap::{Parser, Subcommand, ValueEnum};
 
-// fn main() {
-//     let sys = System::new();
+use tof_control::helper::cpu_type::{CPUInfo, CPUTemp};
 
-//     match sys.cpu_temp() {
-//         Ok(cpu_temp) => println!("CPU Temperature: {}", cpu_temp),
-//         Err(e) => eprintln!("{:?}", e),
-//     }
-// }
+#[derive(Parser, Debug)]
+#[command(author = "Takeru Hayashi", version = "0.1.0", about, long_about = None)]
+struct Cli {
+    #[clap(subcommand)]
+    command: Commands,
+    #[arg(short, long, help = "Verbose mode")]
+    verbose: bool,
+}
 
-use sysinfo::{System, SystemExt, ComponentExt};
+#[derive(Subcommand, Debug)]
+enum Commands {
+    #[clap(short_flag = 'r')]
+    Read {
+        #[arg(ignore_case = true, value_enum)]
+        sensor: Option<Sensor>,
+    }
+}
+
+#[derive(ValueEnum, Clone, Debug)]
+enum Sensor {
+    Info,
+    Temp,
+}
 
 fn main() {
-    // let mut sys = System::new_all();
-    // let components = sys.components();
-    // let comp = &components[0].label();
-    // println!("{:?}", comp);
+    
+    let cli = Cli::parse();
 
-    let temps = CPUTemp::new();
-    println!("CPU Temp");
-    println!("\tCPU0 Temp: {}", temps.cpu0_temp);
-    println!("\tCPU1 Temp: {}", temps.cpu1_temp);
-
-}
-
-#[derive(Debug)]
-struct CPUTemp {
-    cpu0_temp: f32,
-    cpu1_temp: f32,
-}
-
-impl CPUTemp {
-    fn new() -> CPUTemp {
-        let mut sys = System::new_all();
-
-        let compontns = sys.components();
-
-        let mut cpu0_temp: f32 = Default::default();
-        let mut cpu1_temp: f32 = Default::default();
-
-        for component in compontns {
-            let label = component.label();
-            match label {
-                "coretemp Core 0" => {
-                    cpu0_temp = component.temperature();
+    match cli.command {
+        Commands::Read { sensor } => {
+            match sensor {
+                Some(s) => {
+                    match s {
+                        Sensor::Info => {
+                            print_info();
+                        }
+                        Sensor::Temp => {
+                            print_temp();
+                        }
+                    }
                 }
-                "coretemp Core 1" => {
-                    cpu1_temp = component.temperature();
-                }
-                _ => {
-                    // println!("Mismatched Lable: {}", label);
-
+                None => {
+                    print_info();
+                    print_temp();
                 }
             }
         }
-
-        Self {
-            cpu0_temp,
-            cpu1_temp
-        }
     }
+}
+
+fn print_info() {
+    let cpu_info = CPUInfo::new();
+
+    println!("CPU Information");
+    println!("\tUptime              : {}[s]", cpu_info.uptime);
+}
+
+fn print_temp() {
+    let cpu_temp = CPUTemp::new();
+
+    println!("CPU Temperature");
+    println!("\tCPU0 Temp           : {:.3}[°C]", cpu_temp.cpu0_temp);
+    println!("\tCPU1 Temp           : {:.3}[°C]", cpu_temp.cpu1_temp);
 }
