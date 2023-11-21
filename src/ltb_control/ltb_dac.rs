@@ -43,6 +43,14 @@ impl LTBdac {
         ltb_dac.coden_loadn(1, Self::mv_to_adc(LTB_DAC_THRESHOLD_1)).expect("cannot set threshold 1 on MAX5815");
         ltb_dac.coden_loadn(2, Self::mv_to_adc(LTB_DAC_THRESHOLD_2)).expect("cannot set threshold 2 on MAX5815");
     }
+
+    // Set a specific threshold for a specific channel
+    pub fn set_threshold_ch(ch: u8, threshold_level: f32) {
+        let ltb_dac = max5815::MAX5815::new(I2C_BUS, LTB_MAX5815_ADDRESS);
+        ltb_dac.configure().expect("cannot configure MAX5815");
+        ltb_dac.coden_loadn(ch, Self::mv_to_adc(threshold_level)).expect(&format!("cannot set threshold {} on MAX5815",ch));
+    }
+
     pub fn set_threshold_ucla() {
         let ltb_dac = max5815::MAX5815::new(I2C_BUS, LTB_MAX5815_ADDRESS);
         ltb_dac.configure().expect("cannot configure MAX5815");
