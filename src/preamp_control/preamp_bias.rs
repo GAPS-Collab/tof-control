@@ -175,4 +175,17 @@ impl PreampBiasSet {
 
         i2c_mux.reset().expect("cannot reset PCA9548A");
     }
+
+    // Single preamp bias set
+    pub fn set_bias_manual_id(preamp_id: u8, bias_voltage: f32) {
+        let dac_ch = preamp_id % N_PREAMP_DAC;
+        let pb_dac_ch = preamp_id / N_PB_DAC;
+
+        let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, PB_PCA9548A_ADDRESS);
+        i2c_mux.select(pb_dac_ch).expect("cannot access to PCA9548A");
+        let pb_dac_1 = max5825::MAX5825::new(I2C_BUS, PB_MAX5825_ADDRESS);
+        pb_dac_1.coden_loadn(dac_ch, Self::bias_to_adc(bias_voltage)).expect(&format!("cannot set bias voltage {} on MAX5825(DAC1)",dac_ch));
+
+        i2c_mux.reset().expect("cannot reset PCA9548A");
+    }
 }

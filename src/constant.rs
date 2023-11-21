@@ -240,6 +240,10 @@ pub const PREAMP_DAC_14_VOLTAGE: f32 = 58.0; // DAC2, MAX5825
 pub const PREAMP_DAC_15_VOLTAGE: f32 = 58.0; // DAC2, MAX5825
 pub const PREAMP_DAC_16_VOLTAGE: f32 = 58.0; // DAC2, MAX5825
 
+// PREAMP const (Paolo)
+pub const N_PREAMP_DAC: u8 = 8;
+pub const N_PB_DAC: u8 = 2;
+
 // I2C Options for CPC
 pub const CPC_TMP1075_ADDRESS: u16 = 0x48;
 
