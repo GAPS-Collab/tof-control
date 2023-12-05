@@ -110,10 +110,10 @@ elif [ "$1" = "rb-clk-rst" ]; then
 
 
 elif [ "$1" = "rat-init" ]; then
-    # rm -rf target/
+    rm -rf target/
     CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
     cross build --release --bin rat-init --target=armv7-unknown-linux-musleabi
-    # scp target/armv7-unknown-linux-musleabi/release/rat-init tof-computer:/home/gaps/tof-rb/bin
+    scp target/armv7-unknown-linux-musleabi/release/rat-init tof-computer:/home/gaps/tof-rb/bin
     # scp target/armv7-unknown-linux-musleabi/release/rat-init tof-rb41:~/dev
     # scp target/armv7-unknown-linux-musleabi/release/rat-init tof-rb42:~/dev
     # scp target/armv7-unknown-linux-musleabi/release/rat-init tof-rb25:~/dev

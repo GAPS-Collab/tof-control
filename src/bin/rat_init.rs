@@ -1,5 +1,6 @@
 use std::fs::OpenOptions;
 use std::io::prelude::*;
+use clap::Parser;
 use chrono::Utc;
 use i2cdev::core::*;
 use i2cdev::linux::{LinuxI2CDevice, LinuxI2CError};
@@ -10,7 +11,13 @@ use tof_control::ltb_control::ltb_init;
 use tof_control::pb_control::pb_init;
 use tof_control::preamp_control::preamp_init;
 
+#[derive(Parser, Debug)]
+#[command(author, version, about, long_about = None)]
+struct Args {}
+
 fn main() {
+    let _args = Args::parse();
+
     // Initialize RB
     initialize_rb();
 
