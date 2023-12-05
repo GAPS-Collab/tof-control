@@ -1,6 +1,7 @@
 #[derive(Debug)]
 pub struct CPUInfo {
     pub uptime: u32,
+    pub disk_usage: u8,
 }
 
 #[derive(Debug)]

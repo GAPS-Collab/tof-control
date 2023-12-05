@@ -102,7 +102,10 @@ pub fn config_vcp() -> Result<(), PBVcpError> {
         PB_P3V6_PREAMP_INA226_RSHUNT,
         PB_P3V6_PREAMP_INA226_MEC,
     );
-    p3v6_preamp_ina226.configure()?;
+    for _ in 0..3 {
+        p3v6_preamp_ina226.configure()?;
+        p3v6_preamp_ina226.read()?;
+    }
 
     i2c_mux.select(PB_ADC_1_CHANNEL)?;
     let max11617 = max11617::MAX11617::new(I2C_BUS, PB_MAX11617_ADDRESS);
@@ -115,7 +118,10 @@ pub fn config_vcp() -> Result<(), PBVcpError> {
         PB_P3V4F_LTB_INA219_RSHUNT,
         PB_P3V4F_LTB_INA219_MEC,
     );
-    p3v4f_ltb_ina219.configure()?;
+    for _ in 0..3 {
+        p3v4f_ltb_ina219.configure()?;
+        p3v4f_ltb_ina219.read()?;
+    }
 
     let p3v4d_ltb_ina219 = ina219::INA219::new(
         I2C_BUS,
@@ -123,7 +129,10 @@ pub fn config_vcp() -> Result<(), PBVcpError> {
         PB_P3V4D_LTB_INA219_RSHUNT,
         PB_P3V4D_LTB_INA219_MEC,
     );
-    p3v4d_ltb_ina219.configure()?;
+    for _ in 0..3 {
+        p3v4d_ltb_ina219.configure()?;
+        p3v4d_ltb_ina219.read()?;
+    }
 
     let p3v6_ltb_ina219 = ina219::INA219::new(
         I2C_BUS,
@@ -131,7 +140,10 @@ pub fn config_vcp() -> Result<(), PBVcpError> {
         PB_P3V6_LTB_INA219_RSHUNT,
         PB_P3V6_LTB_INA219_MEC,
     );
-    p3v6_ltb_ina219.configure()?;
+    for _ in 0..3 {
+        p3v6_ltb_ina219.configure()?;
+        p3v6_ltb_ina219.read()?;
+    }
 
     i2c_mux.select(PB_ADC_2_CHANNEL)?;
     let max11617 = max11617::MAX11617::new(I2C_BUS, PB_MAX11617_ADDRESS);

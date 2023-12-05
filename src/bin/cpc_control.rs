@@ -1,6 +1,6 @@
 use clap::{Parser, Subcommand, ValueEnum};
 
-use tof_control::helper::cpu_type::{CPUInfo, CPUTemp};
+use tof_control::helper::cpc_type::CPCTemp;
 
 #[derive(Parser, Debug)]
 #[command(author = "Takeru Hayashi", version = "0.1.0", about, long_about = None)]
@@ -22,7 +22,6 @@ enum Commands {
 
 #[derive(ValueEnum, Clone, Debug)]
 enum Sensor {
-    Info,
     Temp,
 }
 
@@ -35,16 +34,12 @@ fn main() {
             match sensor {
                 Some(s) => {
                     match s {
-                        Sensor::Info => {
-                            print_info();
-                        }
                         Sensor::Temp => {
                             print_temp();
                         }
                     }
                 }
                 None => {
-                    print_info();
                     print_temp();
                 }
             }
@@ -52,18 +47,9 @@ fn main() {
     }
 }
 
-fn print_info() {
-    let cpu_info = CPUInfo::new();
-
-    println!("CPU Information");
-    println!("\tUptime              : {}[s]", cpu_info.uptime);
-    println!("\tDisk Usage          : {}[%]", cpu_info.disk_usage);
-}
-
 fn print_temp() {
-    let cpu_temp = CPUTemp::new();
+    let cpc_temp = CPCTemp::new();
 
-    println!("CPU Temperature");
-    println!("\tCPU0 Temp           : {:.3}[°C]", cpu_temp.cpu0_temp);
-    println!("\tCPU1 Temp           : {:.3}[°C]", cpu_temp.cpu1_temp);
+    println!("CPC Temperature");
+    println!("\tCPC Temp            : {:.3}[°C]", cpc_temp.cpc_temp);
 }

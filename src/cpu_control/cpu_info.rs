@@ -1,4 +1,5 @@
-use sysinfo::{System, SystemExt};
+use sysinfo::{System, SystemExt, DiskExt, CpuExt, RefreshKind, CpuRefreshKind};
+// use std::{thread, time::Duration};
 
 use crate::helper::cpu_type::CPUInfo;
 
@@ -9,11 +10,61 @@ impl CPUInfo {
         cpu_info
     }
     pub fn read_info() -> CPUInfo {
-        let sys = System::new_all();
-        let uptime = sys.uptime() as u32;
+        let mut sys = System::new_all();
+
+        let uptime = Self::read_uptime(&mut sys);
+        let disk_usage = Self::read_disk_usage(&mut sys);
+        // Self::read_cpu_load(&mut sys);
+        // Self::read_cpu_load();
 
         CPUInfo {
             uptime,
+            disk_usage,
         }
+    }
+    pub fn read_uptime(sys: &System) -> u32 {
+        let uptime = sys.uptime() as u32;
+
+        uptime
+    }
+    pub fn read_disk_usage(sys: &System) -> u8 {
+        let mut available_space = Default::default();
+        let mut total_space = Default::default();
+        for disk in sys.disks() {
+            if disk.mount_point().as_os_str() == "/" {
+                available_space = disk.available_space();
+                total_space = disk.total_space();
+            }
+        }
+
+        let disk_usage: f32 = (1.0 - (available_space as f32 / total_space as f32)) * 100.0;
+
+        disk_usage as u8
+    }
+    // pub fn read_cpu_load(sys: &mut System) {
+    pub fn read_cpu_load() {
+        // println!("{:?}", sys.cpus());
+        // println!("Load Average: {:?}", sys.load_average());
+        // let cpu0_load = sys.load_average();
+        let mut sys = System::new_with_specifics(RefreshKind::new().with_cpu(CpuRefreshKind::everything()));
+        // sys.refresh_cpu_specifics(CpuRefreshKind::everything());
+        // for cpu in sys.cpus() {
+        //     cpu.cpu_usage();
+        // }
+        let mut l = 0;
+        while l < 4 {
+            sys.refresh_cpu_specifics(CpuRefreshKind::everything());
+            for cpu in sys.cpus() {
+                println!("Usage: {:?}", cpu.cpu_usage());
+                println!("Frequency: {:?}", cpu.frequency());
+            }
+            l += 1;
+            // thread::sleep(Duration::from_millis(1000));
+        }
+        // sys.refresh_cpu_specifics(CpuRefreshKind::everything());
+        // for cpu in sys.cpus() {
+        //     println!("Usage: {:?}", cpu.cpu_usage());
+        //     println!("Frequency: {:?}", cpu.frequency());
+        // }
     }
 }
