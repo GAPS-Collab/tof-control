@@ -56,10 +56,12 @@ elif [ "$1" = "rb-control" ]; then
     # rm -rf target/armv7-unknown*
     CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
     cross build --release --bin rb-control --target=armv7-unknown-linux-musleabi
-    # scp target/armv7-unknown-linux-musleabi/release/rb-control tof-computer:/home/gaps/tof-rb/bin
+    scp target/armv7-unknown-linux-musleabi/release/rb-control tof-computer:/home/gaps/tof-rb/bin
     # scp target/armv7-unknown-linux-musleabi/release/rb-control tof-rb18:~/dev
     # scp target/armv7-unknown-linux-musleabi/release/rb-control tof-rb09:~/dev
-    scp target/armv7-unknown-linux-musleabi/release/rb-control tof-rb37:~/dev
+    # scp target/armv7-unknown-linux-musleabi/release/rb-control tof-rb37:~/dev
+    scp target/armv7-unknown-linux-musleabi/release/rb-control tof-rb41:~/dev
+    scp target/armv7-unknown-linux-musleabi/release/rb-control tof-rb42:~/dev
     # scp target/armv7-unknown-linux-musleabi/release/rb-control tof-rb43:~/dev
 
 elif [ "$1" = "ltb-control" ]; then
@@ -69,15 +71,19 @@ elif [ "$1" = "ltb-control" ]; then
     # scp target/armv7-unknown-linux-musleabi/release/ltb-control tof-rb18:~/dev
     # scp target/armv7-unknown-linux-musleabi/release/ltb-control tof-rb09:~/dev
     # scp target/armv7-unknown-linux-musleabi/release/ltb-control tof-rb37:~/dev
+    scp target/armv7-unknown-linux-musleabi/release/ltb-control tof-rb41:~/dev
+    scp target/armv7-unknown-linux-musleabi/release/ltb-control tof-rb42:~/dev
     # scp target/armv7-unknown-linux-musleabi/release/ltb-control tof-rb43:~/dev
 
 elif [ "$1" = "pb-control" ]; then
     CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
     cross build --release --bin pb-control --target=armv7-unknown-linux-musleabi
-    # scp target/armv7-unknown-linux-musleabi/release/pb-control tof-computer:/home/gaps/tof-rb/bin
+    scp target/armv7-unknown-linux-musleabi/release/pb-control tof-computer:/home/gaps/tof-rb/bin
     # scp target/armv7-unknown-linux-musleabi/release/pb-control tof-rb18:~/dev
     # scp target/armv7-unknown-linux-musleabi/release/pb-control tof-rb09:~/dev
-    scp target/armv7-unknown-linux-musleabi/release/pb-control tof-rb37:~/dev
+    # scp target/armv7-unknown-linux-musleabi/release/pb-control tof-rb37:~/dev
+    scp target/armv7-unknown-linux-musleabi/release/pb-control tof-rb41:~/dev
+    scp target/armv7-unknown-linux-musleabi/release/pb-control tof-rb42:~/dev
     # scp target/armv7-unknown-linux-musleabi/release/pb-control tof-rb43:~/dev
 
 elif [ "$1" = "rat-control" ]; then
@@ -93,6 +99,8 @@ elif [ "$1" = "preamp-control" ]; then
     # scp target/armv7-unknown-linux-musleabi/release/preamp-control tof-rb18:~/dev
     # scp target/armv7-unknown-linux-musleabi/release/preamp-control tof-rb09:~/dev
     # scp target/armv7-unknown-linux-musleabi/release/preamp-control tof-rb37:~/dev
+    scp target/armv7-unknown-linux-musleabi/release/preamp-control tof-rb41:~/dev
+    scp target/armv7-unknown-linux-musleabi/release/preamp-control tof-rb42:~/dev
     # scp target/armv7-unknown-linux-musleabi/release/preamp-control tof-rb43:~/dev
 
 elif [ "$1" = "rb-wd" ]; then
@@ -133,7 +141,8 @@ elif [ "$1" = "cpc-control" ]; then
     # rm -rf target/x86_64-unknown*
     CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
     cross build --release --bin cpc-control --target=x86_64-unknown-linux-musl
-    scp target/x86_64-unknown-linux-musl/release/cpc-control tof-computer:/home/gaps/dev
+    # scp target/x86_64-unknown-linux-musl/release/cpc-control tof-computer:/home/gaps/dev
+    scp target/x86_64-unknown-linux-musl/release/cpc-control gaps@10.97.108.35:/home/gaps/dev
 
 elif [ "$1" = "switch-control" ]; then
     # rm -rf target/x86_64-unknown*

@@ -112,24 +112,24 @@ fn print_temp() {
     let temperatures = PreampTemp::new().preamp_temps;
 
     println!("Preamp Temperature");
-    // for (i, temp) in temperatures.iter().enumerate() {
-    //         println!("\tPreamp {} Temperature       : {:.3}[°C]", i+1, temp);
-    // }
-    println!("\tPreamp 1 Temperature    : {:.3}[°C]", temperatures[0]);
+    for (i, temp) in temperatures.iter().enumerate() {
+            println!("\tPreamp {} Temperature       : {:.3}[°C]", i+1, temp);
+    }
+    // println!("\tPreamp 1 Temperature    : {:.3}[°C]", temperatures[0]);
     // println!("\tPreamp 2 Temperature    : {:.3}[°C]", temperatures[1]);
     // println!("\tPreamp 3 Temperature    : {:.3}[°C]", temperatures[2]);
-    println!("\tPreamp 4 Temperature    : {:.3}[°C]", temperatures[3]);
+    // println!("\tPreamp 4 Temperature    : {:.3}[°C]", temperatures[3]);
     // println!("\tPreamp 5 Temperature    : {:.3}[°C]", temperatures[4]);
     // println!("\tPreamp 6 Temperature    : {:.3}[°C]", temperatures[5]);
     // println!("\tPreamp 7 Temperature    : {:.3}[°C]", temperatures[6]);
-    println!("\tPreamp 8 Temperature    : {:.3}[°C]", temperatures[7]);
-    println!("\tPreamp 9 Temperature    : {:.3}[°C]", temperatures[8]);
+    // println!("\tPreamp 8 Temperature    : {:.3}[°C]", temperatures[7]);
+    // println!("\tPreamp 9 Temperature    : {:.3}[°C]", temperatures[8]);
     // println!("\tPreamp 10 Temperature   : {:.3}[°C]", temperatures[9]);
     // println!("\tPreamp 11 Temperature   : {:.3}[°C]", temperatures[10]);
-    println!("\tPreamp 12 Temperature   : {:.3}[°C]", temperatures[11]);
+    // println!("\tPreamp 12 Temperature   : {:.3}[°C]", temperatures[11]);
     // println!("\tPreamp 13 Temperature   : {:.3}[°C]", temperatures[12]);
     // println!("\tPreamp 14 Temperature   : {:.3}[°C]", temperatures[13]);
-    println!("\tPreamp 15 Temperature   : {:.3}[°C]", temperatures[14]);
+    // println!("\tPreamp 15 Temperature   : {:.3}[°C]", temperatures[14]);
     // println!("\tPreamp 16 Temperature   : {:.3}[°C]", temperatures[15]);
 }
 
@@ -137,25 +137,25 @@ fn print_bias() {
     let read_biases = PreampReadBias::new().read_biases;
 
     println!("Preamp Bias Voltages");
-    // for (i, bias) in read_biases.iter().enumerate() {
-    //         println!("\tPreamp {} Bias       : {:.3}[V]", i+1, bias);
-    // }
-    println!("\tPreamp 1 Bias           : {:.3}[°C]", read_biases[0]);
-    println!("\tPreamp 2 Bias           : {:.3}[°C]", read_biases[1]);
-    println!("\tPreamp 3 Bias           : {:.3}[°C]", read_biases[2]);
-    println!("\tPreamp 4 Bias           : {:.3}[°C]", read_biases[3]);
-    println!("\tPreamp 5 Bias           : {:.3}[°C]", read_biases[4]);
-    println!("\tPreamp 6 Bias           : {:.3}[°C]", read_biases[5]);
-    println!("\tPreamp 7 Bias           : {:.3}[°C]", read_biases[6]);
-    println!("\tPreamp 8 Bias           : {:.3}[°C]", read_biases[7]);
-    println!("\tPreamp 9 Bias           : {:.3}[°C]", read_biases[8]);
-    println!("\tPreamp 10 Bias          : {:.3}[°C]", read_biases[9]);
-    println!("\tPreamp 11 Bias          : {:.3}[°C]", read_biases[10]);
-    println!("\tPreamp 12 Bias          : {:.3}[°C]", read_biases[11]);
-    println!("\tPreamp 13 Bias          : {:.3}[°C]", read_biases[12]);
-    println!("\tPreamp 14 Bias          : {:.3}[°C]", read_biases[13]);
-    println!("\tPreamp 15 Bias          : {:.3}[°C]", read_biases[14]);
-    println!("\tPreamp 16 Bias          : {:.3}[°C]", read_biases[15]);
+    for (i, bias) in read_biases.iter().enumerate() {
+            println!("\tPreamp {} Bias       : {:.3}[V]", i+1, bias);
+    }
+    // println!("\tPreamp 1 Bias           : {:.3}[V]", read_biases[0]);
+    // println!("\tPreamp 2 Bias           : {:.3}[V]", read_biases[1]);
+    // println!("\tPreamp 3 Bias           : {:.3}[V]", read_biases[2]);
+    // println!("\tPreamp 4 Bias           : {:.3}[V]", read_biases[3]);
+    // println!("\tPreamp 5 Bias           : {:.3}[V]", read_biases[4]);
+    // println!("\tPreamp 6 Bias           : {:.3}[V]", read_biases[5]);
+    // println!("\tPreamp 7 Bias           : {:.3}[V]", read_biases[6]);
+    // println!("\tPreamp 8 Bias           : {:.3}[V]", read_biases[7]);
+    // println!("\tPreamp 9 Bias           : {:.3}[V]", read_biases[8]);
+    // println!("\tPreamp 10 Bias          : {:.3}[V]", read_biases[9]);
+    // println!("\tPreamp 11 Bias          : {:.3}[V]", read_biases[10]);
+    // println!("\tPreamp 12 Bias          : {:.3}[V]", read_biases[11]);
+    // println!("\tPreamp 13 Bias          : {:.3}[V]", read_biases[12]);
+    // println!("\tPreamp 14 Bias          : {:.3}[V]", read_biases[13]);
+    // println!("\tPreamp 15 Bias          : {:.3}[V]", read_biases[14]);
+    // println!("\tPreamp 16 Bias          : {:.3}[V]", read_biases[15]);
 }
 
 fn print_all() {

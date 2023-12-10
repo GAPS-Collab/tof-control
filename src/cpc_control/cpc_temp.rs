@@ -16,7 +16,7 @@ impl CPCTemp {
         }
     }
     pub fn read_temp() -> Result<CPCTemp, CPCTempError> {
-        let cpc_tmp1075 = tmp1075::TMP1075::new(CPC_I2C_BUS, CPC_TMP1075_ADDRESS);
+        let cpc_tmp1075 = tmp1075::TMP1075::new(6, CPC_TMP1075_ADDRESS);
         cpc_tmp1075.config()?;
         let cpc_temp = cpc_tmp1075.read()?;
 
