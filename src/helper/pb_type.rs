@@ -1,5 +1,10 @@
 /// PB Data Type
 #[derive(Debug)]
+pub struct PBLevel1 {
+    pub pds_temp: f32,
+}
+
+#[derive(Debug)]
 pub struct PBMonData {
     pub temperature: PBTemp,
     pub vcp: PBVcp,
@@ -26,6 +31,17 @@ pub struct PBVcp {
 }
 
 /// PB Error Type
+#[derive(Debug)]
+pub enum PBLevel1Error {
+    I2C(i2cdev::linux::LinuxI2CError),
+}
+
+impl From<i2cdev::linux::LinuxI2CError> for PBLevel1Error {
+    fn from(e: i2cdev::linux::LinuxI2CError) -> Self {
+        PBLevel1Error::I2C(e)
+    }
+}
+
 #[derive(Debug)]
 pub enum PBError {
     /// Init Error

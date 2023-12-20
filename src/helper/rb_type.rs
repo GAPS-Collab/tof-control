@@ -1,4 +1,11 @@
 #[derive(Debug)]
+pub struct RBLevel1 {
+    pub zynq_temp: f32,
+    pub clk_temp: f32,
+    pub zynq_vc: [f32; 2],
+}
+
+#[derive(Debug)]
 pub struct RBMoniData {
     // RB Information
     pub board_id: u8,
@@ -92,6 +99,24 @@ pub struct RBMag {
 }
 
 /// RB Error Type
+#[derive(Debug)]
+pub enum RBLevel1Error {
+    I2C(i2cdev::linux::LinuxI2CError),
+    Register(crate::memory::RegisterError),
+}
+
+impl From<i2cdev::linux::LinuxI2CError> for RBLevel1Error {
+    fn from(e: i2cdev::linux::LinuxI2CError) -> Self {
+        RBLevel1Error::I2C(e)
+    }
+}
+
+impl From<crate::memory::RegisterError> for RBLevel1Error {
+    fn from(e: crate::memory::RegisterError) -> Self {
+        RBLevel1Error::Register(e)
+    }
+}
+
 #[derive(Debug)]
 pub enum RBError {
     Info(RBInfoError),

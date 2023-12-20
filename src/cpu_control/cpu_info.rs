@@ -16,10 +16,13 @@ impl CPUInfo {
         let disk_usage = Self::read_disk_usage(&mut sys);
         // Self::read_cpu_load(&mut sys);
         // Self::read_cpu_load();
+        // sys.refresh_cpu();
+        let cpu_freq = Self::read_cpu_freq(&mut sys);
 
         CPUInfo {
             uptime,
             disk_usage,
+            cpu_freq,
         }
     }
     pub fn read_uptime(sys: &System) -> u32 {
@@ -66,5 +69,33 @@ impl CPUInfo {
         //     println!("Usage: {:?}", cpu.cpu_usage());
         //     println!("Frequency: {:?}", cpu.frequency());
         // }
+    }
+    pub fn read_cpu_freq(sys: &System) -> [u32; 4] {
+        let mut cpu0_freq: u32 = Default::default();
+        let mut cpu1_freq: u32 = Default::default();
+        let mut cpu2_freq: u32 = Default::default();
+        let mut cpu3_freq: u32 = Default::default();
+        for cpu in sys.cpus() {
+            let cpu_name = cpu.name();
+            match cpu_name {
+                "cpu0" => {
+                    cpu0_freq = cpu.frequency() as u32;
+                }
+                "cpu1" => {
+                    cpu1_freq = cpu.frequency() as u32;
+                }
+                "cpu2" => {
+                    cpu2_freq = cpu.frequency() as u32;
+                }
+                "cpu3" => {
+                    cpu3_freq = cpu.frequency() as u32;
+                }
+                _ => {}
+            }
+        }
+
+        let cpu_freq = [cpu0_freq, cpu1_freq, cpu2_freq, cpu3_freq];
+
+        cpu_freq
     }
 }
