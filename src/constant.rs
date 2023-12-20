@@ -228,6 +228,8 @@ pub const PREAMP_DAC_16_CHANNEL: u8 = 7; // DAC2, MAX5825
 pub const PREAMP_DEFAULT_BIAS: f32 = 58.0;
 
 // I2C Options for CPC
+pub const CPC_I2C_BUS: u8 = 2;
+
 pub const CPC_TMP1075_ADDRESS: u16 = 0x48;
 
 pub const CPC_INA219_ADDRESS: u16 = 0x46;

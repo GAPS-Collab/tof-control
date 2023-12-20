@@ -326,7 +326,7 @@ fn drs_ch3_input_select(gpioe: CY8C9560A, mode: u8) -> Result<(), RBGPIOeError> 
 // GP2[1] = EN
 // GP2[0] = VCTL
 fn drs_ch4_input_select(gpioe: CY8C9560A, mode: u8) -> Result<(), RBGPIOeError> {
-    let port_status = gpioe.read_port_status(2).expect("cannot read CY8C9560A");
+    let port_status = gpioe.read_port_status(2)?;
 
     match mode {
         0 => {
@@ -349,10 +349,10 @@ fn drs_ch4_input_select(gpioe: CY8C9560A, mode: u8) -> Result<(), RBGPIOeError> 
     Ok(())
 }
 
-// GP5[1] = EN
-// GP5[0] = VCTL
+// GP5[1] = VCTL
+// GP5[0] = EN
 fn drs_ch5_input_select(gpioe: CY8C9560A, mode: u8) -> Result<(), RBGPIOeError> {
-    let port_status = gpioe.read_port_status(5).expect("cannot read CY8C9560A");
+    let port_status = gpioe.read_port_status(5)?;
 
     match mode {
         0 => {
@@ -378,7 +378,7 @@ fn drs_ch5_input_select(gpioe: CY8C9560A, mode: u8) -> Result<(), RBGPIOeError> 
 // GP5[5] = EN
 // GP5[4] = VCTL
 fn drs_ch6_input_select(gpioe: CY8C9560A, mode: u8) -> Result<(), RBGPIOeError> {
-    let port_status = gpioe.read_port_status(5).expect("cannot read CY8C9560A");
+    let port_status = gpioe.read_port_status(5)?;
 
     match mode {
         0 => {
@@ -401,10 +401,10 @@ fn drs_ch6_input_select(gpioe: CY8C9560A, mode: u8) -> Result<(), RBGPIOeError> 
     Ok(())
 }
 
-// GP4[7] = EN
-// GP4[6] = VCTL
+// GP4[7] = VCTL
+// GP4[6] = EN
 fn drs_ch7_input_select(gpioe: CY8C9560A, mode: u8) -> Result<(), RBGPIOeError> {
-    let port_status = gpioe.read_port_status(4).expect("cannot read CY8C9560A");
+    let port_status = gpioe.read_port_status(4)?;
 
     match mode {
         0 => {
@@ -427,10 +427,10 @@ fn drs_ch7_input_select(gpioe: CY8C9560A, mode: u8) -> Result<(), RBGPIOeError> 
     Ok(())
 }
 
-// GP4[5] = EN
-// GP4[4] = VCTL
+// GP4[5] = VCTL
+// GP4[4] = EN
 fn drs_ch8_input_select(gpioe: CY8C9560A, mode: u8) -> Result<(), RBGPIOeError> {
-    let port_status = gpioe.read_port_status(4).expect("cannot read CY8C9560A");
+    let port_status = gpioe.read_port_status(4)?;
 
     match mode {
         0 => {
@@ -453,10 +453,10 @@ fn drs_ch8_input_select(gpioe: CY8C9560A, mode: u8) -> Result<(), RBGPIOeError> 
     Ok(())
 }
 
-// GP4[3] = EN
-// GP4[2] = VCTL
+// GP4[3] = VCTL
+// GP4[2] = EN
 fn drs_ch9_input_select(gpioe: CY8C9560A, mode: u8) -> Result<(), RBGPIOeError> {
-    let port_status = gpioe.read_port_status(4).expect("cannot read CY8C9560A");
+    let port_status = gpioe.read_port_status(4)?;
 
     match mode {
         0 => {
@@ -586,6 +586,8 @@ pub fn program_eeprom_gpioe() -> Result<(), RBGPIOeError> {
     }
 
     cy8c9560a.store_config_eeprom_por()?;
+
+    i2c_mux.reset()?;
     
     Ok(())
 }
@@ -601,6 +603,8 @@ pub fn reset_eeprom_gpioe() -> Result<(), RBGPIOeError> {
     }
 
     cy8c9560a.reset_config_eeprom_por()?;
+
+    i2c_mux.reset()?;
     
     Ok(())
 }
@@ -611,6 +615,64 @@ pub fn reset_gpioe() -> Result<(), RBGPIOeError> {
 
     let cy8c9560a = cy8c9560a::CY8C9560A::new(I2C_BUS, RB_CY8C9560A_ADDRESS);
     cy8c9560a.initialize_all_outputs()?;
+
+    i2c_mux.reset()?;
     
     Ok(())
+}
+
+pub fn read_rf_input_port(ch: u8) -> Result<u8, RBGPIOeError> {
+    let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
+    i2c_mux.select(RB_CY8C9560A_CHANNEL)?;
+
+    let cy8c9560a = cy8c9560a::CY8C9560A::new(I2C_BUS, RB_CY8C9560A_ADDRESS);
+    let mut rf_input_port: u8 = Default::default();
+    match ch {
+
+        1 => {
+            rf_input_port = cy8c9560a.read_port_status(7)?;
+            rf_input_port = (rf_input_port & 0x30) >> 4;
+        }
+        2 => {
+            rf_input_port = cy8c9560a.read_port_status(7)?;
+            rf_input_port = (rf_input_port & 0x0C) >> 2;
+        }
+        3 => {
+            rf_input_port = cy8c9560a.read_port_status(7)?;
+            rf_input_port = rf_input_port & 0x03;
+        }
+        4 => {
+            rf_input_port = cy8c9560a.read_port_status(2)?;
+            rf_input_port = rf_input_port & 0x03;
+        }
+        5 => {
+            rf_input_port = cy8c9560a.read_port_status(5)?;
+            rf_input_port = rf_input_port & 0x03;
+            rf_input_port = ((rf_input_port & 0x02) >> 1) | ((rf_input_port & 0x01) << 1)
+        }
+        6 => {
+            rf_input_port = cy8c9560a.read_port_status(5)?;
+            rf_input_port = (rf_input_port & 0x30) >> 4;
+        }
+        7 => {
+            rf_input_port = cy8c9560a.read_port_status(4)?;
+            rf_input_port = (rf_input_port & 0xC0) >> 6;
+            rf_input_port = ((rf_input_port & 0x02) >> 1) | ((rf_input_port & 0x01) << 1)
+        }
+        8 => {
+            rf_input_port = cy8c9560a.read_port_status(4)?;
+            rf_input_port = (rf_input_port & 0x30) >> 4;
+            rf_input_port = ((rf_input_port & 0x02) >> 1) | ((rf_input_port & 0x01) << 1)
+        }
+        9 => {
+            rf_input_port = cy8c9560a.read_port_status(4)?;
+            rf_input_port = (rf_input_port & 0x0C) >> 2;
+            rf_input_port = ((rf_input_port & 0x02) >> 1) | ((rf_input_port & 0x01) << 1)
+        }
+        _ => {}
+    }
+
+    i2c_mux.reset()?;
+
+    Ok(rf_input_port)
 }

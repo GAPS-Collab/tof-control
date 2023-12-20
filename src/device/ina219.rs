@@ -126,10 +126,10 @@ impl INA219 {
     fn read_current(&self, dev: &mut LinuxI2CDevice, c_lsb: f32) -> Result<f32, LinuxI2CError> {
         let mut current_raw = dev.smbus_read_i2c_block_data(CURRENT as u8, 2)?;
         let mut current_adc = ((current_raw[0] as u16) << 8) | (current_raw[1] as u16);
-        while current_adc == 0 {
-            current_raw = dev.smbus_read_i2c_block_data(CURRENT as u8, 2)?;
-            current_adc = ((current_raw[0] as u16) << 8) | (current_raw[1] as u16);
-        }
+        // while current_adc == 0 {
+        //     current_raw = dev.smbus_read_i2c_block_data(CURRENT as u8, 2)?;
+        //     current_adc = ((current_raw[0] as u16) << 8) | (current_raw[1] as u16);
+        // }
         let mut sign: f32 = 1.0;
         if current_adc >= 0x8000 {
             sign = -1.0;
@@ -143,10 +143,10 @@ impl INA219 {
     fn read_power(&self, dev: &mut LinuxI2CDevice, p_lsb: f32) -> Result<f32, LinuxI2CError> {
         let mut power_raw = dev.smbus_read_i2c_block_data(POWER as u8, 2)?;
         let mut power_adc = ((power_raw[0] as u16) << 8) | (power_raw[1] as u16);
-        while power_adc == 0 {
-            power_raw = dev.smbus_read_i2c_block_data(POWER as u8, 2)?;
-            power_adc = ((power_raw[0] as u16) << 8) | (power_raw[1] as u16);
-        }
+        // while power_adc == 0 {
+        //     power_raw = dev.smbus_read_i2c_block_data(POWER as u8, 2)?;
+        //     power_adc = ((power_raw[0] as u16) << 8) | (power_raw[1] as u16);
+        // }
         let power = (power_adc as f32) * p_lsb;
 
         Ok(power)

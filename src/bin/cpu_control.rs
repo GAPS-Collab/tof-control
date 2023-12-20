@@ -1,63 +1,119 @@
-// use systemstat::{System, Platform};
+use clap::{Parser, Subcommand, ValueEnum};
+use chrono::prelude::*;
+use chrono_tz::America::Los_Angeles;
 
-// fn main() {
-//     let sys = System::new();
+use tof_control::helper::cpu_type::{CPUInfo, CPUTemp, CPUTempDebug};
 
-//     match sys.cpu_temp() {
-//         Ok(cpu_temp) => println!("CPU Temperature: {}", cpu_temp),
-//         Err(e) => eprintln!("{:?}", e),
-//     }
-// }
+#[derive(Parser, Debug)]
+#[command(author = "Takeru Hayashi", version = "0.1.0", about, long_about = None)]
+struct Cli {
+    #[clap(subcommand)]
+    command: Commands,
+    #[arg(short, long, help = "Verbose mode")]
+    verbose: bool,
+}
 
-use sysinfo::{System, SystemExt, ComponentExt};
+#[derive(Subcommand, Debug)]
+enum Commands {
+    #[clap(short_flag = 'r')]
+    Read {
+        #[arg(ignore_case = true, value_enum)]
+        sensor: Option<Sensor>,
+    },
+    #[clap(short_flag = 'd')]
+    Debug {}
+}
+
+#[derive(ValueEnum, Clone, Debug)]
+enum Sensor {
+    Info,
+    Temp,
+}
 
 fn main() {
-    // let mut sys = System::new_all();
-    // let components = sys.components();
-    // let comp = &components[0].label();
-    // println!("{:?}", comp);
+    
+    let cli = Cli::parse();
 
-    let temps = CPUTemp::new();
-    println!("CPU Temp");
-    println!("\tCPU0 Temp: {}", temps.cpu0_temp);
-    println!("\tCPU1 Temp: {}", temps.cpu1_temp);
-
-}
-
-#[derive(Debug)]
-struct CPUTemp {
-    cpu0_temp: f32,
-    cpu1_temp: f32,
-}
-
-impl CPUTemp {
-    fn new() -> CPUTemp {
-        let mut sys = System::new_all();
-
-        let compontns = sys.components();
-
-        let mut cpu0_temp: f32 = Default::default();
-        let mut cpu1_temp: f32 = Default::default();
-
-        for component in compontns {
-            let label = component.label();
-            match label {
-                "coretemp Core 0" => {
-                    cpu0_temp = component.temperature();
+    match cli.command {
+        Commands::Read { sensor } => {
+            match sensor {
+                Some(s) => {
+                    match s {
+                        Sensor::Info => {
+                            print_info();
+                        }
+                        Sensor::Temp => {
+                            // print_temp();
+                            print_temp_debug();
+                        }
+                    }
                 }
-                "coretemp Core 1" => {
-                    cpu1_temp = component.temperature();
-                }
-                _ => {
-                    // println!("Mismatched Lable: {}", label);
-
+                None => {
+                    print_info();
+                    // print_temp();
+                    print_temp_debug();
                 }
             }
         }
-
-        Self {
-            cpu0_temp,
-            cpu1_temp
+        Commands::Debug {} => {
+            if cli.verbose {
+                println!("%Y %m %d %H %M %S CPU_TEMP CPU0_TEMP CPU1_TEMP MB_TEMP CPU0_FREQ CPU1_FREQ CPU2_FREQ CPU3_FREQ");
+                print_debug_mode();
+            } else {
+                print_debug_mode();
+            }
         }
     }
+}
+
+fn print_info() {
+    let cpu_info = CPUInfo::new();
+
+    println!("CPU Information");
+    println!("\tUptime              : {}[s]", cpu_info.uptime);
+    println!("\tDisk Usage          : {}[%]", cpu_info.disk_usage);
+    println!("\tCPU0 Frequency      : {}[Hz]", cpu_info.cpu_freq[0]);
+    println!("\tCPU1 Frequency      : {}[Hz]", cpu_info.cpu_freq[1]);
+    println!("\tCPU2 Frequency      : {}[Hz]", cpu_info.cpu_freq[2]);
+    println!("\tCPU3 Frequency      : {}[Hz]", cpu_info.cpu_freq[3]);
+}
+
+fn print_temp() {
+    let cpu_temp = CPUTemp::new();
+
+    println!("CPU Temperature");
+    println!("\tCPU0 Temp           : {:.3}[°C]", cpu_temp.cpu0_temp);
+    println!("\tCPU1 Temp           : {:.3}[°C]", cpu_temp.cpu1_temp);
+}
+
+fn print_temp_debug() {
+    let cpu_temp = CPUTempDebug::new();
+
+    println!("CPU Temperature (Debug Mode)");
+    println!("\tCPU Temp            : {:.3}[°C]", cpu_temp.cpu_temp);
+    println!("\tCPU0 Temp           : {:.3}[°C]", cpu_temp.cpu0_temp);
+    println!("\tCPU1 Temp           : {:.3}[°C]", cpu_temp.cpu1_temp);
+    println!("\tMother Board Temp   : {:.3}[°C]", cpu_temp.mb_temp);
+}
+
+fn print_debug_mode() {
+    let datetime = Utc::now().naive_utc();
+    let datetime_local = Los_Angeles.from_utc_datetime(&datetime);
+    let dt_format = datetime_local.format("%Y %m %d %H %M %S");
+
+    let cpu_temperature = CPUTempDebug::new();
+    let cpu_temp = cpu_temperature.cpu_temp;
+    let cpu0_temp = cpu_temperature.cpu0_temp;
+    let cpu1_temp = cpu_temperature.cpu1_temp;
+    let mb_temp = cpu_temperature.mb_temp;
+
+    let cpu_information = CPUInfo::new();
+    let cpu_freq = cpu_information.cpu_freq;
+
+
+    println!("{} {} {} {} {} {} {} {} {}",
+        dt_format,
+        cpu_temp, cpu0_temp, cpu1_temp, mb_temp,
+        cpu_freq[0], cpu_freq[1], cpu_freq[2], cpu_freq[3],
+    );
 }

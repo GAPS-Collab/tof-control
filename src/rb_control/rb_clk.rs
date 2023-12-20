@@ -73,9 +73,14 @@ pub fn reset_clk_synth(rst_type: u8) -> Result<(), RBClkError> {
     let si5345b = si5345b::SI5345B::new(I2C_BUS, RB_SI5345B_ADDRESS);
 
     match rst_type {
-        0 => si5345b.soft_reset_si5345b()?,
-        1 => si5345b.hard_reset_si5345b()?,
-        _ => (),
+        0 => {
+            si5345b.soft_reset_si5345b()?;
+            si5345b.configure_si5345b()?;
+        }
+        1 => {
+            si5345b.hard_reset_si5345b()?;
+        }
+        _ => {},
     }
 
     i2c_mux.reset()?;

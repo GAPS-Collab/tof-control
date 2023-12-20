@@ -131,7 +131,9 @@ fn print_info() {
     println!("\tTrigger Rate (MTB)  : {}[Hz]", rb_info.trig_rate);
     // Additional Info
     println!("\tFirmware Version    : {}", rb_info.fw_version);
-    println!("\tReadout Mask        : {:#X}", rb_info.readout_mask);
+    println!("\tUptime              : {}[s]", rb_info.uptime);
+    println!("\tSD Usage            : {}[%]", rb_info.sd_usage);
+    println!("\tInput Mode          : {}", rb_info.input_mode);
 }
 
 fn print_temp() {

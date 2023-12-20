@@ -6,3 +6,6 @@ pub mod memory;
 pub mod pb_control;
 pub mod preamp_control;
 pub mod rb_control;
+pub mod cpu_control;
+pub mod cpc_control;
+pub mod tcpc_control;

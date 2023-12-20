@@ -100,7 +100,10 @@ pub fn config_vcp() -> Result<(), RBVcpError> {
         RB_DRS_DVDD_INA226_RSHUNT,
         RB_DRS_DVDD_INA226_MEC,
     );
-    drs_dvdd_ina226.configure()?;
+    for _ in 0..3 {
+        drs_dvdd_ina226.configure()?;
+        drs_dvdd_ina226.read()?;
+    }
 
     i2c_mux_1.select(RB_P3V3_INA226_CHANNEL)?;
     let p3v3_ina226 = ina226::INA226::new(
@@ -109,7 +112,10 @@ pub fn config_vcp() -> Result<(), RBVcpError> {
         RB_P3V3_INA226_RSHUNT,
         RB_P3V3_INA226_MEC,
     );
-    p3v3_ina226.configure()?;
+    for _ in 0..3 {
+        p3v3_ina226.configure()?;
+        p3v3_ina226.read()?;
+    }
 
     i2c_mux_1.select(RB_ZYNQ_INA226_CHANNEL)?;
     let zynq_ina226 = ina226::INA226::new(
@@ -119,6 +125,8 @@ pub fn config_vcp() -> Result<(), RBVcpError> {
         RB_ZYNQ_INA226_MEC,
     );
     zynq_ina226.configure()?;
+    zynq_ina226.read()?;
+    zynq_ina226.read()?;
 
     i2c_mux_1.select(RB_P3V5_INA226_CHANNEL)?;
     let p3v5_ina226 = ina226::INA226::new(
@@ -127,7 +135,10 @@ pub fn config_vcp() -> Result<(), RBVcpError> {
         RB_P3V5_INA226_RSHUNT,
         RB_P3V5_INA226_MEC,
     );
-    p3v5_ina226.configure()?;
+    for _ in 0..3 {
+        p3v5_ina226.configure()?;
+        p3v5_ina226.read()?;
+    }
 
     i2c_mux_2.select(RB_ADC_DVDD_INA226_CHANNEL)?;
     let adc_dvdd_ina226 = ina226::INA226::new(
@@ -136,7 +147,10 @@ pub fn config_vcp() -> Result<(), RBVcpError> {
         RB_ADC_DVDD_INA226_RSHUNT,
         RB_ADC_DVDD_INA226_MEC,
     );
-    adc_dvdd_ina226.configure()?;
+    for _ in 0..3 {
+        adc_dvdd_ina226.configure()?;
+        adc_dvdd_ina226.read()?;
+    }
 
     i2c_mux_2.select(RB_ADC_AVDD_INA226_CHANNEL)?;
     let adc_avdd_ina226 = ina226::INA226::new(
@@ -145,7 +159,10 @@ pub fn config_vcp() -> Result<(), RBVcpError> {
         RB_ADC_AVDD_INA226_RSHUNT,
         RB_ADC_AVDD_INA226_MEC,
     );
-    adc_avdd_ina226.configure()?;
+    for _ in 0..3 {
+        adc_avdd_ina226.configure()?;
+        adc_avdd_ina226.read()?;
+    }
 
     i2c_mux_2.select(RB_DRS_AVDD_INA226_CHANNEL)?;
     let drs_avdd_ina226 = ina226::INA226::new(
@@ -154,7 +171,10 @@ pub fn config_vcp() -> Result<(), RBVcpError> {
         RB_DRS_AVDD_INA226_RSHUNT,
         RB_DRS_AVDD_INA226_MEC,
     );
-    drs_avdd_ina226.configure()?;
+    for _ in 0..3 {
+        drs_avdd_ina226.configure()?;
+        drs_avdd_ina226.read()?;
+    }
 
     i2c_mux_1.select(RB_MAX11645_CHANNEL)?;
     let max11645 = max11645::MAX11645::new(I2C_BUS, RB_MAX11645_ADDRESS);
