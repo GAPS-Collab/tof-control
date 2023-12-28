@@ -185,6 +185,27 @@ impl BME280 {
 
         Ok(ph)
     }
+    pub fn read_all(&self) -> Result<[f32; 3], LinuxI2CError> {
+        let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", self.bus), self.address)?;
+
+        let compensate_data = self.read_compensate(&mut dev)?;
+
+        let temp_measurement = self.read_temperature(&mut dev, compensate_data.dig_t)?;
+        let temperature = temp_measurement[0];
+        let t_fine = temp_measurement[1];
+
+        let pressure = self
+            .read_pressure(&mut dev, t_fine, compensate_data.dig_p)
+            .expect("cannot read pressure from BME280");
+
+        let humidity = self
+            .read_humidity(&mut dev, t_fine, compensate_data.dig_h)
+            .expect("cannot read humidity from BME280");
+
+        let tph = [temperature, pressure, humidity];
+
+        Ok(tph)
+    }
     fn read_temperature(
         &self,
         dev: &mut LinuxI2CDevice,

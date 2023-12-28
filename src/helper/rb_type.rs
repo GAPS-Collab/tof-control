@@ -68,11 +68,33 @@ pub struct RBInfo {
 }
 
 #[derive(Debug)]
+pub struct RBInfoDebug {
+    pub board_id        : u8,
+    pub lol             : u8,
+    pub lol_stable      : u8,
+    pub trig_rate       : u16,
+    pub fw_version      : String,
+    pub uptime          : u32,
+    pub sd_usage        : u8,
+    pub input_mode      : String,
+}
+
+#[derive(Debug)]
 pub struct RBTemp {
     pub zynq_temp       : f32,
     pub drs_temp        : f32,
     pub clk_temp        : f32,
     pub adc_temp        : f32,
+}
+
+#[derive(Debug)]
+pub struct RBTempDebug {
+    pub zynq_temp       : f32,
+    pub drs_temp        : f32,
+    pub clk_temp        : f32,
+    pub adc_temp        : f32,
+    pub bme280_temp     : f32,
+    pub lis3mdltr_temp  : f32,
 }
 
 #[derive(Debug)]
