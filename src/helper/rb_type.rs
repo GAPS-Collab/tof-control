@@ -57,19 +57,16 @@ pub struct RBMoniData {
 #[derive(Debug)]
 pub struct RBInfo {
     pub board_id        : u8,
+    pub sub_board       : u8,
     pub lol             : u8,
     pub lol_stable      : u8,
     pub trig_rate       : u16,
-    // Additional Info
-    pub fw_version      : String,
-    pub uptime          : u32,
-    pub sd_usage        : u8,
-    pub input_mode      : String,
 }
 
 #[derive(Debug)]
 pub struct RBInfoDebug {
     pub board_id        : u8,
+    pub sub_board       : u8,
     pub lol             : u8,
     pub lol_stable      : u8,
     pub trig_rate       : u16,
@@ -211,6 +208,8 @@ impl From<RBModeError> for RBError {
 pub enum RBInfoError {
     // Register Error
     Register(crate::memory::RegisterError),
+    // I2C Error
+    I2C(i2cdev::linux::LinuxI2CError),
     // Parse Integer Error
     ParseInt(std::num::ParseIntError),
     // GPIOe Error
@@ -222,6 +221,12 @@ pub enum RBInfoError {
 impl From<crate::memory::RegisterError> for RBInfoError {
     fn from(e: crate::memory::RegisterError) -> Self {
         RBInfoError::Register(e)
+    }
+}
+
+impl From<i2cdev::linux::LinuxI2CError> for RBInfoError {
+    fn from(e: i2cdev::linux::LinuxI2CError) -> Self {
+        RBInfoError::I2C(e)
     }
 }
 
