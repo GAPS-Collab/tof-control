@@ -56,8 +56,8 @@ elif [ "$1" = "rb-control" ]; then
     # scp target/armv7-unknown-linux-musleabi/release/rb-control tof-rb18:~/dev
     # scp target/armv7-unknown-linux-musleabi/release/rb-control tof-rb09:~/dev
     # scp target/armv7-unknown-linux-musleabi/release/rb-control tof-rb37:~/dev
-    scp target/armv7-unknown-linux-musleabi/release/rb-control tof-rb41:~/dev
-    scp target/armv7-unknown-linux-musleabi/release/rb-control tof-rb42:~/dev
+    scp target/armv7-unknown-linux-musleabi/release/rb-control tof-rb07:~/dev
+    scp target/armv7-unknown-linux-musleabi/release/rb-control tof-rb17:~/dev
     # scp target/armv7-unknown-linux-musleabi/release/rb-control tof-rb43:~/dev
 
 elif [ "$1" = "ltb-control" ]; then

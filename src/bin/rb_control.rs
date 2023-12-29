@@ -3,7 +3,7 @@ use std::fs::OpenOptions;
 use std::io::prelude::*;
 use chrono::Utc;
 
-use tof_control::helper::rb_type::{RBInfo, RBTemp, RBVcp, RBPh, RBMag};
+use tof_control::helper::rb_type::{RBInfoDebug, RBTemp, RBVcp, RBPh, RBMag};
 use tof_control::rb_control::{rb_init, rb_mode};
 
 #[derive(Parser, Debug)]
@@ -122,10 +122,11 @@ fn initialize_rb() {
 }
 
 fn print_info() {
-    let rb_info = RBInfo::new();
+    let rb_info = RBInfoDebug::new();
 
     println!("RB Information");
     println!("\tBoard ID            : {}", rb_info.board_id);
+    println!("\tSub Board           : {}", if rb_info.sub_board == 1 { "LTB" } else if rb_info.sub_board == 2 { "PB/Preamp" } else { "NC" });
     println!("\tLOL                 : {}", if rb_info.lol == 0x01 { "Unlocked" } else { "Locked" });
     println!("\tLOL Stable          : {}", if rb_info.lol_stable == 0x01 { "Unlocked Past Second" } else { "Locked Past Second" });
     println!("\tTrigger Rate (MTB)  : {}[Hz]", rb_info.trig_rate);
