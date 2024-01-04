@@ -1,23 +1,102 @@
-use tof_control::constant::*;
-use tof_control::device::{tmp1075, ina219, max7320};
+use clap::{Parser, Subcommand, ValueEnum};
+use chrono::prelude::*;
+use chrono_tz::America::Los_Angeles;
+
+use tof_control::helper::tcpc_type::{TCPCTemp, TCPCVcp};
+
+#[derive(Parser, Debug)]
+#[command(author = "Takeru Hayashi", version = "0.1.0", about, long_about = None)]
+struct Cli {
+    #[clap(subcommand)]
+    command: Commands,
+    #[arg(short, long, help = "Verbose mode")]
+    verbose: bool,
+}
+
+#[derive(Subcommand, Debug)]
+enum Commands {
+    #[clap(short_flag = 'r')]
+    Read {
+        #[arg(ignore_case = true, value_enum)]
+        sensor: Option<Sensor>,
+    },
+    #[clap(short_flag = 'd')]
+    Debug {}
+}
+
+#[derive(ValueEnum, Clone, Debug)]
+enum Sensor {
+    Temp,
+    Vcp,
+}
 
 fn main() {
-    println!("TCPC Temperature:          {:.3} [°C]", tcpc_temperature());
-    println!("TCPC Power:                {:.3} [V] | {:.3} [A] | {:.3} [W]", tcpc_vcp().0, tcpc_vcp().1, tcpc_vcp().2);
+    
+    let cli = Cli::parse();
+
+    match cli.command {
+        Commands::Read { sensor } => {
+            match sensor {
+                Some(s) => {
+                    match s {
+                        Sensor::Temp => {
+                            print_temp();
+                        }
+                        Sensor::Vcp => {
+                            print_vcp();
+                        }
+                    }
+                }
+                None => {
+                    print_temp();
+                    print_vcp();
+                }
+            }
+        }
+        Commands::Debug {} => {
+            if cli.verbose {
+                println!("%Y %m %d %H %M %S TCPC_TEMP TCPC_VOL TCPC_CUR TCPC_PWR");
+                print_debug_mode();
+            } else {
+                print_debug_mode();
+            }
+        }
+    }
 }
 
-fn tcpc_temperature() -> f32 {
-    let tcpc_tmp1075 = tmp1075::TMP1075::new(1, TCPC_TMP1075_ADDRESS);
-    tcpc_tmp1075.config().expect("cannot configure TMP1075");
-    let tcpc_temp = tcpc_tmp1075.read().expect("cannot read TMP1075");
+fn print_temp() {
+    let tcpc_temp = TCPCTemp::new();
 
-    tcpc_temp
+    println!("TCPC Temperature");
+    println!("\tTCPC Temp            : {:.3}[°C]", tcpc_temp.tcpc_temp);
 }
 
-fn tcpc_vcp() -> (f32, f32, f32) {
-    let tcpc_ina219 = ina219::INA219::new(1, TCPC_INA219_ADDRESS, TCPC_INA219_RSHUNT, TCPC_INA219_MEC);
-    tcpc_ina219.configure().expect("cannot configure INA219");
-    let (tcpc_voltage, tcpc_current, tcpc_power) = tcpc_ina219.read_data().expect("cannot read INA219");
+fn print_vcp() {
+    let tcpc_vcp = TCPCVcp::new();
 
-    (tcpc_voltage, tcpc_current, tcpc_power)
+    println!("TCPC VCP");
+    println!("\tTCPC Voltage          : {:.3}[V]", tcpc_vcp.tcpc_vcp[0]);
+    println!("\tTCPC Current          : {:.3}[A]", tcpc_vcp.tcpc_vcp[1]);
+    println!("\tTCPC Power            : {:.3}[W]", tcpc_vcp.tcpc_vcp[2]);
+}
+
+fn print_debug_mode() {
+    let datetime = Utc::now().naive_utc();
+    let datetime_local = Los_Angeles.from_utc_datetime(&datetime);
+    let dt_format = datetime_local.format("%Y %m %d %H %M %S");
+
+    let tcpc_temperature = TCPCTemp::new();
+    let tcpc_temp = tcpc_temperature.tcpc_temp;
+
+    let tcpc_vcp = TCPCVcp::new();
+    let tcpc_voltage = tcpc_vcp.tcpc_vcp[0];
+    let tcpc_current = tcpc_vcp.tcpc_vcp[1];
+    let tcpc_power = tcpc_vcp.tcpc_vcp[2];
+
+
+    println!("{} {} {} {} {}",
+        dt_format,
+        tcpc_temp,
+        tcpc_voltage, tcpc_current, tcpc_power,
+    );
 }

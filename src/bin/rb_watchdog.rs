@@ -19,6 +19,6 @@ fn switch_watchdog_gpio(operation: bool) -> std::io::Result<()> {
         true => file.write_all(b"1")?,
         false => file.write_all(b"0")?,
     };
-    
+
     Ok(())
 }

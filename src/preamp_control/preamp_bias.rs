@@ -1,191 +1,331 @@
 use crate::constant::*;
-use crate::device::{pca9548a, max11615, max11617, max5825};
+use crate::helper::preamp_type::{PreampReadBias, PreampSetBias, PreampTemp, PreampBiasError};
+use crate::device::{max11615, max11617, max5825, pca9548a};
+use crate::pb_control::pb_temp::read_pds_temp;
 
-pub struct PreampBiasRead {
-    pub preamp_bias_read_1: f32,
-    pub preamp_bias_read_2: f32,
-    pub preamp_bias_read_3: f32,
-    pub preamp_bias_read_4: f32,
-    pub preamp_bias_read_5: f32,
-    pub preamp_bias_read_6: f32,
-    pub preamp_bias_read_7: f32,
-    pub preamp_bias_read_8: f32,
-    pub preamp_bias_read_9: f32,
-    pub preamp_bias_read_10: f32,
-    pub preamp_bias_read_11: f32,
-    pub preamp_bias_read_12: f32,
-    pub preamp_bias_read_13: f32,
-    pub preamp_bias_read_14: f32,
-    pub preamp_bias_read_15: f32,
-    pub preamp_bias_read_16: f32,
-}
-
-impl PreampBiasRead {
+impl PreampReadBias {
     pub fn new() -> Self {
-        let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, PB_PCA9548A_ADDRESS);
-
-        i2c_mux.select(PB_ADC_1_CHANNEL).expect("cannot access to PCA9548A");
-        let max11615 = max11615::MAX11615::new(I2C_BUS, PB_MAX11615_ADDRESS);
-        max11615.setup().expect("cannot setup MAX11615");
-        let max11617 = max11617::MAX11617::new(I2C_BUS, PB_MAX11617_ADDRESS);
-        max11617.setup().expect("cannot setup MAX11617");
-
-        let preamp_bias_read_1 = Self::convert_bias_voltage(max11615.read(PREAMP_SEN_1_CHANNEL).expect("cannot read MAX11615"));
-        let preamp_bias_read_2 = Self::convert_bias_voltage(max11615.read(PREAMP_SEN_2_CHANNEL).expect("cannot read MAX11615"));
-        let preamp_bias_read_3 = Self::convert_bias_voltage(max11615.read(PREAMP_SEN_3_CHANNEL).expect("cannot read MAX11615"));
-        let preamp_bias_read_4 = Self::convert_bias_voltage(max11615.read(PREAMP_SEN_4_CHANNEL).expect("cannot read MAX11615"));
-        let preamp_bias_read_5 = Self::convert_bias_voltage(max11617.read(PREAMP_SEN_5_CHANNEL).expect("cannot read MAX11617"));
-        let preamp_bias_read_6 = Self::convert_bias_voltage(max11617.read(PREAMP_SEN_6_CHANNEL).expect("cannot read MAX11617"));
-        let preamp_bias_read_7 = Self::convert_bias_voltage(max11617.read(PREAMP_SEN_7_CHANNEL).expect("cannot read MAX11617"));
-        let preamp_bias_read_8 = Self::convert_bias_voltage(max11617.read(PREAMP_SEN_8_CHANNEL).expect("cannot read MAX11617"));
-
-        i2c_mux.select(PB_ADC_2_CHANNEL).expect("cannot access to PCA9548A");
-        let max11615 = max11615::MAX11615::new(I2C_BUS, PB_MAX11615_ADDRESS);
-        max11615.setup().expect("cannot setup MAX11615");
-        let max11617 = max11617::MAX11617::new(I2C_BUS, PB_MAX11617_ADDRESS);
-        max11617.setup().expect("cannot setup MAX11617");
-
-        let preamp_bias_read_9 = Self::convert_bias_voltage(max11615.read(PREAMP_SEN_9_CHANNEL).expect("cannot read MAX11615"));
-        let preamp_bias_read_10 = Self::convert_bias_voltage(max11615.read(PREAMP_SEN_10_CHANNEL).expect("cannot read MAX11615"));
-        let preamp_bias_read_11 = Self::convert_bias_voltage(max11615.read(PREAMP_SEN_11_CHANNEL).expect("cannot read MAX11615"));
-        let preamp_bias_read_12 = Self::convert_bias_voltage(max11615.read(PREAMP_SEN_12_CHANNEL).expect("cannot read MAX11615"));
-        let preamp_bias_read_13 = Self::convert_bias_voltage(max11617.read(PREAMP_SEN_13_CHANNEL).expect("cannot read MAX11617"));
-        let preamp_bias_read_14 = Self::convert_bias_voltage(max11617.read(PREAMP_SEN_14_CHANNEL).expect("cannot read MAX11617"));
-        let preamp_bias_read_15 = Self::convert_bias_voltage(max11617.read(PREAMP_SEN_15_CHANNEL).expect("cannot read MAX11617"));
-        let preamp_bias_read_16 = Self::convert_bias_voltage(max11617.read(PREAMP_SEN_16_CHANNEL).expect("cannot read MAX11617"));
-
-        i2c_mux.reset().expect("cannot reset PCA9548A");
-
-        Self {
-            preamp_bias_read_1,
-            preamp_bias_read_2,
-            preamp_bias_read_3,
-            preamp_bias_read_4,
-            preamp_bias_read_5,
-            preamp_bias_read_6,
-            preamp_bias_read_7,
-            preamp_bias_read_8,
-            preamp_bias_read_9,
-            preamp_bias_read_10,
-            preamp_bias_read_11,
-            preamp_bias_read_12,
-            preamp_bias_read_13,
-            preamp_bias_read_14,
-            preamp_bias_read_15,
-            preamp_bias_read_16,
+        match Self::read_bias() {
+            Ok(read_biases) => {
+                read_biases
+            }
+            Err(_) => {
+                Self {
+                    read_biases: [f32::MAX; 16]
+                }
+            }
         }
     }
-    fn convert_bias_voltage(voltage: f32) -> f32 {
-        22.27659574468085 * voltage
-    }
-    pub fn print_preamp_bias() {
-        let preamp_bias_read = PreampBiasRead::new();
-        println!("Preamp 1 Bias Voltage:    {:.3} [V]", preamp_bias_read.preamp_bias_read_1);
-        println!("Preamp 2 Bias Voltage:    {:.3} [V]", preamp_bias_read.preamp_bias_read_2);
-        println!("Preamp 3 Bias Voltage:    {:.3} [V]", preamp_bias_read.preamp_bias_read_3);
-        println!("Preamp 4 Bias Voltage:    {:.3} [V]", preamp_bias_read.preamp_bias_read_4);
-        println!("Preamp 5 Bias Voltage:    {:.3} [V]", preamp_bias_read.preamp_bias_read_5);
-        println!("Preamp 6 Bias Voltage:    {:.3} [V]", preamp_bias_read.preamp_bias_read_6);
-        println!("Preamp 7 Bias Voltage:    {:.3} [V]", preamp_bias_read.preamp_bias_read_7);
-        println!("Preamp 8 Bias Voltage:    {:.3} [V]", preamp_bias_read.preamp_bias_read_8);
-        println!("Preamp 9 Bias Voltage:    {:.3} [V]", preamp_bias_read.preamp_bias_read_9);
-        println!("Preamp 10 Bias Voltage:   {:.3} [V]", preamp_bias_read.preamp_bias_read_10);
-        println!("Preamp 11 Bias Voltage:   {:.3} [V]", preamp_bias_read.preamp_bias_read_11);
-        println!("Preamp 12 Bias Voltage:   {:.3} [V]", preamp_bias_read.preamp_bias_read_12);
-        println!("Preamp 13 Bias Voltage:   {:.3} [V]", preamp_bias_read.preamp_bias_read_13);
-        println!("Preamp 14 Bias Voltage:   {:.3} [V]", preamp_bias_read.preamp_bias_read_14);
-        println!("Preamp 15 Bias Voltage:   {:.3} [V]", preamp_bias_read.preamp_bias_read_15);
-        println!("Preamp 16 Bias Voltage:   {:.3} [V]", preamp_bias_read.preamp_bias_read_16);
-    }
-}
+    pub fn read_bias() -> Result<PreampReadBias, PreampBiasError> {
+        let mut read_biases: [f32; 16] = Default::default();
 
-pub struct PreampBiasSet {
-}
-
-impl PreampBiasSet {
-    pub fn set_bias() {
+        let preamp_channels = [
+            PREAMP_SEN_1_CHANNEL, PREAMP_SEN_2_CHANNEL, PREAMP_SEN_3_CHANNEL, PREAMP_SEN_4_CHANNEL,
+            PREAMP_SEN_5_CHANNEL, PREAMP_SEN_6_CHANNEL, PREAMP_SEN_7_CHANNEL, PREAMP_SEN_8_CHANNEL,
+            PREAMP_SEN_9_CHANNEL, PREAMP_SEN_10_CHANNEL, PREAMP_SEN_11_CHANNEL, PREAMP_SEN_12_CHANNEL,
+            PREAMP_SEN_13_CHANNEL, PREAMP_SEN_14_CHANNEL, PREAMP_SEN_15_CHANNEL, PREAMP_SEN_16_CHANNEL,
+        ];
         let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, PB_PCA9548A_ADDRESS);
+        i2c_mux.select(PB_ADC_1_CHANNEL)?;
+        let max11615 = max11615::MAX11615::new(I2C_BUS, PB_MAX11615_ADDRESS);
+        max11615.setup()?;
+        let max11617 = max11617::MAX11617::new(I2C_BUS, PB_MAX11617_ADDRESS);
+        max11617.setup()?;
 
-        i2c_mux.select(PB_DAC_1_CHANNEL).expect("cannot access to PCA9548A");
-        let pb_dac_1 = max5825::MAX5825::new(I2C_BUS, PB_MAX5825_ADDRESS);
-        pb_dac_1.coden_loadn(PREAMP_DAC_1_CHANNEL, Self::bias_to_adc(PREAMP_DAC_1_VOLTAGE)).expect("cannot set bias voltage 1 on MAX5825(DAC1)");
-        pb_dac_1.coden_loadn(PREAMP_DAC_2_CHANNEL, Self::bias_to_adc(PREAMP_DAC_2_VOLTAGE)).expect("cannot set bias voltage 2 on MAX5825(DAC1)");
-        pb_dac_1.coden_loadn(PREAMP_DAC_3_CHANNEL, Self::bias_to_adc(PREAMP_DAC_3_VOLTAGE)).expect("cannot set bias voltage 3 on MAX5825(DAC1)");
-        pb_dac_1.coden_loadn(PREAMP_DAC_4_CHANNEL, Self::bias_to_adc(PREAMP_DAC_4_VOLTAGE)).expect("cannot set bias voltage 4 on MAX5825(DAC1)");
-        pb_dac_1.coden_loadn(PREAMP_DAC_5_CHANNEL, Self::bias_to_adc(PREAMP_DAC_5_VOLTAGE)).expect("cannot set bias voltage 5 on MAX5825(DAC1)");
-        pb_dac_1.coden_loadn(PREAMP_DAC_6_CHANNEL, Self::bias_to_adc(PREAMP_DAC_6_VOLTAGE)).expect("cannot set bias voltage 6 on MAX5825(DAC1)");
-        pb_dac_1.coden_loadn(PREAMP_DAC_7_CHANNEL, Self::bias_to_adc(PREAMP_DAC_7_VOLTAGE)).expect("cannot set bias voltage 7 on MAX5825(DAC1)");
-        pb_dac_1.coden_loadn(PREAMP_DAC_8_CHANNEL, Self::bias_to_adc(PREAMP_DAC_8_VOLTAGE)).expect("cannot set bias voltage 8 on MAX5825(DAC1)");
-    
-        i2c_mux.select(PB_DAC_2_CHANNEL).expect("cannot access to PCA9548A");
-        let pb_dac_2 = max5825::MAX5825::new(I2C_BUS, PB_MAX5825_ADDRESS);
-        pb_dac_2.coden_loadn(PREAMP_DAC_9_CHANNEL, Self::bias_to_adc(PREAMP_DAC_9_VOLTAGE)).expect("cannot set bias voltage 9 on MAX5825(DAC2)");
-        pb_dac_2.coden_loadn(PREAMP_DAC_10_CHANNEL, Self::bias_to_adc(PREAMP_DAC_10_VOLTAGE)).expect("cannot set bias voltage 10 on MAX5825(DAC2)");
-        pb_dac_2.coden_loadn(PREAMP_DAC_11_CHANNEL, Self::bias_to_adc(PREAMP_DAC_11_VOLTAGE)).expect("cannot set bias voltage 11 on MAX5825(DAC2)");
-        pb_dac_2.coden_loadn(PREAMP_DAC_12_CHANNEL, Self::bias_to_adc(PREAMP_DAC_12_VOLTAGE)).expect("cannot set bias voltage 12 on MAX5825(DAC2)");
-        pb_dac_2.coden_loadn(PREAMP_DAC_13_CHANNEL, Self::bias_to_adc(PREAMP_DAC_13_VOLTAGE)).expect("cannot set bias voltage 13 on MAX5825(DAC2)");
-        pb_dac_2.coden_loadn(PREAMP_DAC_14_CHANNEL, Self::bias_to_adc(PREAMP_DAC_14_VOLTAGE)).expect("cannot set bias voltage 14 on MAX5825(DAC2)");
-        pb_dac_2.coden_loadn(PREAMP_DAC_15_CHANNEL, Self::bias_to_adc(PREAMP_DAC_15_VOLTAGE)).expect("cannot set bias voltage 15 on MAX5825(DAC2)");
-        pb_dac_2.coden_loadn(PREAMP_DAC_16_CHANNEL, Self::bias_to_adc(PREAMP_DAC_16_VOLTAGE)).expect("cannot set bias voltage 16 on MAX5825(DAC2)");
+        for i in 0..=7 {
+            if (0..=3).contains(&i) {
+                let preamp_bias_raw = max11615.read(preamp_channels[i])?;
+                read_biases[i] = Self::convert_bias_voltage(preamp_bias_raw);
+            } else {
+                let preamp_bias_raw = max11617.read(preamp_channels[i])?;
+                read_biases[i] = Self::convert_bias_voltage(preamp_bias_raw);
+            }
+        }
 
-        i2c_mux.reset().expect("cannot reset PCA9548A");
+        i2c_mux.select(PB_ADC_2_CHANNEL)?;
+        max11615.setup()?;
+        max11617.setup()?;
+
+        for i in 8..=15 {
+            if (8..=11).contains(&i) {
+                let preamp_bias_raw = max11615.read(preamp_channels[i])?;
+                read_biases[i] = Self::convert_bias_voltage(preamp_bias_raw);
+            } else {
+                let preamp_bias_raw = max11617.read(preamp_channels[i])?;
+                read_biases[i] = Self::convert_bias_voltage(preamp_bias_raw);
+            }
+        }
+
+        i2c_mux.reset()?;
+
+        Ok(
+            PreampReadBias {
+                read_biases,
+            }
+        )
     }
-    fn bias_to_adc(bias_voltage: f32) -> u16 {
-        let adc = (bias_voltage / 22.3) / PB_DAC_REF_VOLTAGE * 2f32.powf(12.0);
+    fn convert_bias_voltage(voltage: f32) -> f32 {
+        // let bias_voltage = voltage * 22.27659574468085;
+        let bias_voltage = voltage * (10f32.powi(6i32) + 47f32*10f32.powi(3i32))/(47f32*10f32.powi(3i32));
 
+        bias_voltage
+    }
+}
+
+impl PreampSetBias {
+    pub fn read_set_bias() -> Result<Self, PreampBiasError> {
+
+        let preamp_bias_channels = [
+            PREAMP_DAC_1_CHANNEL, PREAMP_DAC_2_CHANNEL, PREAMP_DAC_3_CHANNEL, PREAMP_DAC_4_CHANNEL,
+            PREAMP_DAC_5_CHANNEL, PREAMP_DAC_6_CHANNEL, PREAMP_DAC_7_CHANNEL, PREAMP_DAC_8_CHANNEL,
+            PREAMP_DAC_9_CHANNEL, PREAMP_DAC_10_CHANNEL, PREAMP_DAC_11_CHANNEL, PREAMP_DAC_12_CHANNEL,
+            PREAMP_DAC_13_CHANNEL, PREAMP_DAC_14_CHANNEL, PREAMP_DAC_15_CHANNEL, PREAMP_DAC_16_CHANNEL,
+        ];
+    
+        let mut set_biases: [f32; 16] = Default::default();
+    
+        let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, PB_PCA9548A_ADDRESS);
+    
+        i2c_mux.select(PB_DAC_1_CHANNEL)?;
+        let pb_dac_1 = max5825::MAX5825::new(I2C_BUS, PB_MAX5825_ADDRESS);
+        for i in 0..=7 {
+            set_biases[i] = Self::adc_to_bias(pb_dac_1.read_dacn(preamp_bias_channels[i])?);
+        }
+    
+        i2c_mux.select(PB_DAC_2_CHANNEL)?;
+        let pb_dac_2 = max5825::MAX5825::new(I2C_BUS, PB_MAX5825_ADDRESS);
+        for i in 8..=15 {
+            set_biases[i] = Self::adc_to_bias(pb_dac_2.read_dacn(preamp_bias_channels[i])?);
+        }
+    
+        i2c_mux.reset()?;
+    
+        Ok(
+            Self {
+                set_biases
+            }
+        )
+    }
+
+    pub fn set_default_bias() -> Result<(), PreampBiasError> {
+
+        let bias_voltage = Self::bias_to_adc(PREAMP_DEFAULT_BIAS);
+    
+        let preamp_bias_channels = [
+            PREAMP_DAC_1_CHANNEL, PREAMP_DAC_2_CHANNEL, PREAMP_DAC_3_CHANNEL, PREAMP_DAC_4_CHANNEL,
+            PREAMP_DAC_5_CHANNEL, PREAMP_DAC_6_CHANNEL, PREAMP_DAC_7_CHANNEL, PREAMP_DAC_8_CHANNEL,
+            PREAMP_DAC_9_CHANNEL, PREAMP_DAC_10_CHANNEL, PREAMP_DAC_11_CHANNEL, PREAMP_DAC_12_CHANNEL,
+            PREAMP_DAC_13_CHANNEL, PREAMP_DAC_14_CHANNEL, PREAMP_DAC_15_CHANNEL, PREAMP_DAC_16_CHANNEL,
+        ];
+    
+        let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, PB_PCA9548A_ADDRESS);
+        
+        i2c_mux.select(PB_DAC_1_CHANNEL)?;
+        let pb_dac_1 = max5825::MAX5825::new(I2C_BUS, PB_MAX5825_ADDRESS);
+        for i in 0..=7 {
+            pb_dac_1.coden_loadn(preamp_bias_channels[i], bias_voltage)?;
+        }
+    
+        i2c_mux.select(PB_DAC_2_CHANNEL)?;
+        let pb_dac_2 = max5825::MAX5825::new(I2C_BUS, PB_MAX5825_ADDRESS);
+        for i in 8..=15 {
+            pb_dac_2.coden_loadn(preamp_bias_channels[i], bias_voltage)?;
+        }
+    
+        i2c_mux.reset()?;
+    
+        Ok(())
+    
+    }
+
+    pub fn set_manual_bias(channel: Option<u8>, bias: f32) -> Result<(), PreampBiasError> {
+
+        if bias < 0.0 || bias > 67.0 {
+            eprintln!("Bias voltage must be between 0V to 67V");
+            std::process::exit(1);
+        }
+
+        let bias_voltage = Self::bias_to_adc(bias);
+
+        let preamp_bias_channels = [
+            PREAMP_DAC_1_CHANNEL, PREAMP_DAC_2_CHANNEL, PREAMP_DAC_3_CHANNEL, PREAMP_DAC_4_CHANNEL,
+            PREAMP_DAC_5_CHANNEL, PREAMP_DAC_6_CHANNEL, PREAMP_DAC_7_CHANNEL, PREAMP_DAC_8_CHANNEL,
+            PREAMP_DAC_9_CHANNEL, PREAMP_DAC_10_CHANNEL, PREAMP_DAC_11_CHANNEL, PREAMP_DAC_12_CHANNEL,
+            PREAMP_DAC_13_CHANNEL, PREAMP_DAC_14_CHANNEL, PREAMP_DAC_15_CHANNEL, PREAMP_DAC_16_CHANNEL,
+        ];
+
+        let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, PB_PCA9548A_ADDRESS);
+        match channel {
+            None => {
+                i2c_mux.select(PB_DAC_1_CHANNEL)?;
+                let pb_dac_1 = max5825::MAX5825::new(I2C_BUS, PB_MAX5825_ADDRESS);
+                for i in 0..=7 {
+                    pb_dac_1.coden_loadn(preamp_bias_channels[i], bias_voltage)?;
+                }
+            
+                i2c_mux.select(PB_DAC_2_CHANNEL)?;
+                let pb_dac_2 = max5825::MAX5825::new(I2C_BUS, PB_MAX5825_ADDRESS);
+                for i in 8..=15 {
+                    pb_dac_2.coden_loadn(preamp_bias_channels[i], bias_voltage)?;
+                }
+            }
+            Some(mut ch) => {
+
+                if ch < 1 || ch > 16 {
+                    eprintln!("Channel must be between 1 to 16.");
+                    std::process::exit(1);
+                }
+
+                ch = ch - 1;
+
+                if (0..=7).contains(&ch) {
+                    i2c_mux.select(PB_DAC_1_CHANNEL)?;
+                    let pb_dac_1 = max5825::MAX5825::new(I2C_BUS, PB_MAX5825_ADDRESS);
+                    pb_dac_1.coden_loadn(preamp_bias_channels[ch as usize], bias_voltage)?;
+                } else {
+                    i2c_mux.select(PB_DAC_2_CHANNEL)?;
+                    let pb_dac_2 = max5825::MAX5825::new(I2C_BUS, PB_MAX5825_ADDRESS);
+                    pb_dac_2.coden_loadn(preamp_bias_channels[ch as usize], bias_voltage)?
+                }
+            }
+        }
+    
+        i2c_mux.reset()?;
+    
+        Ok(())
+    
+    }
+
+    pub fn set_bias() -> Result<(), PreampBiasError> {
+
+        // let mut bias_voltage = Default::default();
+    
+        let preamp_bias_channels = [
+            PREAMP_DAC_1_CHANNEL, PREAMP_DAC_2_CHANNEL, PREAMP_DAC_3_CHANNEL, PREAMP_DAC_4_CHANNEL,
+            PREAMP_DAC_5_CHANNEL, PREAMP_DAC_6_CHANNEL, PREAMP_DAC_7_CHANNEL, PREAMP_DAC_8_CHANNEL,
+            PREAMP_DAC_9_CHANNEL, PREAMP_DAC_10_CHANNEL, PREAMP_DAC_11_CHANNEL, PREAMP_DAC_12_CHANNEL,
+            PREAMP_DAC_13_CHANNEL, PREAMP_DAC_14_CHANNEL, PREAMP_DAC_15_CHANNEL, PREAMP_DAC_16_CHANNEL,
+        ];
+    
+        let mut bias_voltages: [u16; 16] = Default::default();
+
+        let read_biases = PreampReadBias::read_bias()?.read_biases;
+        let set_biases = Self::read_set_bias()?.set_biases;
+    
+        for i in 0..=15 {
+            if set_biases[i] == 0.0 {
+                let bias_stc = Self::sipm_temp_comp(i)?;
+                let bias_ptc = Self::pb_temp_comp(bias_stc)?;
+
+                bias_voltages[i] = Self::bias_to_adc(bias_ptc);
+                // if [0, 3, 7, 8, 11, 14].contains(&i) {
+                //     println!("Preamp {} Case 1: {}", i+1, bias_ptc);
+                // }
+            } else {
+                let delta = (read_biases[i] - set_biases[i]).abs();
+                if delta > 0.1 {
+                    if read_biases[i] > set_biases[i] {
+                        bias_voltages[i] = Self::bias_to_adc(set_biases[i] + delta);
+                        // if [0, 3, 7, 8, 11, 14].contains(&i) {
+                        //     println!("Preamp {} Case 2: {}", i+1, set_biases[i] + delta);
+                        // }
+                    } else if read_biases[i] < set_biases[i] {
+                        bias_voltages[i] = Self::bias_to_adc(set_biases[i] - delta);
+                        // if [0, 3, 7, 8, 11, 14].contains(&i) {
+                        //     println!("Preamp {} Case 3: {}", i+1, set_biases[i] + delta);
+                        // }
+                    } else {
+                        bias_voltages[i] = Self::bias_to_adc(set_biases[i]);
+                        // if [0, 3, 7, 8, 11, 14].contains(&i)  {
+                        //     println!("Preamp {} Case 4: {}", i+1, set_biases[i]);
+                        // }
+                    }
+                } else {
+                    let bias_stc = Self::sipm_temp_comp(i)?;
+                    let bias_ptc = Self::pb_temp_comp(bias_stc)?;
+                    
+                    bias_voltages[i] = Self::bias_to_adc(bias_ptc);
+                    // if [0, 3, 7, 8, 11, 14].contains(&i)  {
+                    //     println!("Preamp {} Case 5: {}", i+1, bias_ptc);
+                    // }
+                }
+            }
+        }
+    
+        let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, PB_PCA9548A_ADDRESS);
+        
+        i2c_mux.select(PB_DAC_1_CHANNEL)?;
+        let pb_dac_1 = max5825::MAX5825::new(I2C_BUS, PB_MAX5825_ADDRESS);
+        for i in 0..=7 {
+            pb_dac_1.coden_loadn(preamp_bias_channels[i], bias_voltages[i])?;
+        }
+    
+        i2c_mux.select(PB_DAC_2_CHANNEL)?;
+        let pb_dac_2 = max5825::MAX5825::new(I2C_BUS, PB_MAX5825_ADDRESS);
+        for i in 8..=15 {
+            pb_dac_2.coden_loadn(preamp_bias_channels[i], bias_voltages[i])?;
+        }
+    
+        i2c_mux.reset()?;
+    
+        Ok(())
+    }
+
+    pub fn sipm_temp_comp(ch: usize) -> Result<f32, PreampBiasError> {
+        let bias_voltage;
+        
+        let preamp_temp = PreampTemp::read_signle_temp(ch)?;
+        if preamp_temp == f32::MAX {
+            bias_voltage = 0.0
+        } else {
+            if (0..=15).contains(&ch) {
+                bias_voltage = PREAMP_DEFAULT_BIAS + (preamp_temp - 20.0) * 0.054;
+            } else {
+                bias_voltage = 0.0;
+            }
+        }
+        // if (0..=15).contains(&ch) {
+        //     bias_voltage = PREAMP_DEFAULT_BIAS + (preamp_temp - 20.0) * 0.054;
+        // } else {
+        //     bias_voltage = 0.0;
+        // }
+
+        Ok(bias_voltage)
+    }
+
+    pub fn pb_temp_comp(bias_stc: f32) -> Result<f32, PreampBiasError> {
+        let pb_temp = read_pds_temp()?;
+
+        let bias_voltage = bias_stc - 0.2 + 0.005 * pb_temp + 4.0 * 10f32.powi(-5) * pb_temp.powi(2);
+
+        Ok(bias_voltage)
+    }
+
+    pub fn reset_bias() -> Result<(), PreampBiasError> {
+        let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, PB_PCA9548A_ADDRESS);
+    
+        i2c_mux.select(PB_DAC_1_CHANNEL)?;
+        let pb_dac = max5825::MAX5825::new(I2C_BUS, PB_MAX5825_ADDRESS);
+        pb_dac.reset_dac()?;
+        i2c_mux.select(PB_DAC_2_CHANNEL)?;
+        pb_dac.reset_dac()?;
+    
+        i2c_mux.reset()?;
+    
+        Ok(())
+    
+    }
+
+    fn bias_to_adc(bias_voltage: f32) -> u16 {
+        let adc = (bias_voltage / 22.3) / PB_DAC_REF_VOLTAGE * 2f32.powi(12);
+    
         adc as u16
     }
-    pub fn reset_bias() {
-        let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, PB_PCA9548A_ADDRESS);
-
-        i2c_mux.select(PB_DAC_1_CHANNEL).expect("cannot access to PCA9548A");
-        let pb_dac_1 = max5825::MAX5825::new(I2C_BUS, PB_MAX5825_ADDRESS);
-        pb_dac_1.reset_dac().expect("cannot reset MAX5825(DAC1)");
-
-        i2c_mux.select(PB_DAC_2_CHANNEL).expect("cannot access to PCA9548A");
-        let pb_dac_2 = max5825::MAX5825::new(I2C_BUS, PB_MAX5825_ADDRESS);
-
-        pb_dac_2.reset_dac().expect("cannot reset MAX5825(DAC2)");
-    }
-
-    pub fn set_bias_manual(bias_voltage: f32) {
-        let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, PB_PCA9548A_ADDRESS);
-
-        i2c_mux.select(PB_DAC_1_CHANNEL).expect("cannot access to PCA9548A");
-        let pb_dac_1 = max5825::MAX5825::new(I2C_BUS, PB_MAX5825_ADDRESS);
-        pb_dac_1.coden_loadn(PREAMP_DAC_1_CHANNEL, Self::bias_to_adc(bias_voltage)).expect("cannot set bias voltage 1 on MAX5825(DAC1)");
-        pb_dac_1.coden_loadn(PREAMP_DAC_2_CHANNEL, Self::bias_to_adc(bias_voltage)).expect("cannot set bias voltage 2 on MAX5825(DAC1)");
-        pb_dac_1.coden_loadn(PREAMP_DAC_3_CHANNEL, Self::bias_to_adc(bias_voltage)).expect("cannot set bias voltage 3 on MAX5825(DAC1)");
-        pb_dac_1.coden_loadn(PREAMP_DAC_4_CHANNEL, Self::bias_to_adc(bias_voltage)).expect("cannot set bias voltage 4 on MAX5825(DAC1)");
-        pb_dac_1.coden_loadn(PREAMP_DAC_5_CHANNEL, Self::bias_to_adc(bias_voltage)).expect("cannot set bias voltage 5 on MAX5825(DAC1)");
-        pb_dac_1.coden_loadn(PREAMP_DAC_6_CHANNEL, Self::bias_to_adc(bias_voltage)).expect("cannot set bias voltage 6 on MAX5825(DAC1)");
-        pb_dac_1.coden_loadn(PREAMP_DAC_7_CHANNEL, Self::bias_to_adc(bias_voltage)).expect("cannot set bias voltage 7 on MAX5825(DAC1)");
-        pb_dac_1.coden_loadn(PREAMP_DAC_8_CHANNEL, Self::bias_to_adc(bias_voltage)).expect("cannot set bias voltage 8 on MAX5825(DAC1)");
     
-        i2c_mux.select(PB_DAC_2_CHANNEL).expect("cannot access to PCA9548A");
-        let pb_dac_2 = max5825::MAX5825::new(I2C_BUS, PB_MAX5825_ADDRESS);
-        pb_dac_2.coden_loadn(PREAMP_DAC_9_CHANNEL, Self::bias_to_adc(bias_voltage)).expect("cannot set bias voltage 9 on MAX5825(DAC2)");
-        pb_dac_2.coden_loadn(PREAMP_DAC_10_CHANNEL, Self::bias_to_adc(bias_voltage)).expect("cannot set bias voltage 10 on MAX5825(DAC2)");
-        pb_dac_2.coden_loadn(PREAMP_DAC_11_CHANNEL, Self::bias_to_adc(bias_voltage)).expect("cannot set bias voltage 11 on MAX5825(DAC2)");
-        pb_dac_2.coden_loadn(PREAMP_DAC_12_CHANNEL, Self::bias_to_adc(bias_voltage)).expect("cannot set bias voltage 12 on MAX5825(DAC2)");
-        pb_dac_2.coden_loadn(PREAMP_DAC_13_CHANNEL, Self::bias_to_adc(bias_voltage)).expect("cannot set bias voltage 13 on MAX5825(DAC2)");
-        pb_dac_2.coden_loadn(PREAMP_DAC_14_CHANNEL, Self::bias_to_adc(bias_voltage)).expect("cannot set bias voltage 14 on MAX5825(DAC2)");
-        pb_dac_2.coden_loadn(PREAMP_DAC_15_CHANNEL, Self::bias_to_adc(bias_voltage)).expect("cannot set bias voltage 15 on MAX5825(DAC2)");
-        pb_dac_2.coden_loadn(PREAMP_DAC_16_CHANNEL, Self::bias_to_adc(bias_voltage)).expect("cannot set bias voltage 16 on MAX5825(DAC2)");
-
-        i2c_mux.reset().expect("cannot reset PCA9548A");
+    fn adc_to_bias(adc: u16) -> f32 {
+        let bias_voltage = adc as f32 * PB_DAC_REF_VOLTAGE * 22.3 * 2f32.powi(-12);
+    
+        bias_voltage
     }
-
-    // Single preamp bias set
-    pub fn set_bias_manual_id(preamp_id: u8, bias_voltage: f32) {
-        let dac_ch = preamp_id % N_PREAMP_DAC;
-        let pb_dac_ch = preamp_id / N_PB_DAC;
-
-        let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, PB_PCA9548A_ADDRESS);
-        i2c_mux.select(pb_dac_ch).expect("cannot access to PCA9548A");
-        let pb_dac_1 = max5825::MAX5825::new(I2C_BUS, PB_MAX5825_ADDRESS);
-        pb_dac_1.coden_loadn(dac_ch, Self::bias_to_adc(bias_voltage)).expect(&format!("cannot set bias voltage {} on MAX5825(DAC1)",dac_ch));
-
-        i2c_mux.reset().expect("cannot reset PCA9548A");
-    }
+    
 }

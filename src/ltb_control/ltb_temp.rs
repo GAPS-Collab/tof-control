@@ -1,41 +1,56 @@
 use i2cdev::core::*;
-use i2cdev::linux::{LinuxI2CDevice, LinuxI2CError};
+use i2cdev::linux::LinuxI2CDevice;
 
 use crate::constant::*;
+use crate::helper::ltb_type::{LTBTemp, LTBTempError};
 use crate::device::tmp112;
 
-pub struct LTBtemp {
-    pub trenz_temp: f32,
-    pub ltb_temp: f32,
-}
-
-impl LTBtemp {
+impl LTBTemp {
     pub fn new() -> Self {
-        let trenz_temp = Self::trenz_temp().expect("cannot read Trenz board (0x3C)");
-        let ltb_temp = Self::ltb_temp();
-        Self {
-            trenz_temp,
-            ltb_temp,
+        match Self::read_temp() {
+            Ok(ltb_temp) => {
+                ltb_temp
+            }
+            Err(_) => {
+                Self {
+                    trenz_temp: f32::MAX,
+                    board_temp: f32::MAX,
+                }
+            }
         }
     }
-    fn ltb_temp() -> f32 {
-        let ltb_tmp112 = tmp112::TMP112::new(I2C_BUS, LTB_TMP112_ADDRESS);
-        ltb_tmp112.config().expect("cannot configure TMP112");
-        let ltb_temp = ltb_tmp112.read().expect("cannot read TMP112");
+    pub fn read_temp() -> Result<LTBTemp, LTBTempError> {
+        let trenz_temp = Self::trenz_temp()?;
+        let board_temp = Self::board_temp()?;
 
-        ltb_temp
+        Ok(
+            LTBTemp {
+                trenz_temp,
+                board_temp,
+            }
+        )
     }
-    fn trenz_temp() -> Result<f32, LinuxI2CError> {
+    pub fn board_temp() -> Result<f32, LTBTempError> {
+        let board_tmp112 = tmp112::TMP112::new(I2C_BUS, LTB_TMP112_ADDRESS);
+        board_tmp112.config()?;
+        let board_temp = board_tmp112.read()?;
+
+        Ok(board_temp)
+    }
+    pub fn trenz_temp() -> Result<f32, LTBTempError> {
         let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", I2C_BUS), LTB_TRENZ_ADDRESS)?;
         let trenz_temp_raw = dev.smbus_read_i2c_block_data(LTB_TRENZ_TEMP_OFFSET as u8, 2)?;
-        let trenz_temp_adc = (((trenz_temp_raw[0] as u16) << 4) | ((trenz_temp_raw[1] as u16) >> 4)) & 0xFFF;
+        let trenz_temp_adc =
+            (((trenz_temp_raw[0] as u16) << 4) | ((trenz_temp_raw[1] as u16) >> 4)) & 0xFFF;
         let trenz_temp = (((trenz_temp_adc & 4095) as f32 * 503.975) / 4096.0) - 273.15;
 
         Ok(trenz_temp)
     }
-    pub fn print_ltb_temp() {
-        let ltb_temp = LTBtemp::new();
-        println!("Trenz Temperature:        {:.3} [°C]", ltb_temp.trenz_temp);
-        println!("LTB Temperature:          {:.3} [°C]", ltb_temp.ltb_temp);
-    }
+}
+
+pub fn config_temp() -> Result<(), LTBTempError> {
+    let ltb_tmp112 = tmp112::TMP112::new(I2C_BUS, LTB_TMP112_ADDRESS);
+    ltb_tmp112.config()?;
+
+    Ok(())
 }

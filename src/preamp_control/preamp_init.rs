@@ -1,5 +1,13 @@
-use crate::preamp_control::*;
+use crate::helper::preamp_type::{PreampSetBias, PreampInitError};
 
-pub fn initialize() {
-    preamp_bias::PreampBiasSet::set_bias();
+pub fn initialize() -> Result<(), PreampInitError> {
+    initialize_bias()?;
+
+    Ok(())
+}
+
+fn initialize_bias() -> Result<(), PreampInitError> {
+    PreampSetBias::set_bias()?;
+
+    Ok(())
 }

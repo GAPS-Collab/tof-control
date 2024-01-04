@@ -2,72 +2,88 @@
 use crate::constant::*;
 
 use crate::device::{pca9548a, si5345b};
+use crate::helper::rb_type::RBClkError;
 
-pub struct RBclk {
-    lock_status: bool,
-    mode_of_operation: bool,
+pub fn configure_clk_synth() -> Result<(), RBClkError> {
+    let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
+    i2c_mux.select(RB_SI5345B_CHANNEL)?;
+
+    let si5345b = si5345b::SI5345B::new(I2C_BUS, RB_SI5345B_ADDRESS);
+    si5345b.configure_si5345b()?;
+    
+    i2c_mux.reset()?;
+
+    Ok(())
 }
 
-impl RBclk {
-    pub fn new() -> Self {
-        let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
-        i2c_mux.select(RB_SI5345B_CHANNEL).expect("cannot accesss to PCA9548A");
+pub fn program_nvm_clk_synth(verbose: bool) -> Result<(), RBClkError> {
+    let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
+    i2c_mux.select(RB_SI5345B_CHANNEL)?;
 
-        let si5345b = si5345b::SI5345B::new(I2C_BUS, RB_SI5345B_ADDRESS);
+    let si5345b = si5345b::SI5345B::new(I2C_BUS, RB_SI5345B_ADDRESS);
 
-        let lol_status = si5345b.read_lol_status().expect("cannot read LOL status from SI5345B");
-        let lock_status = if lol_status {false} else {true};
-
-        let holdover_status = si5345b.read_holdover_status().expect("cannot read HOLD status from SI5345B");
-        let mode_of_operation = if holdover_status {false} else {true};
-
-        i2c_mux.reset().expect("cannot reset PCA9548A");
-
-        Self {
-            lock_status,
-            mode_of_operation,
+    /// Check how many user banks available
+    let available_nvm_bank = si5345b.read_available_nvm_bank()?;
+    match available_nvm_bank {
+        2 => {
+            if verbose {
+                println!("Number of User Banks Available to Burn: 2");
+            }
+        },
+        1 => {
+            if verbose {
+                println!("Number of User Banks Available to Burn: 1");
+            }
+        }
+        0 => {
+            println!("Number of User Banks Available to Burn: 0");
+            println!("Exiting the program...");
+            std::process::exit(1);
+        }
+        _ => {
+            println!("ACTIVE_NVM_BANK Error");
+            println!("Exiting the program...");
+            std::process::exit(1);
         }
     }
-    pub fn print_rb_clk() {
-        let rb_clk = RBclk::new();
-        println!("DSPLL Status:             {}", if rb_clk.lock_status {String::from("Locked")} else {String::from("Unlocked")});
-        println!("Mode of Operation:        {}", if rb_clk.mode_of_operation {String::from("Locked Mode")} else {String::from("Holdover Mode (or Freerun Mode)")});
+
+    /// Program SI5345B NVM
+    if verbose {
+        println!("Programming SI5345B NVM...");
     }
-    pub fn print_config() {
-        let si5345b = si5345b::SI5345B::new(I2C_BUS, RB_SI5345B_ADDRESS);
-        si5345b.configure_si5345b().expect("cannot configure SI5345B");
+    si5345b.configure_nvm_si5345b()?;
+    if verbose {
+        println!("Done programming SI5345B NVM");
     }
+    
+    i2c_mux.reset()?;
+
+    if verbose {
+        println!("Complete programming SI5345B NVM!");
+    }
+
+    Ok(())
 }
 
-pub fn configure_clk_synth() {
+
+pub fn reset_clk_synth(rst_type: u8) -> Result<(), RBClkError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
-    i2c_mux.select(RB_SI5345B_CHANNEL).expect("cannot accesss to PCA9548A");
+    i2c_mux.select(RB_SI5345B_CHANNEL)?;
 
     let si5345b = si5345b::SI5345B::new(I2C_BUS, RB_SI5345B_ADDRESS);
 
-    si5345b.configure_si5345b().expect("cannot configure SI5345B");
+    match rst_type {
+        0 => {
+            si5345b.soft_reset_si5345b()?;
+            si5345b.configure_si5345b()?;
+        }
+        1 => {
+            si5345b.hard_reset_si5345b()?;
+        }
+        _ => {},
+    }
 
-    i2c_mux.reset().expect("cannot reset PCA9548A");
-}
+    i2c_mux.reset()?;
 
-pub fn hard_reset_clk_synth() {
-    let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
-    i2c_mux.select(RB_SI5345B_CHANNEL).expect("cannot accesss to PCA9548A");
-
-    let si5345b = si5345b::SI5345B::new(I2C_BUS, RB_SI5345B_ADDRESS);
-
-    si5345b.hard_reset_si5345b().expect("cannot hard reset SI5345B");
-
-    i2c_mux.reset().expect("cannot reset PCA9548A");
-}
-
-pub fn soft_reset_clk_synth() {
-    let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
-    i2c_mux.select(RB_SI5345B_CHANNEL).expect("cannot accesss to PCA9548A");
-
-    let si5345b = si5345b::SI5345B::new(I2C_BUS, RB_SI5345B_ADDRESS);
-
-    si5345b.soft_reset_si5345b().expect("cannot soft reset SI5345B");
-
-    i2c_mux.reset().expect("cannot reset PCA9548A");
+    Ok(())
 }
