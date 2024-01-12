@@ -13,6 +13,10 @@ edition = "2021"
 opt-level = "z"
 
 [[bin]]
+name = "rat-tui"
+path = "src/bin/rat_tui.rs"
+
+[[bin]]
 name = "andrew-test"
 path = "src/bin/andrew_test.rs"
 
@@ -85,8 +89,8 @@ gethostname = "0.4.1"
 libc = "0.2.140"
 # openssl = { version = "0.10", features = ["vendored"] }
 # tokio = "1.27.0"
-tokio = { version = "1.27.0", features = ["macros", "rt-multi-thread"] }
-futures = "0.3.28"
+# tokio = { version = "1.27.0", features = ["macros", "rt-multi-thread"] }
+# futures = "0.3.28"
 chrono = "0.4.24"
 sysfs_gpio = "0.6.1"
 systemstat = "0.2.3"
@@ -96,6 +100,8 @@ serde = { version = "1.0.193", features = ["derive"] }
 serde_json = "1.0.108"
 indicatif = "0.17.7"
 chrono-tz = "0.8.4"
+ratatui = "0.25.0"
+crossterm = "0.27.0"
 
 [build-dependencies]
 bindgen = "0.64.0"
