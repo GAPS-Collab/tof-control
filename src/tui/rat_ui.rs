@@ -4,11 +4,19 @@ use ratatui::{
 };
 
 use crate::tui::rat_app::App;
+use crate::tui::rb_ui::*;
+use crate::tui::ltb_ui::*;
+use crate::tui::pb_ui::*;
+use crate::tui::preamp_ui::*;
 
 pub fn draw(f: &mut Frame, app: &mut App) {
     let chunks = Layout::default()
         .direction(Direction::Vertical)
-        .constraints([Constraint::Length(3), Constraint::Min(0)])
+        .constraints([
+            Constraint::Length(3),
+            Constraint::Min(0),
+            Constraint::Length(4)
+        ])
         .split(f.size());
 
     let titles = app
@@ -25,12 +33,39 @@ pub fn draw(f: &mut Frame, app: &mut App) {
 
     f.render_widget(tabs, chunks[0]);
 
-    let inner = match app.tabs.index {
-        0 => Block::default().title("Test 0").borders(Borders::ALL),
-        1 => Block::default().title("Test 1").borders(Borders::ALL),
-        2 => Block::default().title("Test 2").borders(Borders::ALL),
-        3 => Block::default().title("Test 3").borders(Borders::ALL),
-        _ => unreachable!(),
-    };
-    f.render_widget(inner, chunks[1]);
+    match app.tabs.titles.len() {
+        1 => {
+            draw_rb_tab(f, app, chunks[1])
+        }
+        2 => {
+            match app.tabs.index {
+                0 => draw_rb_tab(f, app, chunks[1]),
+                1 => draw_ltb_tab(f, app, chunks[1]),
+                _ => {},
+            }
+        }
+        3 => {
+            match app.tabs.index {
+                0 => draw_rb_tab(f, app, chunks[1]),
+                1 => draw_pb_tab(f, app, chunks[1]),
+                2 => draw_preamp_tab(f, app, chunks[1]),
+                _ => {},
+            }
+        }
+        _ => {}
+    }
+
+    let footer = Paragraph::new(format!(
+        "Press `q` to stop running.\n\
+        Press `r` to reload the sensor values."
+    ))
+    .block(
+        Block::default()
+            .title("Operation")
+            .title_alignment(Alignment::Left)
+            .borders(Borders::ALL)
+    );
+
+    f.render_widget(footer, chunks[2]);
+
 }

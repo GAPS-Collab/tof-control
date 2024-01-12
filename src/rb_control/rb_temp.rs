@@ -1,7 +1,6 @@
 #![allow(unused)]
 use crate::constant::*;
 use crate::memory::*;
-
 use crate::helper::rb_type::{RBTemp, RBTempDebug, RBTempError};
 use crate::device::{bme280, lis3mdltr, pca9548a, tmp112};
 

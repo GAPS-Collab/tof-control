@@ -127,8 +127,8 @@ elif [ "$1" = "rat-tui" ]; then
     CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
     cross build --release --bin rat-tui --target=armv7-unknown-linux-musleabi
     # scp target/armv7-unknown-linux-musleabi/release/rat-init tof-computer:/home/gaps/tof-rb/bin
-    scp target/armv7-unknown-linux-musleabi/release/rat-tui tof-rb07:~/dev
-    scp target/armv7-unknown-linux-musleabi/release/rat-tui tof-rb17:~/dev
+    scp target/armv7-unknown-linux-musleabi/release/rat-tui tof-rb37:~/dev
+    scp target/armv7-unknown-linux-musleabi/release/rat-tui tof-rb49:~/dev
 
 elif [ "$1" = "andrew-test" ]; then
     # rm -rf target/

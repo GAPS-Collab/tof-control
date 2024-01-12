@@ -89,8 +89,8 @@ gethostname = "0.4.1"
 libc = "0.2.140"
 # openssl = { version = "0.10", features = ["vendored"] }
 # tokio = "1.27.0"
-tokio = { version = "1.27.0", features = ["macros", "rt-multi-thread"] }
-futures = "0.3.28"
+# tokio = { version = "1.27.0", features = ["macros", "rt-multi-thread"] }
+# futures = "0.3.28"
 chrono = "0.4.24"
 sysfs_gpio = "0.6.1"
 systemstat = "0.2.3"

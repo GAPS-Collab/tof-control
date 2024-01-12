@@ -52,6 +52,7 @@ fn run_app<B: Backend>(
                         KeyCode::Left => app.tabs.previous(),
                         KeyCode::Right => app.tabs.next(),
                         KeyCode::Char('q') => app.should_quit = true,
+                        KeyCode::Char('r') => app.reload = true,
                         _ => {}
                     }
                 }
@@ -60,6 +61,11 @@ fn run_app<B: Backend>(
 
         if last_tick.elapsed() >= tick_rate {
             last_tick = Instant::now();
+        }
+
+        if app.reload {
+            app.reload_data();
+            app.reload = false;
         }
 
         if app.should_quit {
