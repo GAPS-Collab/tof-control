@@ -1,7 +1,7 @@
 use sysinfo::{System, SystemExt, DiskExt, CpuExt, RefreshKind, CpuRefreshKind};
 // use std::{thread, time::Duration};
 
-use crate::helper::cpu_type::CPUInfo;
+use crate::helper::cpu_type::{CPUInfo, CPUInfoDebug};
 
 impl CPUInfo {
     pub fn new() -> Self {
@@ -13,13 +13,74 @@ impl CPUInfo {
         let mut sys = System::new_all();
 
         let uptime = Self::read_uptime(&mut sys);
+        let cpu_freq = Self::read_cpu_freq(&mut sys);
+        Self::read_ram_usage(&mut sys);
+
+        CPUInfo {
+            uptime,
+            cpu_freq,
+        }
+    }
+    pub fn read_uptime(sys: &System) -> u32 {
+        let uptime = sys.uptime() as u32;
+
+        uptime
+    }
+    pub fn read_cpu_freq(sys: &System) -> [u32; 4] {
+        let mut cpu0_freq: u32 = Default::default();
+        let mut cpu1_freq: u32 = Default::default();
+        let mut cpu2_freq: u32 = Default::default();
+        let mut cpu3_freq: u32 = Default::default();
+        for cpu in sys.cpus() {
+            let cpu_name = cpu.name();
+            match cpu_name {
+                "cpu0" => {
+                    cpu0_freq = cpu.frequency() as u32;
+                }
+                "cpu1" => {
+                    cpu1_freq = cpu.frequency() as u32;
+                }
+                "cpu2" => {
+                    cpu2_freq = cpu.frequency() as u32;
+                }
+                "cpu3" => {
+                    cpu3_freq = cpu.frequency() as u32;
+                }
+                _ => {}
+            }
+        }
+
+        let cpu_freq = [cpu0_freq, cpu1_freq, cpu2_freq, cpu3_freq];
+
+        cpu_freq
+    }
+    pub fn read_ram_usage(sys: &System) {
+        let used_ram = sys.used_memory();
+        let total_ram = sys.total_memory();
+        let memory_usage = (used_ram as f32 / total_ram as f32) * 100.0;
+        println!("Used RAM: {}MB", used_ram/1000000);
+        println!("Total RAM: {}MB", total_ram/1000000);
+        println!("Memory Usage: {}%", memory_usage);
+    }
+}
+
+impl CPUInfoDebug {
+    pub fn new() -> Self {
+        let cpu_info = Self::read_info();
+
+        cpu_info
+    }
+    pub fn read_info() -> CPUInfoDebug {
+        let mut sys = System::new_all();
+
+        let uptime = Self::read_uptime(&mut sys);
         let disk_usage = Self::read_disk_usage(&mut sys);
         // Self::read_cpu_load(&mut sys);
         // Self::read_cpu_load();
         // sys.refresh_cpu();
         let cpu_freq = Self::read_cpu_freq(&mut sys);
 
-        CPUInfo {
+        CPUInfoDebug {
             uptime,
             disk_usage,
             cpu_freq,

@@ -1,5 +1,5 @@
 use crate::helper::{
-    rb_type::{RBInfo, RBTempDebug},
+    rb_type::{RBInfo, RBInfoDebug, RBTempDebug, RBVcp, RBPh, RBMag},
     ltb_type::{LTBTemp, LTBThreshold},
     pb_type::{PBTemp, PBVcp},
     preamp_type::{PreampTemp, PreampReadBias},
@@ -80,13 +80,21 @@ impl<'a> TabsState<'a> {
 }
 
 pub struct RBData {
+    pub info: RBInfoDebug,
     pub temp: RBTempDebug,
+    pub vcp: RBVcp,
+    pub ph: RBPh,
+    pub mag: RBMag,
 }
 
 impl RBData {
     pub fn new() -> RBData {
         RBData {
+            info: RBInfoDebug::new(),
             temp: RBTempDebug::new(),
+            vcp: RBVcp::new(),
+            ph: RBPh::new(),
+            mag: RBMag::new(),
         }
     }
 }

@@ -1,6 +1,12 @@
 #[derive(Debug)]
 pub struct CPUInfo {
     pub uptime: u32,
+    pub cpu_freq: [u32; 4],
+}
+
+#[derive(Debug)]
+pub struct CPUInfoDebug {
+    pub uptime: u32,
     pub disk_usage: u8,
     pub cpu_freq: [u32; 4],
 }
