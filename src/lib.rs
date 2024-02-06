@@ -9,4 +9,5 @@ pub mod rb_control;
 pub mod cpu_control;
 pub mod cpc_control;
 pub mod tcpc_control;
+pub mod switch_control;
 pub mod tui;

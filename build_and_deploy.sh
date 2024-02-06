@@ -170,7 +170,7 @@ elif [ "$1" = "switch-control" ]; then
     # rm -rf target/x86_64-unknown*
     CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
     cross build --release --bin switch-control --target=x86_64-unknown-linux-musl
-    scp target/x86_64-unknown-linux-musl/release/switch-control tof-computer:/home/gaps/dev
+    scp target/x86_64-unknown-linux-musl/release/switch-control tof-computer:/home/gaps/bin
 
 elif [ "$1" = "cpu-tui" ]; then
     # rm -rf target/x86_64-unknown*

@@ -246,3 +246,9 @@ pub const TCPC_INA219_RSHUNT: f32 = 0.03;
 pub const TCPC_INA219_MEC: f32 = 1.25;
 
 pub const TCPC_MAX7320_ADDRESS: u16 = 0x59;
+
+// Switch Constants
+pub const SWITCH1_ADDRESS: &str = "10.0.1.11:161";
+pub const SWITCH2_ADDRESS: &str = "10.0.1.12:161";
+pub const SWITCH3_ADDRESS: &str = "10.0.1.13:161";
+pub const SWITCH4_ADDRESS: &str = "10.0.1.14:161";
