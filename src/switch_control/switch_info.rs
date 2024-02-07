@@ -3,7 +3,7 @@ use std::time::Duration;
 
 use crate::constant::*;
 use crate::helper::switch_type::{SwitchInfo, SwitchError};
-use super::switch_util::read_snmp_octetstring;
+use super::switch_util::{snmp_get_octetstring, snmp_get_octetstring_raw};
 
 impl SwitchInfo {
     pub fn new() -> Self {
@@ -37,20 +37,31 @@ impl SwitchInfo {
     }
     pub fn read_hostname(session: &mut SyncSession) -> Result<String, SwitchError> {
         let oid = ".1.3.6.1.4.1.38477.1.50.1.24.1.2.1.1";
-        let hostname = read_snmp_octetstring(oid, session)?;
+        let hostname = snmp_get_octetstring(oid, session)?;
 
         Ok(hostname)
     }
     pub fn read_uptime(session: &mut SyncSession) -> Result<String, SwitchError> {
         let oid = ".1.3.6.1.4.1.38477.1.50.1.24.1.3.4.1";
-        let uptime = read_snmp_octetstring(oid, session)?;
+        let uptime = snmp_get_octetstring(oid, session)?;
 
         Ok(uptime)
     }
     pub fn read_mac_address(session: &mut SyncSession) -> Result<String, SwitchError> {
         let oid = ".1.3.6.1.4.1.38477.1.50.1.24.1.3.5.1";
-        let mac_address = read_snmp_octetstring(oid, session)?;
-
+        let mac_address_vec = snmp_get_octetstring_raw(oid, session)?;
+        let mut mac_address: String = Default::default();
+        let mut vec_len = mac_address_vec.len();
+        for octet in mac_address_vec.iter() {
+            let octet_hex = format!("{:02X}", octet);
+            if vec_len == 1 {
+                mac_address = mac_address + &octet_hex;
+            } else {
+                mac_address = mac_address + &octet_hex + "-";
+                vec_len -= 1;
+            }
+        }
+        
         Ok(mac_address)
     }
     pub fn print_switch_info() {

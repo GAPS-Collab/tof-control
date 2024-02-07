@@ -11,13 +11,15 @@
 #[derive(Debug)]
 pub struct SwitchInfo {
     pub hostname: String,
-    pub uptime: String,
+    pub uptime: String, // VTSSDisplayString (OCTET STRING) (SIZE(0..10)). Hint: 255a
     pub mac_address: String,
 }
 
 #[derive(Debug)]
 pub struct SwitchPort {
-    pub link: [u8; 16],
+    pub link: [u8; 16], // TruthValue (INTEGER) {true(1), false(2) }
+    pub speed: [u8; 16], // VTSSPortStatusSpeed (INTEGER) {undefined(0), speed10M(1), speed100M(2), speed1G(3), speed2G5(4), speed5G(5), speed10G(6), speed12G(7) }
+    pub full_duplex: [u8; 16], // TruthValue (INTEGER) {true(1), false(2) }
 }
 
 /// Switch Error Type

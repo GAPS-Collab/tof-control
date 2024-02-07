@@ -15,7 +15,7 @@ pub fn convert_oid(oid_str: &str) -> Result<Vec<u32>, SwitchError> {
     Ok(oid)
 }
 
-pub fn read_snmp_octetstring(oid_str: &str, session: &mut SyncSession) -> Result<String, SwitchError> {
+pub fn snmp_get_octetstring(oid_str: &str, session: &mut SyncSession) -> Result<String, SwitchError> {
     let oid = convert_oid(oid_str)?;
     let mut response = session.getnext(&oid)?;
     let mut value: String = Default::default();
@@ -24,4 +24,31 @@ pub fn read_snmp_octetstring(oid_str: &str, session: &mut SyncSession) -> Result
     }
 
     Ok(value)
+}
+
+pub fn snmp_get_octetstring_raw(oid_str: &str, session: &mut SyncSession) -> Result<Vec<u8>, SwitchError> {
+    let oid = convert_oid(oid_str)?;
+    let mut response = session.getnext(&oid)?;
+    let mut value: Vec<u8>  = Default::default();
+    if let Some((_oid, Value::OctetString(sys_descr))) = response.varbinds.next() {
+        // let value = String::from_utf8_lossy(sys_descr).to_string();
+        value = sys_descr.to_vec();
+    }
+
+    Ok(value)
+}
+
+pub fn snmp_getbulk_integer(oid_str: &str, session: &mut SyncSession) -> Result<[u8; 16], SwitchError> {
+    let oid = convert_oid(oid_str)?;
+    let response = session.getbulk(&[&oid], 0, 16)?;
+
+    let mut values: [u8; 16] = Default::default();
+
+    for (i, varbind) in response.varbinds.enumerate() {
+        if let (_oid, Value::Integer(val)) = varbind {
+            values[i] = val as u8;
+        }
+    }
+
+    Ok(values)
 }
