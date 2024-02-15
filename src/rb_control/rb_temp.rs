@@ -1,7 +1,7 @@
 #![allow(unused)]
 use crate::constant::*;
 use crate::memory::*;
-use crate::helper::rb_type::{RBTemp, RBTempDebug, RBTempError};
+use crate::helper::rb_type::{RBTemp, RBTempDebug, RBTempError, RBError};
 use crate::device::{bme280, lis3mdltr, pca9548a, tmp112};
 
 impl RBTemp {
@@ -155,4 +155,12 @@ impl RBTempDebug {
             }
         )
     }
+}
+
+pub fn to_json() -> Result<String, RBError> {
+    let rb_temp = RBTempDebug::new();
+    let rb_temp_json = serde_json::to_string(&rb_temp)?;
+    // let rb_temp_json = rb_temp::to_json().unwrap_or(r#"{"rb_temp":"error"}"#.to_string());
+
+    Ok(rb_temp_json)
 }

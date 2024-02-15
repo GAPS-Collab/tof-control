@@ -1,6 +1,6 @@
 [package]
 name = "tof-control"
-version = "0.4.1"
+version = "0.5.0"
 edition = "2021"
 # build = "build.rs"
 
@@ -11,6 +11,10 @@ edition = "2021"
 
 [profile.release]
 opt-level = "z"
+
+[[bin]]
+name = "tof-stress"
+path = "src/bin/tof_stress.rs"
 
 [[bin]]
 name = "sys-control"
@@ -92,12 +96,12 @@ memmap = "0.7"
 log = "0.4"
 clap = { version = "4.1", features = ["derive"] }
 csv = "1.1"
-# comfy-table = "6.1.4"
+comfy-table = "7.1.0"
 gethostname = "0.4.1"
 libc = "0.2.140"
 # openssl = { version = "0.10", features = ["vendored"] }
 # tokio = "1.27.0"
-# tokio = { version = "1.27.0", features = ["macros", "rt-multi-thread"] }
+tokio = { version = "1.27.0", features = ["macros", "rt-multi-thread"] }
 # futures = "0.3.28"
 chrono = "0.4.24"
 sysfs_gpio = "0.6.1"
@@ -110,6 +114,7 @@ indicatif = "0.17.7"
 chrono-tz = "0.8.4"
 ratatui = "0.25.0"
 crossterm = "0.27.0"
+openssh = "0.10.3"
 
 [build-dependencies]
 bindgen = "0.64.0"

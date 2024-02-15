@@ -1,3 +1,5 @@
+use serde::{Deserialize, Serialize};
+
 #[derive(Debug)]
 pub struct PreampMoniData {
     // Preamp Temperature Sensors
@@ -6,12 +8,12 @@ pub struct PreampMoniData {
     pub read_bias: PreampReadBias,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct PreampTemp {
     pub preamp_temps: [f32; 16],
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct PreampReadBias {
     pub read_biases: [f32; 16],
 }

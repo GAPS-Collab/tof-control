@@ -1,3 +1,5 @@
+use serde::{Deserialize, Serialize};
+
 /// PB Data Type
 #[derive(Debug)]
 pub struct PBLevel1 {
@@ -11,7 +13,7 @@ pub struct PBMonData {
 }
 
 // PB Temperature Sensor
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct PBTemp {
     pub pds_temp: f32,
     pub pas_temp: f32,
@@ -20,7 +22,7 @@ pub struct PBTemp {
 }
 
 // PB VCP (Voltage, Current and Power) Sensor
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct PBVcp {
     pub p3v6_preamp_vcp:    [f32; 3],
     pub n1v6_preamp_vcp:    [f32; 3],
