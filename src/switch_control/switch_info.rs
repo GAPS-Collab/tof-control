@@ -1,13 +1,12 @@
 use snmp::SyncSession;
 use std::time::Duration;
 
-use crate::constant::*;
 use crate::helper::switch_type::{SwitchInfo, SwitchError};
-use super::switch_util::{snmp_get_octetstring, snmp_get_octetstring_raw};
+use super::switch_util::{snmp_get_unsigned32, snmp_get_octetstring, snmp_get_octetstring_raw};
 
 impl SwitchInfo {
-    pub fn new() -> Self {
-        match Self::read_info() {
+    pub fn new(ip_addr: &str) -> Self {
+        match Self::read_info(ip_addr) {
             Ok(switch_info) => {
                 switch_info
             }
@@ -16,22 +15,25 @@ impl SwitchInfo {
                     hostname: "".to_string(),
                     uptime: "".to_string(),
                     mac_address: "".to_string(),
+                    cpu_load: [u8::MAX, u8::MAX, u8::MAX],
                 }
             }
         }
     }
-    pub fn read_info() -> Result<SwitchInfo, SwitchError> {
-        let mut snmp_session = SyncSession::new(SWITCH1_ADDRESS, b"public", Some(Duration::from_secs(2)), 0)?;
+    pub fn read_info(ip_addr: &str) -> Result<SwitchInfo, SwitchError> {
+        let mut snmp_session = SyncSession::new(ip_addr, b"public", Some(Duration::from_secs(2)), 0)?;
 
         let hostname = Self::read_hostname(&mut snmp_session)?;
         let uptime = Self::read_uptime(&mut snmp_session)?;
         let mac_address = Self::read_mac_address(&mut snmp_session)?;
+        let cpu_load = Self::read_cpu_load(&mut snmp_session)?;
 
         Ok(
             SwitchInfo {
                 hostname,
                 uptime,
                 mac_address,
+                cpu_load,
             }
         )
     }
@@ -64,12 +66,23 @@ impl SwitchInfo {
         
         Ok(mac_address)
     }
-    pub fn print_switch_info() {
-        let switch_info = Self::new();
+    pub fn read_cpu_load(session: &mut SyncSession) -> Result<[u8; 3], SwitchError> {
+        let oid_100ms = ".1.3.6.1.4.1.38477.1.50.1.24.1.3.1.1";
+        let oid_1s = ".1.3.6.1.4.1.38477.1.50.1.24.1.3.1.2";
+        let oid_10s = ".1.3.6.1.4.1.38477.1.50.1.24.1.3.1.3";
 
-        println!("Switch Info");
-        println!("\tHostname:       {}", switch_info.hostname);
-        println!("\tUptime:         {}", switch_info.uptime);
-        println!("\tMac Address:    {}", switch_info.mac_address);
+        let cpu_load_avg_100ms = snmp_get_unsigned32(oid_100ms, session)? as u8;
+        let cpu_load_avg_1s = snmp_get_unsigned32(oid_1s, session)? as u8;
+        let cpu_load_avg_10s = snmp_get_unsigned32(oid_10s, session)? as u8;
+
+        Ok([cpu_load_avg_100ms, cpu_load_avg_1s, cpu_load_avg_10s])
     }
+    // pub fn print_switch_info(ip_addr: &str) {
+    //     let switch_info = Self::new(ip_addr);
+
+    //     println!("Switch Info");
+    //     println!("\tHostname:       {}", switch_info.hostname);
+    //     println!("\tUptime:         {}", switch_info.uptime);
+    //     println!("\tMac Address:    {}", switch_info.mac_address);
+    // }
 }

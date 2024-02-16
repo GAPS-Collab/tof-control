@@ -1,6 +1,6 @@
 use snmp::{SyncSession, Value};
 
-use crate::helper::switch_type::SwitchError;
+use crate::helper::switch_type::{SwitchData, SwitchError};
 
 pub fn convert_oid(oid_str: &str) -> Result<Vec<u32>, SwitchError> {
     let mut oid_trim = oid_str.trim();
@@ -13,6 +13,17 @@ pub fn convert_oid(oid_str: &str) -> Result<Vec<u32>, SwitchError> {
     }
 
     Ok(oid)
+}
+
+pub fn snmp_get_unsigned32(oid_str: &str, session: &mut SyncSession) -> Result<u32, SwitchError> {
+    let oid = convert_oid(oid_str)?;
+    let mut response = session.getnext(&oid)?;
+    let mut value: u32 = Default::default();
+    if let Some((_oid, Value::Unsigned32(sys_descr))) = response.varbinds.next() {
+        value = sys_descr;
+    }
+
+    Ok(value)
 }
 
 pub fn snmp_get_octetstring(oid_str: &str, session: &mut SyncSession) -> Result<String, SwitchError> {
@@ -51,4 +62,16 @@ pub fn snmp_getbulk_integer(oid_str: &str, session: &mut SyncSession) -> Result<
     }
 
     Ok(values)
+}
+
+pub fn print_switch_data(switch: &SwitchData) {
+    // Switch Info
+    println!("\tHostname:       {}", switch.info.hostname);
+    println!("\tUptime:         {}", switch.info.uptime);
+    println!("\tMac Address:    {}", switch.info.mac_address);
+    println!("\tCPU Load Avg:   {:?}", switch.info.cpu_load);
+    // Switch Port
+    println!("\tLink:           {:?}", switch.port.link);
+    println!("\tSpeed:          {:?}", switch.port.speed);
+    println!("\tFull Duplex:    {:?}", switch.port.full_duplex);
 }

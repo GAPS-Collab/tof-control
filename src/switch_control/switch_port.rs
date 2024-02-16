@@ -1,13 +1,12 @@
 use snmp::SyncSession;
 use std::time::Duration;
 
-use crate::constant::*;
 use crate::helper::switch_type::{SwitchPort, SwitchError};
 use crate::switch_control::switch_util::snmp_getbulk_integer;
 
 impl SwitchPort {
-    pub fn new() -> Self {
-        match Self::read_port() {
+    pub fn new(ip_addr: &str) -> Self {
+        match Self::read_port(ip_addr) {
             Ok(switch_port) => {
                 switch_port
             }
@@ -20,8 +19,8 @@ impl SwitchPort {
             }
         }
     }
-    pub fn read_port() -> Result<SwitchPort, SwitchError> {
-        let mut snmp_session = SyncSession::new(SWITCH1_ADDRESS, b"public", Some(Duration::from_secs(1)), 0)?;
+    pub fn read_port(ip_addr: &str) -> Result<SwitchPort, SwitchError> {
+        let mut snmp_session = SyncSession::new(ip_addr, b"public", Some(Duration::from_secs(1)), 0)?;
 
         let link = Self::read_link(&mut snmp_session)?;
         let speed = Self::read_speed(&mut snmp_session)?;
@@ -54,8 +53,8 @@ impl SwitchPort {
         Ok(fdx)
     }
 
-    pub fn print_switch_port() {
-        let switch_port = Self::new();
+    pub fn print_switch_port(ip_addr: &str) {
+        let switch_port = Self::new(ip_addr);
 
         println!("Switch Port");
         println!("\tLink:           {:?}", switch_port.link);

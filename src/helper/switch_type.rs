@@ -1,18 +1,22 @@
-// #[derive(Debug)]
-// pub struct SwitchData {
-//     pub switch1: Switch1Data,
-// }
+#[derive(Debug)]
+pub struct AllSwitchData {
+    pub switch1: Option<SwitchData>,
+    pub switch2: Option<SwitchData>,
+    pub switch3: Option<SwitchData>,
+}
 
-// #[derive(Debug)]
-// pub struct Switch1Data {
-//     pub info: SwitchInfo,
-// }
+#[derive(Debug)]
+pub struct SwitchData {
+    pub info: SwitchInfo,
+    pub port: SwitchPort,
+}
 
 #[derive(Debug)]
 pub struct SwitchInfo {
     pub hostname: String,
     pub uptime: String, // VTSSDisplayString (OCTET STRING) (SIZE(0..10)). Hint: 255a
     pub mac_address: String,
+    pub cpu_load: [u8; 3], // [100ms, 1s, 10s]
 }
 
 #[derive(Debug)]
@@ -28,6 +32,7 @@ pub enum SwitchError {
     SNMP(snmp::SnmpError),
     ParseInt(std::num::ParseIntError),
     IO(std::io::Error),
+    Address,
 }
 
 impl From<snmp::SnmpError> for SwitchError {
