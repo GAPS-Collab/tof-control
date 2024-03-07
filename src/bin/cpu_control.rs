@@ -5,7 +5,7 @@ use chrono_tz::America::Los_Angeles;
 use tof_control::helper::cpu_type::{CPUInfo, CPUTemp, CPUTempDebug};
 
 #[derive(Parser, Debug)]
-#[command(author = "Takeru Hayashi", version = "0.1.0", about, long_about = None)]
+#[command(author = "Takeru Hayashi", version, about, long_about = None)]
 struct Cli {
     #[clap(subcommand)]
     command: Commands,

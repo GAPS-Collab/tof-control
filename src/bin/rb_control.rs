@@ -129,11 +129,11 @@ fn print_info() {
     println!("\tSub Board           : {}", if rb_info.sub_board == 1 { "LTB" } else if rb_info.sub_board == 2 { "PB/Preamp" } else { "NC" });
     println!("\tLOL                 : {}", if rb_info.lol == 0x01 { "Unlocked" } else { "Locked" });
     println!("\tLOL Stable          : {}", if rb_info.lol_stable == 0x01 { "Unlocked Past Second" } else { "Locked Past Second" });
-    println!("\tTrigger Rate (MTB)  : {}[Hz]", rb_info.trig_rate);
+    // println!("\tTrigger Rate (MTB)  : {}[Hz]", rb_info.trig_rate);
     // Additional Info
     println!("\tFirmware Version    : {}", rb_info.fw_version);
     println!("\tUptime              : {}[s]", rb_info.uptime);
-    println!("\tSD Usage            : {}[%]", rb_info.sd_usage);
+    // println!("\tSD Usage            : {}[%]", rb_info.sd_usage);
     println!("\tInput Mode          : {}", rb_info.input_mode);
 }
 

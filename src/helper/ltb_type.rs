@@ -1,3 +1,5 @@
+use serde::{Deserialize, Serialize};
+
 /// LTB Data Type
 #[derive(Debug)]
 pub struct LTBMoniData {
@@ -6,14 +8,14 @@ pub struct LTBMoniData {
 }
 
 // LTB Temperature Sensor
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct LTBTemp {
     pub trenz_temp: f32,
     pub board_temp: f32,
 }
 
 // LTB Threshold Voltages
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct LTBThreshold {
     pub thresholds: [f32; 3],
 }
