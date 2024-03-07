@@ -1,6 +1,6 @@
 [package]
 name = "tof-control"
-version = "0.5.0"
+version = "0.5.2"
 edition = "2021"
 # build = "build.rs"
 
@@ -41,12 +41,20 @@ name = "cpc-control"
 path = "src/bin/cpc_control.rs"
 
 [[bin]]
+name = "mtb-control"
+path = "src/bin/mtb_control.rs"
+
+[[bin]]
 name = "switch-control"
 path = "src/bin/switch_control.rs"
 
 [[bin]]
 name = "cpu-control"
 path = "src/bin/cpu_control.rs"
+
+[[bin]]
+name = "rat-reset"
+path = "src/bin/rat_reset.rs"
 
 [[bin]]
 name = "rat-init"
@@ -115,6 +123,7 @@ chrono-tz = "0.8.4"
 ratatui = "0.25.0"
 crossterm = "0.27.0"
 openssh = "0.10.3"
+hex = "0.4.3"
 
 [build-dependencies]
 bindgen = "0.64.0"

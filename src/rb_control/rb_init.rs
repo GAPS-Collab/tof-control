@@ -37,7 +37,6 @@ fn set_board_id() -> Result<(), RBInitError> {
 }
 
 fn initialize_daq() -> Result<(), RBInitError> {
-    let mut value: u32;
     /// Disable DAQ Fragment
     disable_daq_fragment()?;
 

@@ -372,6 +372,64 @@ impl From<RBMagError> for RBInitError {
 }
 
 #[derive(Debug)]
+pub enum RBResetError {
+    GPIOe(RBGPIOeError),
+    Clk(RBClkError),
+    DAC(RBDacError),
+    Register(crate::memory::RegisterError),
+    Temp(RBTempError),
+    Vcp(RBVcpError),
+    Ph(RBPhError),
+    Mag(RBMagError),
+}
+impl std::fmt::Display for RBResetError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "RBResetError")
+    }
+}
+
+impl From<RBGPIOeError> for RBResetError {
+    fn from(e: RBGPIOeError) -> Self {
+        RBResetError::GPIOe(e)
+    }
+}
+impl From<RBClkError> for RBResetError {
+    fn from(e: RBClkError) -> Self {
+        RBResetError::Clk(e)
+    }
+}
+impl From<RBDacError> for RBResetError {
+    fn from(e: RBDacError) -> Self {
+        RBResetError::DAC(e)
+    }
+}
+impl From<crate::memory::RegisterError> for RBResetError {
+    fn from(e: crate::memory::RegisterError) -> Self {
+        RBResetError::Register(e)
+    }
+}
+impl From<RBTempError> for RBResetError {
+    fn from(e: RBTempError) -> Self {
+        RBResetError::Temp(e)
+    }
+}
+impl From<RBVcpError> for RBResetError {
+    fn from(e: RBVcpError) -> Self {
+        RBResetError::Vcp(e)
+    }
+}
+impl From<RBPhError> for RBResetError {
+    fn from(e: RBPhError) -> Self {
+        RBResetError::Ph(e)
+    }
+}
+impl From<RBMagError> for RBResetError {
+    fn from(e: RBMagError) -> Self {
+        RBResetError::Mag(e)
+    }
+}
+
+#[derive(Debug)]
 pub enum RBTempError {
     // Register Error
     Register(crate::memory::RegisterError),

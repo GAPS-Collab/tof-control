@@ -10,6 +10,7 @@ pub mod rb_mode;
 pub mod rb_ph;
 pub mod rb_temp;
 pub mod rb_vcp;
+pub mod rb_reset;
 
 use crate::helper::rb_type::{RBLevel1, RBLevel1Error};
 use crate::device::{pca9548a, tmp112, ina226};

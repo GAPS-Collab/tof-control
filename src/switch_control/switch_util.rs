@@ -15,6 +15,17 @@ pub fn convert_oid(oid_str: &str) -> Result<Vec<u32>, SwitchError> {
     Ok(oid)
 }
 
+pub fn snmp_get_integer(oid_str: &str, session: &mut SyncSession) -> Result<i64, SwitchError> {
+    let oid = convert_oid(oid_str)?;
+    let mut response = session.getnext(&oid)?;
+    let mut value: i64 = Default::default();
+    if let Some((_oid, Value::Integer(sys_descr))) = response.varbinds.next() {
+        value = sys_descr;
+    }
+
+    Ok(value)
+}
+
 pub fn snmp_get_unsigned32(oid_str: &str, session: &mut SyncSession) -> Result<u32, SwitchError> {
     let oid = convert_oid(oid_str)?;
     let mut response = session.getnext(&oid)?;
@@ -64,14 +75,48 @@ pub fn snmp_getbulk_integer(oid_str: &str, session: &mut SyncSession) -> Result<
     Ok(values)
 }
 
+pub fn snmp_getbulk_counter64(oid_str: &str, session: &mut SyncSession) -> Result<[u64; 16], SwitchError> {
+    let oid = convert_oid(oid_str)?;
+    let response = session.getbulk(&[&oid], 0, 16)?;
+
+    let mut values: [u64; 16] = Default::default();
+
+    for (i, varbind) in response.varbinds.enumerate() {
+        if let (_oid, Value::Counter64(val)) = varbind {
+            values[i] = val;
+        }
+    }
+
+    Ok(values)
+}
+
 pub fn print_switch_data(switch: &SwitchData) {
     // Switch Info
-    println!("\tHostname:       {}", switch.info.hostname);
-    println!("\tUptime:         {}", switch.info.uptime);
-    println!("\tMac Address:    {}", switch.info.mac_address);
-    println!("\tCPU Load Avg:   {:?}", switch.info.cpu_load);
+    println!("\tHostname:               {}", switch.info.hostname);
+    println!("\tUptime:                 {}", switch.info.uptime);
+    println!("\tMac Address:            {}", switch.info.mac_address);
+    println!("\tCPU Load Avg:           {:?}", switch.info.cpu_load);
+    println!("\tPower Supply Status:    {:?}", switch.info.ps_status);
     // Switch Port
-    println!("\tLink:           {:?}", switch.port.link);
-    println!("\tSpeed:          {:?}", switch.port.speed);
-    println!("\tFull Duplex:    {:?}", switch.port.full_duplex);
+    println!("\tLink:                   {:?}", switch.port.link);
+    println!("\tSpeed:                  {:?}", switch.port.speed);
+    println!("\tFull Duplex:            {:?}", switch.port.full_duplex);
+    println!("\tRx Bytes:               {:?}", switch.port.rx_bytes);
+    println!("\tRx Packets:             {:?}", switch.port.rx_pkts);
+    println!("\tRx Dropped Events:      {:?}", switch.port.rx_drop_evts);
+    println!("\tRx Broadcast Packets:   {:?}", switch.port.rx_broadcast_pkts);
+    println!("\tRx Multicast Packets:   {:?}", switch.port.rx_multicast_pkts);
+    println!("\tRx CRC Error Packets:   {:?}", switch.port.rx_crc_align_err_pkts);
+    println!("\tTx Bytes:               {:?}", switch.port.tx_bytes);
+    println!("\tTx Packets:             {:?}", switch.port.tx_pkts);
+    println!("\tTx Dropped Events:      {:?}", switch.port.tx_drop_evts);
+    println!("\tTx Broadcast Packets:   {:?}", switch.port.tx_broadcast_pkts);
+    println!("\tTx Multicast Packets:   {:?}", switch.port.tx_multicast_pkts);
+}
+
+pub fn snmp_set_integer(oid_str: &str, value: i64, session: &mut SyncSession) -> Result<(), SwitchError> {
+    let oid = convert_oid(oid_str)?;
+    let _response = session.set(&[(&oid, Value::Integer(value))])?;
+
+    Ok(())
 }

@@ -6,6 +6,7 @@ use crate::constant::*;
 use crate::helper::switch_type::{AllSwitchData, SwitchData, SwitchInfo, SwitchPort, SwitchError};
 
 use switch_util::print_switch_data;
+use switch_port::clear_port_statistics;
 
 impl AllSwitchData {
     pub fn new() -> Self {
@@ -78,4 +79,13 @@ impl AllSwitchData {
             println!("TOF-SWITCH3 is not connected.");
         }
     }
+}
+
+pub fn clear_port_statistics_all() -> Result<(), SwitchError> {
+    
+    clear_port_statistics(SWITCH1_ADDRESS)?;
+    clear_port_statistics(SWITCH2_ADDRESS)?;
+    clear_port_statistics(SWITCH3_ADDRESS)?;
+
+    Ok(())
 }
