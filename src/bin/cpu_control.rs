@@ -71,11 +71,14 @@ fn print_info() {
 
     println!("CPU Information");
     println!("\tUptime              : {}[s]", cpu_info.uptime);
-    println!("\tDisk Usage          : {}[%]", cpu_info.disk_usage);
+    // println!("\tDisk Usage          : {}[%]", cpu_info.disk_usage);
     println!("\tCPU0 Frequency      : {}[Hz]", cpu_info.cpu_freq[0]);
     println!("\tCPU1 Frequency      : {}[Hz]", cpu_info.cpu_freq[1]);
     println!("\tCPU2 Frequency      : {}[Hz]", cpu_info.cpu_freq[2]);
     println!("\tCPU3 Frequency      : {}[Hz]", cpu_info.cpu_freq[3]);
+    println!("Disk Information");
+    println!("\tRoot Usage          : {}[%]", cpu_info.root_usage);
+    println!("\ttofdata Usage       : {}[%]", cpu_info.tofdata_usage);
 }
 
 fn print_temp() {

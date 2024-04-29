@@ -51,6 +51,13 @@ impl TMP112 {
 
         Ok(self.adc_to_celsius(temp_adc))
     }
+    pub fn read_raw(&self) -> Result<u16, LinuxI2CError> {
+        let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", self.bus), self.address)?;
+        let temp_raw = dev.smbus_read_i2c_block_data(TEMP as u8, 2)?;
+        let temp_adc = (((temp_raw[0] as u16) << 4) | ((temp_raw[1] as u16) >> 4)) & 0xFFF;
+
+        Ok(temp_adc)
+    }
     fn adc_to_celsius(&self, mut adc: u16) -> f32 {
         let mut sign: f32 = 1.0;
         if adc >= 0x800 {

@@ -63,13 +63,14 @@ elif [ "$1" = "rb-control" ]; then
 elif [ "$1" = "ltb-control" ]; then
     CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
     cross build --release --bin ltb-control --target=armv7-unknown-linux-musleabi
-    scp target/armv7-unknown-linux-musleabi/release/ltb-control tof-computer:/home/gaps/tof-rb/bin
+    # scp target/armv7-unknown-linux-musleabi/release/ltb-control tof-computer:/home/gaps/tof-rb/bin
     # scp target/armv7-unknown-linux-musleabi/release/ltb-control tof-rb18:~/dev
     # scp target/armv7-unknown-linux-musleabi/release/ltb-control tof-rb09:~/dev
     # scp target/armv7-unknown-linux-musleabi/release/ltb-control tof-rb37:~/dev
-    scp target/armv7-unknown-linux-musleabi/release/ltb-control tof-rb41:~/dev
-    scp target/armv7-unknown-linux-musleabi/release/ltb-control tof-rb42:~/dev
+    # scp target/armv7-unknown-linux-musleabi/release/ltb-control tof-rb41:~/dev
+    # scp target/armv7-unknown-linux-musleabi/release/ltb-control tof-rb42:~/dev
     # scp target/armv7-unknown-linux-musleabi/release/ltb-control tof-rb43:~/dev
+    scp target/armv7-unknown-linux-musleabi/release/ltb-control tof-nts-computer:/home/gaps/tof-nas/tof-rb/software
 
 elif [ "$1" = "pb-control" ]; then
     CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
@@ -95,13 +96,14 @@ elif [ "$1" = "rat-control" ]; then
 elif [ "$1" = "preamp-control" ]; then
     CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
     cross build --release --bin preamp-control --target=armv7-unknown-linux-musleabi
-    scp target/armv7-unknown-linux-musleabi/release/preamp-control tof-computer:/home/gaps/tof-rb/bin
+    # scp target/armv7-unknown-linux-musleabi/release/preamp-control tof-computer:/home/gaps/tof-rb/bin
     # scp target/armv7-unknown-linux-musleabi/release/preamp-control tof-rb18:~/dev
     # scp target/armv7-unknown-linux-musleabi/release/preamp-control tof-rb09:~/dev
     # scp target/armv7-unknown-linux-musleabi/release/preamp-control tof-rb37:~/dev
-    scp target/armv7-unknown-linux-musleabi/release/preamp-control tof-rb41:~/dev
-    scp target/armv7-unknown-linux-musleabi/release/preamp-control tof-rb42:~/dev
+    # scp target/armv7-unknown-linux-musleabi/release/preamp-control tof-rb41:~/dev
+    # scp target/armv7-unknown-linux-musleabi/release/preamp-control tof-rb42:~/dev
     # scp target/armv7-unknown-linux-musleabi/release/preamp-control tof-rb43:~/dev
+    scp target/armv7-unknown-linux-musleabi/release/preamp-control tof-nts-computer:/home/gaps/tof-nas/tof-rb/software
 
 elif [ "$1" = "rb-wd" ]; then
     rm -rf target/
@@ -137,9 +139,10 @@ elif [ "$1" = "rat-tui" ]; then
     CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
     cross build --release --bin rat-tui --target=armv7-unknown-linux-musleabi
     # scp target/armv7-unknown-linux-musleabi/release/rat-init tof-computer:/home/gaps/tof-rb/bin
-    scp target/armv7-unknown-linux-musleabi/release/rat-tui tof-rb37:~/bin
-    scp target/armv7-unknown-linux-musleabi/release/rat-tui tof-rb49:~/bin
-    # scp target/armv7-unknown-linux-musleabi/release/rat-tui tof-nts-computer:/home/gaps/tof-nas/tof-rb/software
+    # scp target/armv7-unknown-linux-musleabi/release/rat-tui tof-rb37:~/bin
+    # scp target/armv7-unknown-linux-musleabi/release/rat-tui tof-rb49:~/bin
+    # scp target/armv7-unknown-linux-musleabi/release/rat-tui tof-rb43:~/bin
+    scp target/armv7-unknown-linux-musleabi/release/rat-tui tof-nts-computer:/home/gaps/tof-nas/tof-rb/software
 
 elif [ "$1" = "andrew-test" ]; then
     # rm -rf target/
@@ -159,6 +162,7 @@ elif [ "$1" = "cpu-control" ]; then
     CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
     cross build --release --bin cpu-control --target=x86_64-unknown-linux-musl
     scp target/x86_64-unknown-linux-musl/release/cpu-control tof-computer:/home/gaps/dev
+    scp target/x86_64-unknown-linux-musl/release/cpu-control tof-nts-computer:/home/gaps/tof-nas/tof-cpu/software
     # scp target/x86_64-unknown-linux-musl/release/cpu-control tof-cpu:/home/gaps/test
     # CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
     # cross build --release --bin cpu-control --target=x86_64-unknown-linux-gnu
@@ -207,6 +211,17 @@ elif [ "$1" = "tof-stress" ]; then
     cross build --release --bin tof-stress --target=x86_64-unknown-linux-musl
     scp target/x86_64-unknown-linux-musl/release/tof-stress tof-computer:~/bin
     scp target/x86_64-unknown-linux-musl/release/tof-stress tof-nts-computer:/home/gaps/tof-nas/tof-rb/software
+
+elif [ "$1" = "rb-dac" ]; then
+    rm -rf target/
+    CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
+    cross build --release --bin rb-dac --target=armv7-unknown-linux-musleabi
+    scp target/armv7-unknown-linux-musleabi/release/rb-dac tof-nts-computer:/home/gaps/tof-nas/tof-rb/software
+
+elif [ "$1" = "rat-hkp" ]; then
+    CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
+    cross build --release --bin rat-hkp --target=armv7-unknown-linux-musleabi
+    scp target/armv7-unknown-linux-musleabi/release/rat-hkp tof-rb49:/home/gaps/dev
 
 else
     CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \

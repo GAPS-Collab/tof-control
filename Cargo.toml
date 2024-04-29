@@ -13,6 +13,14 @@ edition = "2021"
 opt-level = "z"
 
 [[bin]]
+name = "rat-hkp"
+path = "src/bin/rat_hkp.rs"
+
+[[bin]]
+name = "rb-dac"
+path = "src/bin/rb_dac.rs"
+
+[[bin]]
 name = "tof-stress"
 path = "src/bin/tof_stress.rs"
 
