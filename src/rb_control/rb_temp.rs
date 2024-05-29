@@ -59,7 +59,7 @@ impl RBTemp {
         let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_1);
         i2c_mux.select(RB_DRS_TMP112_CHANNEL)?;
         let drs_tmp112 = tmp112::TMP112::new(I2C_BUS, RB_DRS_TMP112_ADDRESS);
-        // drs_tmp112.config()?;
+        drs_tmp112.config()?;
         let drs_temp = drs_tmp112.read()?;
 
         i2c_mux.reset()?;
@@ -88,6 +88,18 @@ pub fn config_temp() -> Result<(), RBTempError> {
     i2c_mux_2.reset()?;
 
     Ok(())
+}
+
+pub fn read_drs_temp_raw() -> Result<u16, RBTempError> {
+    let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_1);
+    i2c_mux.select(RB_DRS_TMP112_CHANNEL)?;
+    let drs_tmp112 = tmp112::TMP112::new(I2C_BUS, RB_DRS_TMP112_ADDRESS);
+    drs_tmp112.config()?;
+    let drs_temp_raw = drs_tmp112.read_raw()?;
+
+    i2c_mux.reset()?;
+
+    Ok(drs_temp_raw)
 }
 
 impl RBTempDebug {

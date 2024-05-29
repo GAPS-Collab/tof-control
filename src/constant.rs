@@ -95,6 +95,8 @@ pub const LOSS_OF_LOCK_STABLE: u32 = 0x10; // Bits: 1, Perm: r, Description: Los
 pub const RB_TEMP: u32 = 0xA0; // Bits: [11:0], Perm: r, XADC Temperature
 /// DRS.FPGA (FPGA Status)
 pub const BOARD_ID: u32 = 0xA8; // Bits: [7:0], Perm: rw, Board ID Number
+pub const DRS_TEMP: u32 = 0xAC; // Bits: [15:0], Perm: rw, Copy of the I2C DRS temperature reading
+pub const RAT_HOUSEKEEPING: u32 = 0xB0; // Bits: [31:0], Perm: rw, 32 bit RAT housekeeping data. Meaning is software defined.
 /// DRS.DAQ (DAQ)
 pub const DAQ_FRAGMENT_EN: u32 = 0xC4; // Bits: 0, Perm: rw, 1 to enable daq fragments (header only packets) when the DRS is busy
 /// DRS.READOUT (Registers for configuring the readout state machine)

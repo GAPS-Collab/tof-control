@@ -4,6 +4,8 @@ use serde::{Deserialize, Serialize};
 pub struct CPUInfo {
     pub uptime: u32,
     pub cpu_freq: [u32; 4],
+    pub root_usage: u8,
+    pub tofdata_usage: u8,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

@@ -13,6 +13,14 @@ edition = "2021"
 opt-level = "z"
 
 [[bin]]
+name = "rat-hkp"
+path = "src/bin/rat_hkp.rs"
+
+[[bin]]
+name = "rb-dac"
+path = "src/bin/rb_dac.rs"
+
+[[bin]]
 name = "tof-stress"
 path = "src/bin/tof_stress.rs"
 
@@ -104,15 +112,15 @@ memmap = "0.7"
 log = "0.4"
 clap = { version = "4.1", features = ["derive"] }
 csv = "1.1"
-comfy-table = "7.1.0"
+# comfy-table = "7.1.0"
 gethostname = "0.4.1"
 libc = "0.2.140"
 # openssl = { version = "0.10", features = ["vendored"] }
 # tokio = "1.27.0"
-tokio = { version = "1.27.0", features = ["macros", "rt-multi-thread"] }
+# tokio = { version = "1.27.0", features = ["macros", "rt-multi-thread"] }
 # futures = "0.3.28"
 chrono = "0.4.24"
-sysfs_gpio = "0.6.1"
+# sysfs_gpio = "0.6.1"
 systemstat = "0.2.3"
 sysinfo = "0.29.10"
 snmp = "0.2.2"
@@ -122,8 +130,9 @@ indicatif = "0.17.7"
 chrono-tz = "0.8.4"
 ratatui = "0.25.0"
 crossterm = "0.27.0"
-openssh = "0.10.3"
-hex = "0.4.3"
+# openssh = "0.10.3"
+# hex = "0.4.3"
+# zmq = "0.10.0"
 
 [build-dependencies]
 bindgen = "0.64.0"

@@ -14,11 +14,15 @@ impl CPUInfo {
 
         let uptime = Self::read_uptime(&mut sys);
         let cpu_freq = Self::read_cpu_freq(&mut sys);
-        Self::read_ram_usage(&mut sys);
+        let disk_usage = Self::read_disk_usage(&mut sys);
+        let root_usage = disk_usage[0];
+        let tofdata_usage = disk_usage[1];
 
         CPUInfo {
             uptime,
             cpu_freq,
+            root_usage,
+            tofdata_usage,
         }
     }
     pub fn read_uptime(sys: &System) -> u32 {
@@ -62,6 +66,31 @@ impl CPUInfo {
         println!("Total RAM: {}MB", total_ram/1000000);
         println!("Memory Usage: {}%", memory_usage);
     }
+    pub fn read_disk_usage(sys: &System) -> [u8; 2] {
+        let mut root_usage: u32 = Default::default();
+        let mut tofdata_usage: u32 = Default::default();
+        for disk in sys.disks() {
+            let mut usage = 1.0 - disk.available_space() as f32 / disk.total_space() as f32;
+            usage = usage * 100.0;
+            let mounted_point = disk.mount_point().as_os_str();
+            if mounted_point == "/" {
+                root_usage = usage as u32;
+            } else if mounted_point == "/tofdata" {
+                tofdata_usage = usage as u32;
+            } else if mounted_point == "/tpool/tofdata" {
+                tofdata_usage = usage as u32;
+            }
+        }
+
+        // println!("/ Usage: {:?}%", root_usage);
+        // println!("/tofdata Usage: {:?}%", tofdata_usage);
+
+        // let disk_usage: f32 = (1.0 - (available_space as f32 / total_space as f32)) * 100.0;
+        // println!("{}", disk_usage);
+        // disk_usage as u8
+        [root_usage as u8, tofdata_usage as u8]
+    }
+    
 }
 
 impl CPUInfoDebug {
