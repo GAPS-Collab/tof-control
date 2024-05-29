@@ -196,6 +196,41 @@ impl PreampSetBias {
     
     }
 
+    pub fn set_manual_biases(biases: [f32; 16]) -> Result<(), PreampBiasError> {
+        
+        for bias in biases {
+            if bias < 0.0 || bias > 67.0 {
+                eprintln!("Bias voltage must be between 0V to 67V");
+                std::process::exit(1);
+            }
+        }
+
+        let preamp_bias_channels = [
+            PREAMP_DAC_1_CHANNEL, PREAMP_DAC_2_CHANNEL, PREAMP_DAC_3_CHANNEL, PREAMP_DAC_4_CHANNEL,
+            PREAMP_DAC_5_CHANNEL, PREAMP_DAC_6_CHANNEL, PREAMP_DAC_7_CHANNEL, PREAMP_DAC_8_CHANNEL,
+            PREAMP_DAC_9_CHANNEL, PREAMP_DAC_10_CHANNEL, PREAMP_DAC_11_CHANNEL, PREAMP_DAC_12_CHANNEL,
+            PREAMP_DAC_13_CHANNEL, PREAMP_DAC_14_CHANNEL, PREAMP_DAC_15_CHANNEL, PREAMP_DAC_16_CHANNEL,
+        ];
+
+        let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, PB_PCA9548A_ADDRESS);
+
+        i2c_mux.select(PB_DAC_1_CHANNEL)?;
+        let pb_dac_1 = max5825::MAX5825::new(I2C_BUS, PB_MAX5825_ADDRESS);
+        for i in 0..=7 {
+            pb_dac_1.coden_loadn(preamp_bias_channels[i], Self::bias_to_adc(biases[i]))?;
+        }
+    
+        i2c_mux.select(PB_DAC_2_CHANNEL)?;
+        let pb_dac_2 = max5825::MAX5825::new(I2C_BUS, PB_MAX5825_ADDRESS);
+        for i in 8..=15 {
+            pb_dac_2.coden_loadn(preamp_bias_channels[i], Self::bias_to_adc(biases[i]))?;
+        }
+    
+        i2c_mux.reset()?;
+
+        Ok(())
+    }
+
     pub fn set_bias() -> Result<(), PreampBiasError> {
 
         // let mut bias_voltage = Default::default();

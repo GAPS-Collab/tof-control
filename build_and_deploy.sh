@@ -52,12 +52,12 @@ elif [ "$1" = "rb-control" ]; then
     # rm -rf target/armv7-unknown*
     CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
     cross build --release --bin rb-control --target=armv7-unknown-linux-musleabi
-    scp target/armv7-unknown-linux-musleabi/release/rb-control tof-computer:/home/gaps/tof-rb/bin
+    # scp target/armv7-unknown-linux-musleabi/release/rb-control tof-computer:/home/gaps/tof-rb/bin
     # scp target/armv7-unknown-linux-musleabi/release/rb-control tof-rb18:~/dev
     # scp target/armv7-unknown-linux-musleabi/release/rb-control tof-rb09:~/dev
     # scp target/armv7-unknown-linux-musleabi/release/rb-control tof-rb37:~/dev
-    scp target/armv7-unknown-linux-musleabi/release/rb-control tof-rb07:~/dev
-    scp target/armv7-unknown-linux-musleabi/release/rb-control tof-rb17:~/dev
+    # scp target/armv7-unknown-linux-musleabi/release/rb-control tof-rb07:~/dev
+    scp target/armv7-unknown-linux-musleabi/release/rb-control tof-rb46:~/dev
     # scp target/armv7-unknown-linux-musleabi/release/rb-control tof-rb43:~/dev
 
 elif [ "$1" = "ltb-control" ]; then
@@ -89,9 +89,7 @@ elif [ "$1" = "rat-control" ]; then
     # scp target/armv7-unknown-linux-musleabi/release/rat-control tof-computer:/home/gaps/tof-rb/bin
     scp target/armv7-unknown-linux-musleabi/release/rat-control tof-rb37:~/bin
     scp target/armv7-unknown-linux-musleabi/release/rat-control tof-rb49:~/bin
-    scp target/armv7-unknown-linux-musleabi/release/rat-control tof-rb48:~/bin
-    scp target/armv7-unknown-linux-musleabi/release/rat-control tof-rb47:~/bin
-    scp target/armv7-unknown-linux-musleabi/release/rat-control tof-nts-computer:/home/gaps/tof-nas/tof-rb/software
+    # scp target/armv7-unknown-linux-musleabi/release/rat-control tof-nts-computer:/home/gaps/tof-nas/tof-rb/software
 
 elif [ "$1" = "preamp-control" ]; then
     CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
@@ -221,7 +219,7 @@ elif [ "$1" = "rb-dac" ]; then
 elif [ "$1" = "rat-hkp" ]; then
     CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
     cross build --release --bin rat-hkp --target=armv7-unknown-linux-musleabi
-    scp target/armv7-unknown-linux-musleabi/release/rat-hkp tof-rb49:/home/gaps/dev
+    scp target/armv7-unknown-linux-musleabi/release/rat-hkp tof-rb37:/home/gaps/dev
 
 else
     CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
