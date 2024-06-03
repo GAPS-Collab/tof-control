@@ -71,6 +71,23 @@ pub fn set_threshold(channel: u8, threshold: f32) -> Result<(), LTBThresholdErro
     Ok(())
 }
 
+pub fn set_thresholds(thresholds: [f32; 3]) -> Result<(), LTBThresholdError> {
+
+    let ltb_dac = max5815::MAX5815::new(I2C_BUS, LTB_MAX5815_ADDRESS);
+    ltb_dac.configure()?;
+
+    for (i, threshold) in thresholds.iter().enumerate() {
+
+        if (*threshold < 0.0) | (*threshold > 1000.0) {
+            return Err(LTBThresholdError::SetThreshold())
+        }
+        
+        ltb_dac.coden_loadn(i as u8, mv_to_adc(*threshold))?;
+    }
+
+    Ok(())
+}
+
 fn mv_to_adc(mv: f32) -> u16 {
 let adc = (mv / 1000.0) / LTB_DAC_REF_VOLTAGE * 2f32.powf(12.0);
 
