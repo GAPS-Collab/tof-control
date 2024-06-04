@@ -94,16 +94,6 @@ pub struct RBTemp {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct RBTempDebug {
-    pub zynq_temp       : f32,
-    pub drs_temp        : f32,
-    pub clk_temp        : f32,
-    pub adc_temp        : f32,
-    pub bme280_temp     : f32,
-    pub lis3mdltr_temp  : f32,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
 pub struct RBVcp {
     pub zynq_vcp        : [f32; 3],
     pub p3v3_vcp        : [f32; 3],
