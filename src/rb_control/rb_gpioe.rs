@@ -1,9 +1,8 @@
-#![allow(unused)]
 use std::thread;
 use std::time::Duration;
 
 use crate::constant::*;
-use crate::helper::rb_type::RBGPIOeError;
+use crate::helper::rb_type::RBError;
 use crate::device::cy8c9560a::CY8C9560A;
 use crate::device::{cy8c9560a, pca9548a};
 
@@ -68,7 +67,7 @@ GP7: 0x3F
 
 */
 
-pub fn initialize_gpioe() -> Result<(), RBGPIOeError> {
+pub fn initialize_gpioe() -> Result<(), RBError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_CY8C9560A_CHANNEL)?;
 
@@ -137,7 +136,7 @@ pub fn initialize_gpioe() -> Result<(), RBGPIOeError> {
     Ok(())
 }
 
-pub fn reset_si5345b_gpioe() -> Result<(), RBGPIOeError> {
+pub fn reset_si5345b_gpioe() -> Result<(), RBError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_CY8C9560A_CHANNEL)?;
 
@@ -156,7 +155,7 @@ pub fn reset_si5345b_gpioe() -> Result<(), RBGPIOeError> {
     Ok(())
 }
 
-pub fn enable_si5345b_gpioe() -> Result<(), RBGPIOeError> {
+pub fn enable_si5345b_gpioe() -> Result<(), RBError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_CY8C9560A_CHANNEL)?;
 
@@ -170,7 +169,7 @@ pub fn enable_si5345b_gpioe() -> Result<(), RBGPIOeError> {
     Ok(())
 }
 
-pub fn enable_ad5675_gpioe() -> Result<(), RBGPIOeError> {
+pub fn enable_ad5675_gpioe() -> Result<(), RBError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_CY8C9560A_CHANNEL)?;
 
@@ -186,7 +185,7 @@ pub fn enable_ad5675_gpioe() -> Result<(), RBGPIOeError> {
 
 // GP7[7]: TCA_CLK_SC_EN
 // GP7[6]: TCA_CLK_OUT_EN
-pub fn enable_nb3v9312c_gpioe() -> Result<(), RBGPIOeError>  {
+pub fn enable_nb3v9312c_gpioe() -> Result<(), RBError>  {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_CY8C9560A_CHANNEL)?;
 
@@ -199,7 +198,7 @@ pub fn enable_nb3v9312c_gpioe() -> Result<(), RBGPIOeError>  {
 
     Ok(())
 }
-pub fn disable_nb3v9312c_gpioe() -> Result<(), RBGPIOeError>  {
+pub fn disable_nb3v9312c_gpioe() -> Result<(), RBError>  {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_CY8C9560A_CHANNEL)?;
 
@@ -227,7 +226,7 @@ pub fn disable_nb3v9312c_gpioe() -> Result<(), RBGPIOeError>  {
           2: RFC -> RF2 (SMA Input)
 
 */
-pub fn rf_input_select_gpioe(mode: u8) -> Result<(), RBGPIOeError> {
+pub fn rf_input_select_gpioe(mode: u8) -> Result<(), RBError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_CY8C9560A_CHANNEL)?;
 
@@ -247,7 +246,7 @@ pub fn rf_input_select_gpioe(mode: u8) -> Result<(), RBGPIOeError> {
 
 // GP7[5] = EN
 // GP7[4] = VCTL
-fn drs_ch1_input_select(gpioe: CY8C9560A, mode: u8) -> Result<(), RBGPIOeError> {
+fn drs_ch1_input_select(gpioe: CY8C9560A, mode: u8) -> Result<(), RBError> {
     let port_status = gpioe.read_port_status(7)?;
 
     match mode {
@@ -261,7 +260,7 @@ fn drs_ch1_input_select(gpioe: CY8C9560A, mode: u8) -> Result<(), RBGPIOeError> 
         }
         2 => {
             let value = (port_status & !0x30) | 0x00;
-            gpioe.set_output_port(7, value)?;;
+            gpioe.set_output_port(7, value)?;
         }
         _ => {
             gpioe.set_output_port(7, port_status)?;
@@ -273,7 +272,7 @@ fn drs_ch1_input_select(gpioe: CY8C9560A, mode: u8) -> Result<(), RBGPIOeError> 
 
 // GP7[3] = EN
 // GP7[2] = VCTL
-fn drs_ch2_input_select(gpioe: CY8C9560A, mode: u8) -> Result<(), RBGPIOeError> {
+fn drs_ch2_input_select(gpioe: CY8C9560A, mode: u8) -> Result<(), RBError> {
     let port_status = gpioe.read_port_status(7)?;
 
     match mode {
@@ -299,7 +298,7 @@ fn drs_ch2_input_select(gpioe: CY8C9560A, mode: u8) -> Result<(), RBGPIOeError> 
 
 // GP7[1] = EN
 // GP7[0] = VCTL
-fn drs_ch3_input_select(gpioe: CY8C9560A, mode: u8) -> Result<(), RBGPIOeError> {
+fn drs_ch3_input_select(gpioe: CY8C9560A, mode: u8) -> Result<(), RBError> {
     let port_status = gpioe.read_port_status(7)?;
 
     match mode {
@@ -325,7 +324,7 @@ fn drs_ch3_input_select(gpioe: CY8C9560A, mode: u8) -> Result<(), RBGPIOeError> 
 
 // GP2[1] = EN
 // GP2[0] = VCTL
-fn drs_ch4_input_select(gpioe: CY8C9560A, mode: u8) -> Result<(), RBGPIOeError> {
+fn drs_ch4_input_select(gpioe: CY8C9560A, mode: u8) -> Result<(), RBError> {
     let port_status = gpioe.read_port_status(2)?;
 
     match mode {
@@ -351,7 +350,7 @@ fn drs_ch4_input_select(gpioe: CY8C9560A, mode: u8) -> Result<(), RBGPIOeError> 
 
 // GP5[1] = VCTL
 // GP5[0] = EN
-fn drs_ch5_input_select(gpioe: CY8C9560A, mode: u8) -> Result<(), RBGPIOeError> {
+fn drs_ch5_input_select(gpioe: CY8C9560A, mode: u8) -> Result<(), RBError> {
     let port_status = gpioe.read_port_status(5)?;
 
     match mode {
@@ -377,7 +376,7 @@ fn drs_ch5_input_select(gpioe: CY8C9560A, mode: u8) -> Result<(), RBGPIOeError> 
 
 // GP5[5] = EN
 // GP5[4] = VCTL
-fn drs_ch6_input_select(gpioe: CY8C9560A, mode: u8) -> Result<(), RBGPIOeError> {
+fn drs_ch6_input_select(gpioe: CY8C9560A, mode: u8) -> Result<(), RBError> {
     let port_status = gpioe.read_port_status(5)?;
 
     match mode {
@@ -403,7 +402,7 @@ fn drs_ch6_input_select(gpioe: CY8C9560A, mode: u8) -> Result<(), RBGPIOeError> 
 
 // GP4[7] = VCTL
 // GP4[6] = EN
-fn drs_ch7_input_select(gpioe: CY8C9560A, mode: u8) -> Result<(), RBGPIOeError> {
+fn drs_ch7_input_select(gpioe: CY8C9560A, mode: u8) -> Result<(), RBError> {
     let port_status = gpioe.read_port_status(4)?;
 
     match mode {
@@ -429,7 +428,7 @@ fn drs_ch7_input_select(gpioe: CY8C9560A, mode: u8) -> Result<(), RBGPIOeError> 
 
 // GP4[5] = VCTL
 // GP4[4] = EN
-fn drs_ch8_input_select(gpioe: CY8C9560A, mode: u8) -> Result<(), RBGPIOeError> {
+fn drs_ch8_input_select(gpioe: CY8C9560A, mode: u8) -> Result<(), RBError> {
     let port_status = gpioe.read_port_status(4)?;
 
     match mode {
@@ -455,7 +454,7 @@ fn drs_ch8_input_select(gpioe: CY8C9560A, mode: u8) -> Result<(), RBGPIOeError> 
 
 // GP4[3] = VCTL
 // GP4[2] = EN
-fn drs_ch9_input_select(gpioe: CY8C9560A, mode: u8) -> Result<(), RBGPIOeError> {
+fn drs_ch9_input_select(gpioe: CY8C9560A, mode: u8) -> Result<(), RBError> {
     let port_status = gpioe.read_port_status(4)?;
 
     match mode {
@@ -480,7 +479,7 @@ fn drs_ch9_input_select(gpioe: CY8C9560A, mode: u8) -> Result<(), RBGPIOeError> 
 }
 
 
-pub fn device_info_gpioe() -> Result<(u8, u8, Vec<u8>), RBGPIOeError> {
+pub fn device_info_gpioe() -> Result<(u8, u8, Vec<u8>), RBError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_CY8C9560A_CHANNEL)?;
 
@@ -498,7 +497,7 @@ pub fn device_info_gpioe() -> Result<(u8, u8, Vec<u8>), RBGPIOeError> {
     ))
 }
 
-pub fn read_port_gpioe() -> Result<Vec<u8>, RBGPIOeError> {
+pub fn read_port_gpioe() -> Result<Vec<u8>, RBError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_CY8C9560A_CHANNEL)?;
 
@@ -510,10 +509,10 @@ pub fn read_port_gpioe() -> Result<Vec<u8>, RBGPIOeError> {
 
     i2c_mux.reset()?;
 
-    Ok((gp))
+    Ok(gp)
 }
 
-pub fn set_rf_switch_gpioe(mode: u8) -> Result<(), RBGPIOeError> {
+pub fn set_rf_switch_gpioe(mode: u8) -> Result<(), RBError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_CY8C9560A_CHANNEL)?;
 
@@ -535,7 +534,7 @@ pub fn set_rf_switch_gpioe(mode: u8) -> Result<(), RBGPIOeError> {
     Ok(())
 }
 
-pub fn enable_tcal_clock_gpioe(mode: u8) -> Result<(), RBGPIOeError> {
+pub fn enable_tcal_clock_gpioe(mode: u8) -> Result<(), RBError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_CY8C9560A_CHANNEL)?;
 
@@ -549,7 +548,7 @@ pub fn enable_tcal_clock_gpioe(mode: u8) -> Result<(), RBGPIOeError> {
     Ok(())
 }
 
-pub fn disable_tcal_clock_gpioe() -> Result<(), RBGPIOeError> {
+pub fn disable_tcal_clock_gpioe() -> Result<(), RBError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_CY8C9560A_CHANNEL)?;
 
@@ -561,7 +560,7 @@ pub fn disable_tcal_clock_gpioe() -> Result<(), RBGPIOeError> {
     Ok(())
 }
 
-pub fn dac_reset_gpioe() -> Result<(), RBGPIOeError> {
+pub fn dac_reset_gpioe() -> Result<(), RBError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_CY8C9560A_CHANNEL)?;
 
@@ -575,12 +574,12 @@ pub fn dac_reset_gpioe() -> Result<(), RBGPIOeError> {
     Ok(())
 }
 
-pub fn program_eeprom_gpioe() -> Result<(), RBGPIOeError> {
+pub fn program_eeprom_gpioe() -> Result<(), RBError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_CY8C9560A_CHANNEL)?;
 
     let cy8c9560a = cy8c9560a::CY8C9560A::new(I2C_BUS, RB_CY8C9560A_ADDRESS);
-    let mut enable_register = cy8c9560a.read_enable_register()?;
+    let enable_register = cy8c9560a.read_enable_register()?;
     if (enable_register & 0x02) != 0x02 {
         cy8c9560a.enable_eeprom()?;
     }
@@ -592,12 +591,12 @@ pub fn program_eeprom_gpioe() -> Result<(), RBGPIOeError> {
     Ok(())
 }
 
-pub fn reset_eeprom_gpioe() -> Result<(), RBGPIOeError> {
+pub fn reset_eeprom_gpioe() -> Result<(), RBError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_CY8C9560A_CHANNEL)?;
 
     let cy8c9560a = cy8c9560a::CY8C9560A::new(I2C_BUS, RB_CY8C9560A_ADDRESS);
-    let mut enable_register = cy8c9560a.read_enable_register()?;
+    let enable_register = cy8c9560a.read_enable_register()?;
     if (enable_register & 0x02) != 0x02 {
         cy8c9560a.enable_eeprom()?;
     }
@@ -609,7 +608,7 @@ pub fn reset_eeprom_gpioe() -> Result<(), RBGPIOeError> {
     Ok(())
 }
 
-pub fn reset_gpioe() -> Result<(), RBGPIOeError> {
+pub fn reset_gpioe() -> Result<(), RBError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_CY8C9560A_CHANNEL)?;
 
@@ -621,7 +620,7 @@ pub fn reset_gpioe() -> Result<(), RBGPIOeError> {
     Ok(())
 }
 
-pub fn read_rf_input_port(ch: u8) -> Result<u8, RBGPIOeError> {
+pub fn read_rf_input_port(ch: u8) -> Result<u8, RBError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_CY8C9560A_CHANNEL)?;
 
