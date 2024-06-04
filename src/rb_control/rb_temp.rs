@@ -1,4 +1,3 @@
-#![allow(unused)]
 use crate::constant::*;
 use crate::memory::read_control_reg;
 use crate::helper::rb_type::{RBTemp, RBError};

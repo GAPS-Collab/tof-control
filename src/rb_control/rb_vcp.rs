@@ -1,5 +1,4 @@
 use crate::constant::*;
-
 use crate::helper::rb_type::{RBVcp, RBError};
 use crate::device::{ina226, max11645, pca9548a};
 

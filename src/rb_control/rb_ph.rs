@@ -1,5 +1,4 @@
 use crate::constant::*;
-
 use crate::helper::rb_type::{RBPh, RBError};
 use crate::device::{bme280, pca9548a};
 

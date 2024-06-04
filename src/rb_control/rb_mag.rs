@@ -1,5 +1,4 @@
 use crate::constant::*;
-
 use crate::helper::rb_type::{RBMag, RBError};
 use crate::device::{lis3mdltr, pca9548a};
 

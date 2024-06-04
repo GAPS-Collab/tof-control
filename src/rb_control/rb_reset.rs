@@ -1,10 +1,10 @@
-use crate::constant::*;
-use crate::memory::*;
-use crate::helper::rb_type::RBError;
-use crate::rb_control::{rb_gpioe, rb_clk, rb_dac, rb_temp, rb_vcp, rb_ph, rb_mag};
-
 use std::thread;
 use std::time::Duration;
+
+use crate::constant::*;
+use crate::memory::{read_control_reg, write_control_reg};
+use crate::helper::rb_type::RBError;
+use crate::rb_control::{rb_temp, rb_vcp, rb_ph, rb_mag, rb_dac, rb_gpioe, rb_clk};
 
 pub fn reset() -> Result<(), RBError> {
     reset_gpioe()?;
