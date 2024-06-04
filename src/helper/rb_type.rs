@@ -287,7 +287,7 @@ pub enum RBInfoError {
     // GPIOe Error
     // GPIOe(RBGPIOeError),
     // Mode Error
-    Mode(RBModeError),
+    // Mode(RBModeError),
 }
 
 impl From<crate::memory::RegisterError> for RBInfoError {
@@ -314,37 +314,8 @@ impl From<std::num::ParseIntError> for RBInfoError {
 //     }
 // }
 
-impl From<RBModeError> for RBInfoError {
-    fn from(e: RBModeError) -> Self {
-        RBInfoError::Mode(e)
-    }
-}
-
-
-#[derive(Debug)]
-pub enum RBModeError {
-    // RB DAC Error
-    // Dac(RBDacError),
-    // RB Input Error
-    // Input(RBInputError),
-    // GPIO Expander Error
-    // GPIOe(RBGPIOeError),
-}
-
-// impl From<RBDacError> for RBModeError {
-//     fn from(e: RBDacError) -> Self {
-//         RBModeError::Dac(e)
-//     }
-// }
-
-// impl From<RBInputError> for RBModeError {
-//     fn from(e: RBInputError) -> Self {
-//         RBModeError::Input(e)
-//     }
-// }
-
-// impl From<RBGPIOeError> for RBModeError {
-//     fn from(e: RBGPIOeError) -> Self {
-//         RBModeError::GPIOe(e)
+// impl From<RBModeError> for RBInfoError {
+//     fn from(e: RBModeError) -> Self {
+//         RBInfoError::Mode(e)
 //     }
 // }
