@@ -1,9 +1,8 @@
-#![allow(unused)]
 use crate::constant::*;
-use crate::helper::rb_type::RBDacError;
+use crate::helper::rb_type::RBError;
 use crate::device::{ad5675, pca9548a};
 
-pub fn set_dac() -> Result<(), RBDacError> {
+pub fn set_dac() -> Result<(), RBError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_AD5675_CHANNEL)?;
     let ad5675 = ad5675::AD5675::new(RB_AD5675_ADDRESS);
@@ -42,7 +41,7 @@ pub fn set_dac() -> Result<(), RBDacError> {
     
 }
 
-pub fn set_dac_500() -> Result<(), RBDacError> {
+pub fn set_dac_500() -> Result<(), RBError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_AD5675_CHANNEL)?;
     let ad5675 = ad5675::AD5675::new(RB_AD5675_ADDRESS);
@@ -54,7 +53,7 @@ pub fn set_dac_500() -> Result<(), RBDacError> {
     Ok(())
 }
 
-pub fn dac_noi_mode() -> Result<(), RBDacError> {
+pub fn dac_noi_mode() -> Result<(), RBError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_AD5675_CHANNEL)?;
     let ad5675 = ad5675::AD5675::new(RB_AD5675_ADDRESS);
@@ -66,7 +65,7 @@ pub fn dac_noi_mode() -> Result<(), RBDacError> {
     Ok(())
 }
 
-pub fn dac_vcal_mode() -> Result<(), RBDacError> {
+pub fn dac_vcal_mode() -> Result<(), RBError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_AD5675_CHANNEL)?;
     let ad5675 = ad5675::AD5675::new(RB_AD5675_ADDRESS);
@@ -78,7 +77,7 @@ pub fn dac_vcal_mode() -> Result<(), RBDacError> {
     Ok(())
 }
 
-pub fn dac_tcal_mode() -> Result<(), RBDacError> {
+pub fn dac_tcal_mode() -> Result<(), RBError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_AD5675_CHANNEL)?;
     let ad5675 = ad5675::AD5675::new(RB_AD5675_ADDRESS);
@@ -90,7 +89,7 @@ pub fn dac_tcal_mode() -> Result<(), RBDacError> {
     Ok(())
 }
 
-pub fn dac_sma_mode() -> Result<(), RBDacError> {
+pub fn dac_sma_mode() -> Result<(), RBError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_AD5675_CHANNEL)?;
     let ad5675 = ad5675::AD5675::new(RB_AD5675_ADDRESS);

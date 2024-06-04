@@ -93,18 +93,6 @@ impl From<std::ffi::OsString> for RBError {
 
 
 
-#[derive(Debug)]
-pub enum RBInitError {
-    DAC(RBDacError),
-}
-
-impl From<RBDacError> for RBInitError {
-    fn from(e: RBDacError) -> Self {
-        RBInitError::DAC(e)
-    }
-}
-
-
 
 
 
@@ -346,20 +334,6 @@ impl From<i2cdev::linux::LinuxI2CError> for RBClkError {
 }
 
 #[derive(Debug)]
-pub enum RBDacError {
-    /// I2C Error
-    I2C(i2cdev::linux::LinuxI2CError),
-    // TryFrom Error
-    // TryFrom(<u64 as TryFrom<u64>>::Error),
-}
-
-impl From<i2cdev::linux::LinuxI2CError> for RBDacError {
-    fn from(e: i2cdev::linux::LinuxI2CError) -> Self {
-        RBDacError::I2C(e)
-    }
-}
-
-#[derive(Debug)]
 pub enum RBGPIOeError {
     /// I2C Error
     I2C(i2cdev::linux::LinuxI2CError),
@@ -375,7 +349,7 @@ impl From<i2cdev::linux::LinuxI2CError> for RBGPIOeError {
 pub enum RBResetError {
     GPIOe(RBGPIOeError),
     Clk(RBClkError),
-    DAC(RBDacError),
+    // DAC(RBDacError),
     Register(crate::memory::RegisterError),
     // Temp(RBTempError),
     // Vcp(RBVcpError),
@@ -398,11 +372,11 @@ impl From<RBClkError> for RBResetError {
         RBResetError::Clk(e)
     }
 }
-impl From<RBDacError> for RBResetError {
-    fn from(e: RBDacError) -> Self {
-        RBResetError::DAC(e)
-    }
-}
+// impl From<RBDacError> for RBResetError {
+//     fn from(e: RBDacError) -> Self {
+//         RBResetError::DAC(e)
+//     }
+// }
 impl From<crate::memory::RegisterError> for RBResetError {
     fn from(e: crate::memory::RegisterError) -> Self {
         RBResetError::Register(e)
@@ -452,18 +426,18 @@ impl From<RBGPIOeError> for RBInputError {
 #[derive(Debug)]
 pub enum RBModeError {
     /// RB DAC Error
-    Dac(RBDacError),
+    // Dac(RBDacError),
     /// RB Input Error
     Input(RBInputError),
     /// GPIO Expander Error
     GPIOe(RBGPIOeError),
 }
 
-impl From<RBDacError> for RBModeError {
-    fn from(e: RBDacError) -> Self {
-        RBModeError::Dac(e)
-    }
-}
+// impl From<RBDacError> for RBModeError {
+//     fn from(e: RBDacError) -> Self {
+//         RBModeError::Dac(e)
+//     }
+// }
 
 impl From<RBInputError> for RBModeError {
     fn from(e: RBInputError) -> Self {
