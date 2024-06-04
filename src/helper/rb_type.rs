@@ -322,31 +322,11 @@ impl From<RBModeError> for RBInfoError {
 
 
 #[derive(Debug)]
-pub enum RBInputError {
-    /// I2C Error
-    I2C(i2cdev::linux::LinuxI2CError),
-    // RB GPIOe Error
-    // GPIOe(RBGPIOeError),
-}
-
-impl From<i2cdev::linux::LinuxI2CError> for RBInputError {
-    fn from(e: i2cdev::linux::LinuxI2CError) -> Self {
-        RBInputError::I2C(e)
-    }
-}
-
-// impl From<RBGPIOeError> for RBInputError {
-//     fn from(e: RBGPIOeError) -> Self {
-//         RBInputError::GPIOe(e)
-//     }
-// }
-
-#[derive(Debug)]
 pub enum RBModeError {
-    /// RB DAC Error
+    // RB DAC Error
     // Dac(RBDacError),
-    /// RB Input Error
-    Input(RBInputError),
+    // RB Input Error
+    // Input(RBInputError),
     // GPIO Expander Error
     // GPIOe(RBGPIOeError),
 }
@@ -357,11 +337,11 @@ pub enum RBModeError {
 //     }
 // }
 
-impl From<RBInputError> for RBModeError {
-    fn from(e: RBInputError) -> Self {
-        RBModeError::Input(e)
-    }
-}
+// impl From<RBInputError> for RBModeError {
+//     fn from(e: RBInputError) -> Self {
+//         RBModeError::Input(e)
+//     }
+// }
 
 // impl From<RBGPIOeError> for RBModeError {
 //     fn from(e: RBGPIOeError) -> Self {
