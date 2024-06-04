@@ -29,6 +29,11 @@ pub struct RBPh {
     pub pressure        : f32,
     pub humidity        : f32,
 }
+// RB Magnetic Sensor Data Type
+#[derive(Debug, Serialize, Deserialize)]
+pub struct RBMag {
+    pub mag_xyz         : [f32; 3],
+}
 
 
 /// RB Error Type
@@ -87,10 +92,10 @@ impl From<std::ffi::OsString> for RBError {
 
 
 
+
 #[derive(Debug)]
 pub enum RBInitError {
     DAC(RBDacError),
-    Mag(RBMagError),
 }
 
 impl From<RBDacError> for RBInitError {
@@ -99,11 +104,6 @@ impl From<RBDacError> for RBInitError {
     }
 }
 
-impl From<RBMagError> for RBInitError {
-    fn from(e: RBMagError) -> Self {
-        RBInitError::Mag(e)
-    }
-}
 
 
 
@@ -199,11 +199,6 @@ pub struct RBInfoDebug {
     pub rat_num         : u8,
     pub rat_pos         : u8,
     pub rb_pos          : u8, 
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct RBMag {
-    pub mag_xyz         : [f32; 3],
 }
 
 /// RB Error Type
@@ -385,7 +380,7 @@ pub enum RBResetError {
     // Temp(RBTempError),
     // Vcp(RBVcpError),
     // Ph(RBPhError),
-    Mag(RBMagError),
+    // Mag(RBMagError),
 }
 impl std::fmt::Display for RBResetError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -428,23 +423,11 @@ impl From<crate::memory::RegisterError> for RBResetError {
 //         RBResetError::Ph(e)
 //     }
 // }
-impl From<RBMagError> for RBResetError {
-    fn from(e: RBMagError) -> Self {
-        RBResetError::Mag(e)
-    }
-}
-
-#[derive(Debug)]
-pub enum RBMagError {
-    /// I2C Error
-    I2C(i2cdev::linux::LinuxI2CError),
-}
-
-impl From<i2cdev::linux::LinuxI2CError> for RBMagError {
-    fn from(e: i2cdev::linux::LinuxI2CError) -> Self {
-        RBMagError::I2C(e)
-    }
-}
+// impl From<RBMagError> for RBResetError {
+//     fn from(e: RBMagError) -> Self {
+//         RBResetError::Mag(e)
+//     }
+// }
 
 #[derive(Debug)]
 pub enum RBInputError {

@@ -1,6 +1,6 @@
 use crate::constant::*;
 
-use crate::helper::rb_type::{RBMag, RBMagError};
+use crate::helper::rb_type::{RBMag, RBError};
 use crate::device::{lis3mdltr, pca9548a};
 
 impl RBMag {
@@ -16,7 +16,7 @@ impl RBMag {
             }
         }
     }
-    pub fn read_mag() -> Result<RBMag, RBMagError> {
+    pub fn read_mag() -> Result<RBMag, RBError> {
         let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_1);
         i2c_mux.select(RB_LIS3MDLTR_CHANNEL)?;
 
@@ -34,7 +34,7 @@ impl RBMag {
     }
 }
 
-pub fn config_mag() -> Result<(), RBMagError> {
+pub fn config_mag() -> Result<(), RBError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_1);
     i2c_mux.select(RB_LIS3MDLTR_CHANNEL)?;
     let lis3mdltr = lis3mdltr::LIS3MDLTR::new(I2C_BUS, RB_LIS3MDLTR_ADDRESS);
