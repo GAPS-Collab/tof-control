@@ -1,5 +1,67 @@
 use serde::{Deserialize, Serialize};
-// use serde_json::Error;
+
+/// RB Data Type
+#[derive(Debug, Serialize, Deserialize)]
+pub struct RBTemp {
+    pub zynq_temp       : f32,
+    pub drs_temp        : f32,
+    pub clk_temp        : f32,
+    pub adc_temp        : f32,
+    pub bme280_temp     : f32,
+    pub lis3mdltr_temp  : f32,
+}
+
+/// RB Error Type
+#[derive(Debug)]
+pub enum RBError {
+    // Register Error
+    Register(crate::memory::RegisterError),
+    // I2C Error
+    I2C(i2cdev::linux::LinuxI2CError),
+    // JSON Error
+    JSON(serde_json::Error),
+}
+
+impl std::fmt::Display for RBError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "RBError")
+    }
+}
+
+impl From<crate::memory::RegisterError> for RBError {
+    fn from(e: crate::memory::RegisterError) -> Self {
+        RBError::Register(e)
+    }
+}
+
+impl From<i2cdev::linux::LinuxI2CError> for RBError {
+    fn from(e: i2cdev::linux::LinuxI2CError) -> Self {
+        RBError::I2C(e)
+    }
+}
+
+impl From<serde_json::Error> for RBError {
+    fn from(e: serde_json::Error) -> Self {
+        RBError::JSON(e)
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #[derive(Debug)]
 pub struct RBLevel1 {
@@ -8,54 +70,54 @@ pub struct RBLevel1 {
     pub zynq_vc: [f32; 2],
 }
 
-#[derive(Debug)]
-pub struct RBMoniData {
-    // RB Information
-    pub board_id: u8,
-    pub lol: bool,
-    pub lol_stable: bool,
-    pub trigger_rate: u16,
-    // RB Temperature Sensor
-    pub drs_temp: f32,
-    pub clk_temp: f32,
-    pub adc_temp: f32,
-    pub lis3mdltr_temp: f32,
-    pub bme280_temp: f32,
-    pub zynq_temp: f32,
-    // RB Pressure and Humidity Sensor
-    pub pressure: f32,
-    pub humidity: f32,
-    // RB VCP (Voltage, Current and Power) Sensor
-    pub drs_dvdd_voltage: f32,
-    pub drs_dvdd_current: f32,
-    pub drs_dvdd_power: f32,
-    pub p3v3_voltage: f32,
-    pub p3v3_current: f32,
-    pub p3v3_power: f32,
-    pub zynq_voltage: f32,
-    pub zynq_current: f32,
-    pub zynq_power: f32,
-    pub p3v5_voltage: f32,
-    pub p3v5_current: f32,
-    pub p3v5_power: f32,
-    pub adc_dvdd_voltage: f32,
-    pub adc_dvdd_current: f32,
-    pub adc_dvdd_power: f32,
-    pub adc_avdd_voltage: f32,
-    pub adc_avdd_current: f32,
-    pub adc_avdd_power: f32,
-    pub drs_avdd_voltage: f32,
-    pub drs_avdd_current: f32,
-    pub drs_avdd_power: f32,
-    pub n1v5_voltage: f32,
-    pub n1v5_current: f32,
-    pub n1v5_power: f32,
-    // RB Magnetic Sensor
-    pub mag_x: f32,
-    pub mag_y: f32,
-    pub mag_z: f32,
-    pub mag_t: f32,
-}
+// #[derive(Debug)]
+// pub struct RBMoniData {
+//     // RB Information
+//     pub board_id: u8,
+//     pub lol: bool,
+//     pub lol_stable: bool,
+//     pub trigger_rate: u16,
+//     // RB Temperature Sensor
+//     pub drs_temp: f32,
+//     pub clk_temp: f32,
+//     pub adc_temp: f32,
+//     pub lis3mdltr_temp: f32,
+//     pub bme280_temp: f32,
+//     pub zynq_temp: f32,
+//     // RB Pressure and Humidity Sensor
+//     pub pressure: f32,
+//     pub humidity: f32,
+//     // RB VCP (Voltage, Current and Power) Sensor
+//     pub drs_dvdd_voltage: f32,
+//     pub drs_dvdd_current: f32,
+//     pub drs_dvdd_power: f32,
+//     pub p3v3_voltage: f32,
+//     pub p3v3_current: f32,
+//     pub p3v3_power: f32,
+//     pub zynq_voltage: f32,
+//     pub zynq_current: f32,
+//     pub zynq_power: f32,
+//     pub p3v5_voltage: f32,
+//     pub p3v5_current: f32,
+//     pub p3v5_power: f32,
+//     pub adc_dvdd_voltage: f32,
+//     pub adc_dvdd_current: f32,
+//     pub adc_dvdd_power: f32,
+//     pub adc_avdd_voltage: f32,
+//     pub adc_avdd_current: f32,
+//     pub adc_avdd_power: f32,
+//     pub drs_avdd_voltage: f32,
+//     pub drs_avdd_current: f32,
+//     pub drs_avdd_power: f32,
+//     pub n1v5_voltage: f32,
+//     pub n1v5_current: f32,
+//     pub n1v5_power: f32,
+//     // RB Magnetic Sensor
+//     pub mag_x: f32,
+//     pub mag_y: f32,
+//     pub mag_z: f32,
+//     pub mag_t: f32,
+// }
 
 #[derive(Debug)]
 pub struct RBInfo {
@@ -82,17 +144,6 @@ pub struct RBInfoDebug {
     pub rat_pos         : u8,
     pub rb_pos          : u8, 
 }
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct RBTemp {
-    pub zynq_temp       : f32,
-    pub drs_temp        : f32,
-    pub clk_temp        : f32,
-    pub adc_temp        : f32,
-    pub bme280_temp     : f32,
-    pub lis3mdltr_temp  : f32,
-}
-
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RBVcp {
     pub zynq_vcp        : [f32; 3],
@@ -117,17 +168,6 @@ pub struct RBMag {
 }
 
 /// RB Error Type
-#[derive(Debug)]
-pub enum RBError {
-    JSON(serde_json::Error),
-}
-
-impl From<serde_json::Error> for RBError {
-    fn from(e: serde_json::Error) -> Self {
-        RBError::JSON(e)
-    }
-}
-
 
 #[derive(Debug)]
 pub enum RBLevel1Error {
@@ -303,7 +343,7 @@ pub enum RBInitError {
     OsString,
     ParseInt(std::num::ParseIntError),
     Register(crate::memory::RegisterError),
-    Temp(RBTempError),
+    // Temp(RBTempError),
     Vcp(RBVcpError),
     Ph(RBPhError),
     Mag(RBMagError),
@@ -339,11 +379,11 @@ impl From<crate::memory::RegisterError> for RBInitError {
     }
 }
 
-impl From<RBTempError> for RBInitError {
-    fn from(e: RBTempError) -> Self {
-        RBInitError::Temp(e)
-    }
-}
+// impl From<RBTempError> for RBInitError {
+//     fn from(e: RBTempError) -> Self {
+//         RBInitError::Temp(e)
+//     }
+// }
 
 impl From<RBVcpError> for RBInitError {
     fn from(e: RBVcpError) -> Self {
@@ -369,7 +409,7 @@ pub enum RBResetError {
     Clk(RBClkError),
     DAC(RBDacError),
     Register(crate::memory::RegisterError),
-    Temp(RBTempError),
+    // Temp(RBTempError),
     Vcp(RBVcpError),
     Ph(RBPhError),
     Mag(RBMagError),
@@ -400,11 +440,11 @@ impl From<crate::memory::RegisterError> for RBResetError {
         RBResetError::Register(e)
     }
 }
-impl From<RBTempError> for RBResetError {
-    fn from(e: RBTempError) -> Self {
-        RBResetError::Temp(e)
-    }
-}
+// impl From<RBTempError> for RBResetError {
+//     fn from(e: RBTempError) -> Self {
+//         RBResetError::Temp(e)
+//     }
+// }
 impl From<RBVcpError> for RBResetError {
     fn from(e: RBVcpError) -> Self {
         RBResetError::Vcp(e)
@@ -418,26 +458,6 @@ impl From<RBPhError> for RBResetError {
 impl From<RBMagError> for RBResetError {
     fn from(e: RBMagError) -> Self {
         RBResetError::Mag(e)
-    }
-}
-
-#[derive(Debug)]
-pub enum RBTempError {
-    // Register Error
-    Register(crate::memory::RegisterError),
-    /// I2C Error
-    I2C(i2cdev::linux::LinuxI2CError),
-}
-
-impl From<crate::memory::RegisterError> for RBTempError {
-    fn from(e: crate::memory::RegisterError) -> Self {
-        RBTempError::Register(e)
-    }
-}
-
-impl From<i2cdev::linux::LinuxI2CError> for RBTempError {
-    fn from(e: i2cdev::linux::LinuxI2CError) -> Self {
-        RBTempError::I2C(e)
     }
 }
 

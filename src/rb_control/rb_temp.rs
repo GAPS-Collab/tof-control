@@ -1,7 +1,7 @@
 #![allow(unused)]
 use crate::constant::*;
 use crate::memory::*;
-use crate::helper::rb_type::{RBTemp, RBTempError, RBError};
+use crate::helper::rb_type::{RBTemp, RBError};
 use crate::device::{bme280, lis3mdltr, pca9548a, tmp112};
 
 impl RBTemp {
@@ -23,7 +23,7 @@ impl RBTemp {
         }
         
     }
-    pub fn read_temp() -> Result<RBTemp, RBTempError> {
+    pub fn read_temp() -> Result<RBTemp, RBError> {
         let zynq_temp_adc = read_control_reg(RB_TEMP)?;
         let zynq_temp = (((zynq_temp_adc & 4095) as f32 * 503.975) / 4096.0) - 273.15;
 
@@ -69,7 +69,7 @@ impl RBTemp {
             }
         )
     }
-    pub fn read_drs_temp() -> Result<f32, RBTempError> {
+    pub fn read_drs_temp() -> Result<f32, RBError> {
         let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_1);
         i2c_mux.select(RB_DRS_TMP112_CHANNEL)?;
         let drs_tmp112 = tmp112::TMP112::new(I2C_BUS, RB_DRS_TMP112_ADDRESS);
@@ -82,7 +82,7 @@ impl RBTemp {
     }
 }
 
-pub fn config_temp() -> Result<(), RBTempError> {
+pub fn config_temp() -> Result<(), RBError> {
     let i2c_mux_1 = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_1);
     let i2c_mux_2 = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
 
@@ -104,7 +104,7 @@ pub fn config_temp() -> Result<(), RBTempError> {
     Ok(())
 }
 
-pub fn read_drs_temp_raw() -> Result<u16, RBTempError> {
+pub fn read_drs_temp_raw() -> Result<u16, RBError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_1);
     i2c_mux.select(RB_DRS_TMP112_CHANNEL)?;
     let drs_tmp112 = tmp112::TMP112::new(I2C_BUS, RB_DRS_TMP112_ADDRESS);
@@ -119,7 +119,6 @@ pub fn read_drs_temp_raw() -> Result<u16, RBTempError> {
 pub fn to_json() -> Result<String, RBError> {
     let rb_temp = RBTemp::new();
     let rb_temp_json = serde_json::to_string(&rb_temp)?;
-    // let rb_temp_json = rb_temp::to_json().unwrap_or(r#"{"rb_temp":"error"}"#.to_string());
 
     Ok(rb_temp_json)
 }
