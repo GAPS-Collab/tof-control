@@ -4,11 +4,11 @@ use std::thread;
 use std::time::Duration;
 
 use crate::constant::*;
-use crate::helper::rb_type::RBInitError;
+use crate::helper::rb_type::RBError;
 use crate::memory::*;
 use crate::rb_control::{rb_temp, rb_dac, rb_vcp, rb_ph, rb_mag};
 
-pub fn initialize() -> Result<(), RBInitError> {    
+pub fn initialize() -> Result<(), RBError> {    
     /// Initialize DAC Chip
     initialize_dac()?;
     /// Set RB ID
@@ -21,13 +21,13 @@ pub fn initialize() -> Result<(), RBInitError> {
     Ok(())
 }
 
-fn initialize_dac() -> Result<(), RBInitError> {
+fn initialize_dac() -> Result<(), RBError> {
     rb_dac::set_dac()?;
 
     Ok(())
 }
 
-fn set_board_id() -> Result<(), RBInitError> {
+fn set_board_id() -> Result<(), RBError> {
     let hostname = gethostname().into_string()?;
     let board_id = hostname.replace("tof-rb", "").parse::<u32>()?;
 
@@ -36,7 +36,7 @@ fn set_board_id() -> Result<(), RBInitError> {
     Ok(())
 }
 
-fn initialize_daq() -> Result<(), RBInitError> {
+fn initialize_daq() -> Result<(), RBError> {
     /// Disable DAQ Fragment
     disable_daq_fragment()?;
 
@@ -55,7 +55,7 @@ fn initialize_daq() -> Result<(), RBInitError> {
     Ok(())
 }
 
-fn disable_daq_fragment() -> Result<(), RBInitError> {
+fn disable_daq_fragment() -> Result<(), RBError> {
     let mut value = read_control_reg(DAQ_FRAGMENT_EN)?;
     if (value & 0x01) == 0x01 {
         write_control_reg(DAQ_FRAGMENT_EN, 0x00)?;
@@ -64,7 +64,7 @@ fn disable_daq_fragment() -> Result<(), RBInitError> {
     Ok(())
 } 
 
-fn enable_spike_clean() -> Result<(), RBInitError> {
+fn enable_spike_clean() -> Result<(), RBError> {
     let mut value = read_control_reg(EN_SPIKE_REMOVAL)?;
     value = value | 0x400000;
     if ((value >> 22) & 0x01) != 0x01 {
@@ -74,7 +74,7 @@ fn enable_spike_clean() -> Result<(), RBInitError> {
     Ok(())
 }
 
-fn enable_8_channels() -> Result<(), RBInitError> {
+fn enable_8_channels() -> Result<(), RBError> {
     let mut value = read_control_reg(READOUT_MASK)?;
     value = value | 0x1FF;
     if (value & 0x1FF) != 0x1FF {
@@ -84,7 +84,7 @@ fn enable_8_channels() -> Result<(), RBInitError> {
     Ok(())
 }
 
-fn enable_9th_channel() -> Result<(), RBInitError> {
+fn enable_9th_channel() -> Result<(), RBError> {
     let mut value = read_control_reg(READOUT_MASK)?;
     value = value | 0x3FF;
     if ((value >> 9) & 0x01) != 0x01 {
@@ -94,13 +94,13 @@ fn enable_9th_channel() -> Result<(), RBInitError> {
     Ok(())
 }
 
-fn start_drs() -> Result<(), RBInitError> {
+fn start_drs() -> Result<(), RBError> {
     write_control_reg(START, 0x01)?;
 
     Ok(())
 }
 
-fn initialize_sensor() -> Result<(), RBInitError> {
+fn initialize_sensor() -> Result<(), RBError> {
     // Configure Temp Sensors (TMP112)
     rb_temp::config_temp()?;
     // Configure VCP Sensors (INA226 and INA200)

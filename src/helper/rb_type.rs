@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 /// RB Data Type
+// RB Temperature Sensor Data Type
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RBTemp {
     pub zynq_temp       : f32,
@@ -11,6 +12,20 @@ pub struct RBTemp {
     pub lis3mdltr_temp  : f32,
 }
 
+// RB VCP (Voltage, Current and Power) Sensor Data Type
+#[derive(Debug, Serialize, Deserialize)]
+pub struct RBVcp {
+    pub zynq_vcp        : [f32; 3],
+    pub p3v3_vcp        : [f32; 3],
+    pub p3v5_vcp        : [f32; 3],
+    pub n1v5_vcp        : [f32; 3],
+    pub drs_dvdd_vcp    : [f32; 3],
+    pub drs_avdd_vcp    : [f32; 3],
+    pub adc_dvdd_vcp    : [f32; 3],
+    pub adc_avdd_vcp    : [f32; 3],
+}
+
+
 /// RB Error Type
 #[derive(Debug)]
 pub enum RBError {
@@ -20,6 +35,10 @@ pub enum RBError {
     I2C(i2cdev::linux::LinuxI2CError),
     // JSON Error
     JSON(serde_json::Error),
+    // ParseInt Error
+    ParseInt(std::num::ParseIntError),
+    // OsString Error
+    OsString,
 }
 
 impl std::fmt::Display for RBError {
@@ -46,8 +65,44 @@ impl From<serde_json::Error> for RBError {
     }
 }
 
+impl From<std::num::ParseIntError> for RBError {
+    fn from(e: std::num::ParseIntError) -> Self {
+        RBError::ParseInt(e)
+    }
+}
+
+impl From<std::ffi::OsString> for RBError {
+    fn from(_: std::ffi::OsString) -> Self {
+        RBError::OsString
+    }
+}
 
 
+
+#[derive(Debug)]
+pub enum RBInitError {
+    DAC(RBDacError),
+    Ph(RBPhError),
+    Mag(RBMagError),
+}
+
+impl From<RBDacError> for RBInitError {
+    fn from(e: RBDacError) -> Self {
+        RBInitError::DAC(e)
+    }
+}
+
+impl From<RBPhError> for RBInitError {
+    fn from(e: RBPhError) -> Self {
+        RBInitError::Ph(e)
+    }
+}
+
+impl From<RBMagError> for RBInitError {
+    fn from(e: RBMagError) -> Self {
+        RBInitError::Mag(e)
+    }
+}
 
 
 
@@ -143,17 +198,6 @@ pub struct RBInfoDebug {
     pub rat_num         : u8,
     pub rat_pos         : u8,
     pub rb_pos          : u8, 
-}
-#[derive(Debug, Serialize, Deserialize)]
-pub struct RBVcp {
-    pub zynq_vcp        : [f32; 3],
-    pub p3v3_vcp        : [f32; 3],
-    pub p3v5_vcp        : [f32; 3],
-    pub n1v5_vcp        : [f32; 3],
-    pub drs_dvdd_vcp    : [f32; 3],
-    pub drs_avdd_vcp    : [f32; 3],
-    pub adc_dvdd_vcp    : [f32; 3],
-    pub adc_avdd_vcp    : [f32; 3],
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -338,79 +382,13 @@ impl From<i2cdev::linux::LinuxI2CError> for RBGPIOeError {
 }
 
 #[derive(Debug)]
-pub enum RBInitError {
-    DAC(RBDacError),
-    OsString,
-    ParseInt(std::num::ParseIntError),
-    Register(crate::memory::RegisterError),
-    // Temp(RBTempError),
-    Vcp(RBVcpError),
-    Ph(RBPhError),
-    Mag(RBMagError),
-}
-
-impl std::fmt::Display for RBInitError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "RBInitError")
-    }
-}
-
-impl From<RBDacError> for RBInitError {
-    fn from(e: RBDacError) -> Self {
-        RBInitError::DAC(e)
-    }
-}
-
-impl From<std::ffi::OsString> for RBInitError {
-    fn from(_: std::ffi::OsString) -> Self {
-        RBInitError::OsString
-    }
-}
-
-impl From<std::num::ParseIntError> for RBInitError {
-    fn from(e: std::num::ParseIntError) -> Self {
-        RBInitError::ParseInt(e)
-    }
-}
-
-impl From<crate::memory::RegisterError> for RBInitError {
-    fn from(e: crate::memory::RegisterError) -> Self {
-        RBInitError::Register(e)
-    }
-}
-
-// impl From<RBTempError> for RBInitError {
-//     fn from(e: RBTempError) -> Self {
-//         RBInitError::Temp(e)
-//     }
-// }
-
-impl From<RBVcpError> for RBInitError {
-    fn from(e: RBVcpError) -> Self {
-        RBInitError::Vcp(e)
-    }
-}
-
-impl From<RBPhError> for RBInitError {
-    fn from(e: RBPhError) -> Self {
-        RBInitError::Ph(e)
-    }
-}
-
-impl From<RBMagError> for RBInitError {
-    fn from(e: RBMagError) -> Self {
-        RBInitError::Mag(e)
-    }
-}
-
-#[derive(Debug)]
 pub enum RBResetError {
     GPIOe(RBGPIOeError),
     Clk(RBClkError),
     DAC(RBDacError),
     Register(crate::memory::RegisterError),
     // Temp(RBTempError),
-    Vcp(RBVcpError),
+    // Vcp(RBVcpError),
     Ph(RBPhError),
     Mag(RBMagError),
 }
@@ -445,11 +423,11 @@ impl From<crate::memory::RegisterError> for RBResetError {
 //         RBResetError::Temp(e)
 //     }
 // }
-impl From<RBVcpError> for RBResetError {
-    fn from(e: RBVcpError) -> Self {
-        RBResetError::Vcp(e)
-    }
-}
+// impl From<RBVcpError> for RBResetError {
+//     fn from(e: RBVcpError) -> Self {
+//         RBResetError::Vcp(e)
+//     }
+// }
 impl From<RBPhError> for RBResetError {
     fn from(e: RBPhError) -> Self {
         RBResetError::Ph(e)
@@ -458,18 +436,6 @@ impl From<RBPhError> for RBResetError {
 impl From<RBMagError> for RBResetError {
     fn from(e: RBMagError) -> Self {
         RBResetError::Mag(e)
-    }
-}
-
-#[derive(Debug)]
-pub enum RBVcpError {
-    /// I2C Error
-    I2C(i2cdev::linux::LinuxI2CError),
-}
-
-impl From<i2cdev::linux::LinuxI2CError> for RBVcpError {
-    fn from(e: i2cdev::linux::LinuxI2CError) -> Self {
-        RBVcpError::I2C(e)
     }
 }
 
