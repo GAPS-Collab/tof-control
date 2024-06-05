@@ -1,6 +1,6 @@
-use crate::helper::{
-    cpu_type::{CPUInfo, CPUTemp},
-};
+// use crate::helper::{
+//     cpu_type::{CPUInfo, CPUTemp},
+// };
 
 pub struct App<'a> {
     pub title: &'a str,
@@ -22,7 +22,7 @@ impl<'a> App<'a> {
     }
 
     fn define_tabs() -> Vec<&'a str> {
-        let mut tabs: Vec<&str> = Default::default();
+        let tabs: Vec<&str> = Default::default();
 
         // match RBInfo::read_sub_board().unwrap_or(0) {
         //     0 => tabs = vec!["RB"],
