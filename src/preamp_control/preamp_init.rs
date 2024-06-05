@@ -7,11 +7,11 @@ pub fn initialize() -> Result<(), PreampInitError> {
     Ok(())
 }
 
-fn initialize_bias() -> Result<(), PreampInitError> {
-    PreampSetBias::set_bias()?;
+// fn initialize_bias() -> Result<(), PreampInitError> {
+//     PreampSetBias::set_bias()?;
 
-    Ok(())
-}
+//     Ok(())
+// }
 
 fn initialize_bias_manual() -> Result<(), PreampInitError> {
     PreampSetBias::set_manual_bias(None, 58.0)?;
