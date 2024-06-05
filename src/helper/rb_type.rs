@@ -1,6 +1,23 @@
 use serde::{Deserialize, Serialize};
 
 /// RB Data Type
+// RB Information Data Type
+#[derive(Debug, Serialize, Deserialize)]
+pub struct RBInfo {
+    pub board_id        : u8,
+    pub sub_board       : u8,
+    pub lol             : u8,
+    pub lol_stable      : u8,
+    pub trig_rate       : u16,
+    pub fw_version      : String,
+    pub fw_hash         : String,
+    pub uptime          : u32,
+    pub sd_usage        : u8,
+    pub input_mode      : String,
+    pub rat_num         : u8,
+    pub rat_pos         : u8,
+    pub rb_pos          : u8, 
+}
 // RB Temperature Sensor Data Type
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RBTemp {
@@ -162,31 +179,31 @@ pub struct RBLevel1 {
 //     pub mag_t: f32,
 // }
 
-#[derive(Debug)]
-pub struct RBInfo {
-    pub board_id        : u8,
-    pub sub_board       : u8,
-    pub lol             : u8,
-    pub lol_stable      : u8,
-    pub trig_rate       : u16,
-}
+// #[derive(Debug)]
+// pub struct RBInfo {
+//     pub board_id        : u8,
+//     pub sub_board       : u8,
+//     pub lol             : u8,
+//     pub lol_stable      : u8,
+//     pub trig_rate       : u16,
+// }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct RBInfoDebug {
-    pub board_id        : u8,
-    pub sub_board       : u8,
-    pub lol             : u8,
-    pub lol_stable      : u8,
-    // pub trig_rate       : u16,
-    pub fw_version      : String,
-    pub fw_hash         : String,
-    pub uptime          : u32,
-    // pub sd_usage        : u8,
-    pub input_mode      : String,
-    pub rat_num         : u8,
-    pub rat_pos         : u8,
-    pub rb_pos          : u8, 
-}
+// #[derive(Debug, Serialize, Deserialize)]
+// pub struct RBInfoDebug {
+//     pub board_id        : u8,
+//     pub sub_board       : u8,
+//     pub lol             : u8,
+//     pub lol_stable      : u8,
+//     // pub trig_rate       : u16,
+//     pub fw_version      : String,
+//     pub fw_hash         : String,
+//     pub uptime          : u32,
+//     // pub sd_usage        : u8,
+//     pub input_mode      : String,
+//     pub rat_num         : u8,
+//     pub rat_pos         : u8,
+//     pub rb_pos          : u8, 
+// }
 
 /// RB Error Type
 
@@ -273,49 +290,5 @@ impl From<crate::memory::RegisterError> for RBLevel1Error {
 // impl From<RBModeError> for RBError {
 //     fn from(e: RBModeError) -> Self {
 //         RBError::Mode(e)
-//     }
-// }
-
-#[derive(Debug)]
-pub enum RBInfoError {
-    // Register Error
-    Register(crate::memory::RegisterError),
-    // I2C Error
-    I2C(i2cdev::linux::LinuxI2CError),
-    // Parse Integer Error
-    ParseInt(std::num::ParseIntError),
-    // GPIOe Error
-    // GPIOe(RBGPIOeError),
-    // Mode Error
-    // Mode(RBModeError),
-}
-
-impl From<crate::memory::RegisterError> for RBInfoError {
-    fn from(e: crate::memory::RegisterError) -> Self {
-        RBInfoError::Register(e)
-    }
-}
-
-impl From<i2cdev::linux::LinuxI2CError> for RBInfoError {
-    fn from(e: i2cdev::linux::LinuxI2CError) -> Self {
-        RBInfoError::I2C(e)
-    }
-}
-
-impl From<std::num::ParseIntError> for RBInfoError {
-    fn from(e: std::num::ParseIntError) -> Self {
-        RBInfoError::ParseInt(e)
-    }
-}
-
-// impl From<RBGPIOeError> for RBInfoError {
-//     fn from(e: RBGPIOeError) -> Self {
-//         RBInfoError::GPIOe(e)
-//     }
-// }
-
-// impl From<RBModeError> for RBInfoError {
-//     fn from(e: RBModeError) -> Self {
-//         RBInfoError::Mode(e)
 //     }
 // }
