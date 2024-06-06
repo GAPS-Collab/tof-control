@@ -136,7 +136,6 @@ impl PASetBias {
         Ok(())
     
     }
-
     pub fn set_manual_bias(channel: Option<u8>, bias: f32) -> Result<(), PAError> {
 
         if bias < 0.0 || bias > 67.0 {
@@ -192,7 +191,6 @@ impl PASetBias {
         i2c_mux.reset()?;
     
         Ok(())
-    
     }
     pub fn set_manual_biases(biases: [f32; 16]) -> Result<(), PAError> {
         
