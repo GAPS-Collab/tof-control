@@ -26,24 +26,19 @@ pub struct LTBThreshold {
 pub enum LTBError {
     // I2C Error
     I2C(i2cdev::linux::LinuxI2CError),
+    // Setting Threshold Error
+    SetThreshold,
+}
+
+impl std::fmt::Display for LTBError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "LTBError")
+    }
 }
 
 impl From<i2cdev::linux::LinuxI2CError> for LTBError {
     fn from(e: i2cdev::linux::LinuxI2CError) -> Self {
         LTBError::I2C(e)
-    }
-}
-
-
-#[derive(Debug)]
-pub enum LTBTempError {
-    /// I2C Error
-    I2C(i2cdev::linux::LinuxI2CError),
-}
-
-impl From<i2cdev::linux::LinuxI2CError> for LTBTempError {
-    fn from(e: i2cdev::linux::LinuxI2CError) -> Self {
-        LTBTempError::I2C(e)
     }
 }
 
@@ -70,19 +65,5 @@ impl From<LTBTempError> for LTBInitError {
 impl From<LTBThresholdError> for LTBInitError {
     fn from(e: LTBThresholdError) -> Self {
         LTBInitError::Threshold(e)
-    }
-}
-
-#[derive(Debug)]
-pub enum LTBThresholdError {
-    /// I2C Error
-    I2C(i2cdev::linux::LinuxI2CError),
-    /// Setting Threshold Error
-    SetThreshold(),
-}
-
-impl From<i2cdev::linux::LinuxI2CError> for LTBThresholdError {
-    fn from(e: i2cdev::linux::LinuxI2CError) -> Self {
-        LTBThresholdError::I2C(e)
     }
 }
