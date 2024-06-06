@@ -1,16 +1,16 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
-pub struct PreampMoniData {
-    // Preamp Temperature Sensors
-    pub temperature: PreampTemp,
-    // Preamp Read Bias Voltages
-    pub read_bias: PreampReadBias,
-}
-
+/// PA Data Type
+// All PA Monitoring Types
 #[derive(Debug, Serialize, Deserialize)]
-pub struct PreampTemp {
-    pub preamp_temps: [f32; 16],
+pub struct PAMoniData {
+    pub pa_temp: PATemp,
+    pub pa_bias: PABias,
+}
+// PA Temperature Data Type
+#[derive(Debug, Serialize, Deserialize)]
+pub struct PATemp {
+    pub pa_temps: [f32; 16],
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -23,34 +23,30 @@ pub struct PreampSetBias {
     pub set_biases: [f32; 16],
 }
 
-/// Preamp Error Type
+/// PA Error Type
 #[derive(Debug)]
-pub enum PreampError {
-    /// Init Error
-    Init(PreampInitError),
-    /// Temp Error
-    Temp(PreampTempError),
-    /// Bias Error
-    Bias(PreampBiasError),
+pub enum PAError {
+    // I2C Error
+    I2C(i2cdev::linux::LinuxI2CError),
+    // /// Init Error
+    // Init(PreampInitError),
+    // /// Bias Error
+    // Bias(PreampBiasError),
 }
 
-impl From<PreampInitError> for PreampError {
-    fn from(e: PreampInitError) -> Self {
-        PreampError::Init(e)
+impl From<i2cdev::linux::LinuxI2CError> for PAError {
+    fn from(e: i2cdev::linux::LinuxI2CError) -> Self {
+        PAError::I2C(e)
     }
 }
 
-impl From<PreampTempError> for PreampError {
-    fn from(e: PreampTempError) -> Self {
-        PreampError::Temp(e)
-    }
-}
 
-impl From<PreampBiasError> for PreampError {
-    fn from(e: PreampBiasError) -> Self {
-        PreampError::Bias(e)
-    }
-}
+
+
+
+
+
+
 
 #[derive(Debug)]
 pub enum PreampInitError {
@@ -70,17 +66,6 @@ impl From<PreampBiasError> for PreampInitError {
     }
 }
 
-#[derive(Debug)]
-pub enum PreampTempError {
-    /// I2C Error
-    I2C(i2cdev::linux::LinuxI2CError),
-}
-
-impl From<i2cdev::linux::LinuxI2CError> for PreampTempError {
-    fn from(e: i2cdev::linux::LinuxI2CError) -> Self {
-        PreampTempError::I2C(e)
-    }
-}
 
 #[derive(Debug)]
 pub enum PreampBiasError {

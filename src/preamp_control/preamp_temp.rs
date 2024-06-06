@@ -1,25 +1,25 @@
 use crate::constant::*;
-use crate::helper::preamp_type::{PreampTemp, PreampTempError};
+use crate::helper::preamp_type::{PATemp, PAError};
 use crate::device::{max11615, max11617, pca9548a};
 
-impl PreampTemp {
+impl PATemp {
     pub fn new() -> Self {
         match Self::read_temp() {
-            Ok(preamp_temps) => {
-                preamp_temps
+            Ok(pa_temps) => {
+                pa_temps
             }
             Err(_) => {
                 Self {
-                    preamp_temps: [f32::MAX; 16]
+                    pa_temps: [f32::MAX; 16]
                 }
             }
         }
     }
 
-    pub fn read_temp() -> Result<PreampTemp, PreampTempError> {
-        let mut preamp_temps: [f32; 16] = Default::default();
+    pub fn read_temp() -> Result<PATemp, PAError> {
+        let mut pa_temps: [f32; 16] = Default::default();
 
-        let preamp_channels = [
+        let pa_channels = [
             PREAMP_TEMP_1_CHNANNEL, PREAMP_TEMP_2_CHNANNEL, PREAMP_TEMP_3_CHNANNEL, PREAMP_TEMP_4_CHNANNEL,
             PREAMP_TEMP_5_CHNANNEL, PREAMP_TEMP_6_CHNANNEL, PREAMP_TEMP_7_CHNANNEL, PREAMP_TEMP_8_CHNANNEL,
             PREAMP_TEMP_9_CHNANNEL, PREAMP_TEMP_10_CHNANNEL, PREAMP_TEMP_11_CHNANNEL, PREAMP_TEMP_12_CHNANNEL,
@@ -34,11 +34,11 @@ impl PreampTemp {
 
         for i in 0..=7 {
             if (0..=3).contains(&i) {
-                let preamp_temp_raw = max11615.read(preamp_channels[i])?;
-                preamp_temps[i] = Self::voltage_to_temp(preamp_temp_raw);
+                let preamp_temp_raw = max11615.read(pa_channels[i])?;
+                pa_temps[i] = Self::voltage_to_temp(preamp_temp_raw);
             } else {
-                let preamp_temp_raw = max11617.read(preamp_channels[i])?;
-                preamp_temps[i] = Self::voltage_to_temp(preamp_temp_raw);
+                let preamp_temp_raw = max11617.read(pa_channels[i])?;
+                pa_temps[i] = Self::voltage_to_temp(preamp_temp_raw);
             }
         }
 
@@ -48,28 +48,28 @@ impl PreampTemp {
 
         for i in 8..=15 {
             if (8..=11).contains(&i) {
-                let preamp_temp_raw = max11615.read(preamp_channels[i])?;
-                preamp_temps[i] = Self::voltage_to_temp(preamp_temp_raw);
+                let preamp_temp_raw = max11615.read(pa_channels[i])?;
+                pa_temps[i] = Self::voltage_to_temp(preamp_temp_raw);
             } else {
-                let preamp_temp_raw = max11617.read(preamp_channels[i])?;
-                preamp_temps[i] = Self::voltage_to_temp(preamp_temp_raw);
+                let preamp_temp_raw = max11617.read(pa_channels[i])?;
+                pa_temps[i] = Self::voltage_to_temp(preamp_temp_raw);
             }
         }
 
         i2c_mux.reset()?;
 
         Ok(
-            PreampTemp {
-                preamp_temps
+            PATemp {
+                pa_temps
             }
         )
 
 
     }
-    pub fn read_signle_temp(ch: usize) -> Result<f32, PreampTempError> {
-        let preamp_temp;
+    pub fn read_signle_temp(ch: usize) -> Result<f32, PAError> {
+        let pa_temp;
 
-        let preamp_channels = [
+        let pa_channels = [
             PREAMP_TEMP_1_CHNANNEL, PREAMP_TEMP_2_CHNANNEL, PREAMP_TEMP_3_CHNANNEL, PREAMP_TEMP_4_CHNANNEL,
             PREAMP_TEMP_5_CHNANNEL, PREAMP_TEMP_6_CHNANNEL, PREAMP_TEMP_7_CHNANNEL, PREAMP_TEMP_8_CHNANNEL,
             PREAMP_TEMP_9_CHNANNEL, PREAMP_TEMP_10_CHNANNEL, PREAMP_TEMP_11_CHNANNEL, PREAMP_TEMP_12_CHNANNEL,
@@ -84,35 +84,35 @@ impl PreampTemp {
             0..=3 => {
                 i2c_mux.select(PB_ADC_1_CHANNEL)?;
                 max11615.setup()?;
-                let preamp_temp_raw = max11615.read(preamp_channels[ch])?;
-                preamp_temp = Self::voltage_to_temp(preamp_temp_raw);
+                let pa_temp_raw = max11615.read(pa_channels[ch])?;
+                pa_temp = Self::voltage_to_temp(pa_temp_raw);
             }
             4..=7 => {
                 i2c_mux.select(PB_ADC_1_CHANNEL)?;
                 max11617.setup()?;
-                let preamp_temp_raw = max11617.read(preamp_channels[ch])?;
-                preamp_temp = Self::voltage_to_temp(preamp_temp_raw);
+                let pa_temp_raw = max11617.read(pa_channels[ch])?;
+                pa_temp = Self::voltage_to_temp(pa_temp_raw);
             }
             8..=11 => {
                 i2c_mux.select(PB_ADC_2_CHANNEL)?;
                 max11615.setup()?;
-                let preamp_temp_raw = max11615.read(preamp_channels[ch])?;
-                preamp_temp = Self::voltage_to_temp(preamp_temp_raw);
+                let pa_temp_raw = max11615.read(pa_channels[ch])?;
+                pa_temp = Self::voltage_to_temp(pa_temp_raw);
             }
             12..=15 => {
                 i2c_mux.select(PB_ADC_2_CHANNEL)?;
                 max11617.setup()?;
-                let preamp_temp_raw = max11617.read(preamp_channels[ch])?;
-                preamp_temp = Self::voltage_to_temp(preamp_temp_raw);
+                let pa_temp_raw = max11617.read(pa_channels[ch])?;
+                pa_temp = Self::voltage_to_temp(pa_temp_raw);
             }
             _ => {
-                preamp_temp = f32::MAX;
+                pa_temp = f32::MAX;
             }
         }
 
         i2c_mux.reset()?;
 
-        Ok(preamp_temp)
+        Ok(pa_temp)
     }
     
     fn voltage_to_temp(voltage: f32) -> f32 {
