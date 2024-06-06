@@ -44,30 +44,3 @@ impl From<i2cdev::linux::LinuxI2CError> for PBError {
         PBError::I2C(e)
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#[derive(Debug)]
-pub enum PBLevel1Error {
-    I2C(i2cdev::linux::LinuxI2CError),
-}
-
-impl From<i2cdev::linux::LinuxI2CError> for PBLevel1Error {
-    fn from(e: i2cdev::linux::LinuxI2CError) -> Self {
-        PBLevel1Error::I2C(e)
-    }
-}
