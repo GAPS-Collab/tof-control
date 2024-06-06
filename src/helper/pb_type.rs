@@ -103,16 +103,3 @@ impl std::fmt::Display for PBInitError {
 //         PBInitError::Vcp(e)
 //     }
 // }
-
-
-#[derive(Debug)]
-pub enum LTBPwrSwitchError {
-    /// I2C Error
-    I2C(i2cdev::linux::LinuxI2CError),
-}
-
-impl From<i2cdev::linux::LinuxI2CError> for LTBPwrSwitchError {
-    fn from(e: i2cdev::linux::LinuxI2CError) -> Self {
-        LTBPwrSwitchError::I2C(e)
-    }
-}
