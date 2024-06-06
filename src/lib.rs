@@ -4,7 +4,7 @@ pub mod device;
 pub mod ltb_control;
 pub mod memory;
 pub mod pb_control;
-pub mod preamp_control;
+pub mod pa_control;
 pub mod rb_control;
 pub mod cpu_control;
 pub mod cpc_control;

@@ -18,8 +18,8 @@ pub struct PBTemp {
 // PB VCP (Voltage, Current and Power) Sensor
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PBVcp {
-    pub p3v6_preamp_vcp:    [f32; 3],
-    pub n1v6_preamp_vcp:    [f32; 3],
+    pub p3v6_pa_vcp:    [f32; 3],
+    pub n1v6_pa_vcp:    [f32; 3],
     pub p3v4f_ltb_vcp:      [f32; 3],
     pub p3v4d_ltb_vcp:      [f32; 3],
     pub p3v6_ltb_vcp:       [f32; 3],
