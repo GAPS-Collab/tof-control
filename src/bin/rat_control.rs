@@ -1,5 +1,6 @@
 use clap::{Parser, ValueEnum};
 
+use tof_control::RATMoniData;
 use tof_control::helper::{
     rb_type::{RBMoniData, RBInfo},
     ltb_type::LTBMoniData,
@@ -39,31 +40,17 @@ fn main() {
                 rb_handler(&args, json);
             }
             Board::LTB => {
-                if sub_board != 1 {
-                    println!("LTB is not connected.");
-                    std::process::exit(0);
-                } else {
-                    ltb_handler(&args, json);
-                }
+                ltb_handler(&args, json, sub_board);
             }
             Board::PB => {
-                if sub_board != 2 {
-                    println!("PB is not connected.");
-                    std::process::exit(0);
-                } else {
-                    pb_handler(&args, json);
-                }
+                pb_handler(&args, json, sub_board);
             }
             Board::PA => {
-                if sub_board != 2 {
-                    println!("Preamps are not connected.");
-                    std::process::exit(0);
-                } else {
-                    pa_handler(&args, json);
-                }
-
+                pa_handler(&args, json, sub_board);
             }
         }
+    } else {
+        rat_handler(&args, json);
     }
 }
 
@@ -78,35 +65,61 @@ fn rb_handler(args: &Args, json: bool) {
     }
 }
 
-fn ltb_handler(args: &Args, json: bool) {
-    if args.sensor {
-        let ltb_moni_data = LTBMoniData::new();
-        if json {
-            ltb_moni_data.print_json();
-        } else {
-            ltb_moni_data.print();
+fn ltb_handler(args: &Args, json: bool, sub_board: u8) {
+    if sub_board != 1 {
+        println!("LTB is not connected.");
+        std::process::exit(0);
+    } else {
+        if args.sensor {
+            let ltb_moni_data = LTBMoniData::new();
+            if json {
+                ltb_moni_data.print_json();
+            } else {
+                ltb_moni_data.print();
+            }
         }
     }
 }
 
-fn pb_handler(args: &Args, json: bool) {
-    if args.sensor {
-        let pb_moni_data = PBMoniData::new();
-        if json {
-            pb_moni_data.print_json();
-        } else {
-            pb_moni_data.print();
+fn pb_handler(args: &Args, json: bool, sub_board: u8) {
+    if sub_board != 2 {
+        println!("PB is not connected.");
+        std::process::exit(0);
+    } else {
+        if args.sensor {
+            let pb_moni_data = PBMoniData::new();
+            if json {
+                pb_moni_data.print_json();
+            } else {
+                pb_moni_data.print();
+            }
         }
     }
 }
 
-fn pa_handler(args: &Args, json: bool) {
+fn pa_handler(args: &Args, json: bool, sub_board: u8) {
+    if sub_board != 2 {
+        println!("Preamps are not connected.");
+        std::process::exit(0);
+    } else {
+        if args.sensor {
+            let pa_moni_data = PAMoniData::new();
+            if json {
+                pa_moni_data.print_json();
+            } else {
+                pa_moni_data.print();
+            }
+        }
+    }
+}
+
+fn rat_handler(args: &Args, json: bool) {
     if args.sensor {
-        let pa_moni_data = PAMoniData::new();
+        let rat_moni_data = RATMoniData::new();
         if json {
-            pa_moni_data.print_json();
+            rat_moni_data.print_json();
         } else {
-            pa_moni_data.print();
+            rat_moni_data.print();
         }
     }
 }
