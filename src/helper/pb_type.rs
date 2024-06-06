@@ -29,11 +29,6 @@ pub struct PBVcp {
 /// PB Error Type
 #[derive(Debug)]
 pub enum PBError {
-    // /// Init Error
-    // Init(PBInitError),
-    // /// LTB Power Switch
-    // LTBPwrSwitch(LTBPwrSwitchError),
-
     // I2C Error
     I2C(i2cdev::linux::LinuxI2CError),
 }
@@ -76,30 +71,3 @@ impl From<i2cdev::linux::LinuxI2CError> for PBLevel1Error {
         PBLevel1Error::I2C(e)
     }
 }
-
-
-#[derive(Debug)]
-pub enum PBInitError {
-    // Temp Error
-    // Temp(PBTempError),
-    // /// VCP (Voltage, Current and Power) Error
-    // Vcp(PBVcpError),
-}
-
-impl std::fmt::Display for PBInitError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "PBInitError")
-    }
-}
-
-// impl From<PBTempError> for PBInitError {
-//     fn from(e: PBTempError) -> Self {
-//         PBInitError::Temp(e)
-//     }
-// }
-
-// impl From<PBVcpError> for PBInitError {
-//     fn from(e: PBVcpError) -> Self {
-//         PBInitError::Vcp(e)
-//     }
-// }

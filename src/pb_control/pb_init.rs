@@ -1,7 +1,7 @@
-use crate::helper::pb_type::PBInitError;
+use crate::helper::pb_type::PBError;
 use crate::pb_control::{pb_temp, pb_vcp};
 
-pub fn initialize() -> Result<(), PBInitError> {
+pub fn initialize() -> Result<(), PBError> {
     // Initialize Temp Sensor
     initialize_temp()?;
     // Initialize VCP Sensor
@@ -10,13 +10,13 @@ pub fn initialize() -> Result<(), PBInitError> {
     Ok(())
 }
 
-fn initialize_temp() -> Result<(), PBInitError> {
+fn initialize_temp() -> Result<(), PBError> {
     pb_temp::config_temp()?;
 
     Ok(())
 }
 
-fn initialize_vcp() -> Result<(), PBInitError> {
+fn initialize_vcp() -> Result<(), PBError> {
     pb_vcp::config_vcp()?;
 
     Ok(())
