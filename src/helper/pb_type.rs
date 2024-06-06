@@ -1,18 +1,13 @@
 use serde::{Deserialize, Serialize};
 
 /// PB Data Type
-#[derive(Debug)]
-pub struct PBLevel1 {
-    pub pds_temp: f32,
+// All PB Monitoring Types
+#[derive(Debug, Serialize, Deserialize)]
+pub struct PBMoniData {
+    pub pb_temp: PBTemp,
+    pub pb_vcp: PBVcp,
 }
-
-#[derive(Debug)]
-pub struct PBMonData {
-    pub temperature: PBTemp,
-    pub vcp: PBVcp,
-}
-
-// PB Temperature Sensor
+// PB Temperature Sensor Data Type
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PBTemp {
     pub pds_temp: f32,
@@ -20,7 +15,6 @@ pub struct PBTemp {
     pub nas_temp: f32,
     pub shv_temp: f32,
 }
-
 // PB VCP (Voltage, Current and Power) Sensor
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PBVcp {
@@ -34,6 +28,49 @@ pub struct PBVcp {
 
 /// PB Error Type
 #[derive(Debug)]
+pub enum PBError {
+    // /// Init Error
+    // Init(PBInitError),
+    // /// VCP (Voltage, Current and Power) Error
+    // Vcp(PBVcpError),
+    // /// LTB Power Switch
+    // LTBPwrSwitch(LTBPwrSwitchError),
+
+    // I2C Error
+    I2C(i2cdev::linux::LinuxI2CError),
+}
+
+impl std::fmt::Display for PBError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "PBError")
+    }
+}
+
+impl From<i2cdev::linux::LinuxI2CError> for PBError {
+    fn from(e: i2cdev::linux::LinuxI2CError) -> Self {
+        PBError::I2C(e)
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#[derive(Debug)]
 pub enum PBLevel1Error {
     I2C(i2cdev::linux::LinuxI2CError),
 }
@@ -44,41 +81,6 @@ impl From<i2cdev::linux::LinuxI2CError> for PBLevel1Error {
     }
 }
 
-#[derive(Debug)]
-pub enum PBError {
-    /// Init Error
-    Init(PBInitError),
-    /// Temp Error
-    Temp(PBTempError),
-    /// VCP (Voltage, Current and Power) Error
-    Vcp(PBVcpError),
-    /// LTB Power Switch
-    LTBPwrSwitch(LTBPwrSwitchError),
-}
-
-impl From<PBInitError> for PBError {
-    fn from(e: PBInitError) -> Self {
-        PBError::Init(e)
-    }
-}
-
-impl From<PBTempError> for PBError {
-    fn from(e: PBTempError) -> Self {
-        PBError::Temp(e)
-    }
-}
-
-impl From<PBVcpError> for PBError {
-    fn from(e: PBVcpError) -> Self {
-        PBError::Vcp(e)
-    }
-}
-
-impl From<LTBPwrSwitchError> for PBError {
-    fn from(e: LTBPwrSwitchError) -> Self {
-        PBError::LTBPwrSwitch(e)
-    }
-}
 
 #[derive(Debug)]
 pub enum PBInitError {
