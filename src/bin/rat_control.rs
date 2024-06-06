@@ -1,7 +1,6 @@
 use clap::{Parser, ValueEnum};
 
-// use tof_control::helper::{
-// }
+use tof_control::helper::rb_type::RBMoniData;
 
 #[derive(Parser, Debug)]
 #[command(author = "Takeru Hayashi", version, about, long_about = None)]
@@ -47,10 +46,11 @@ fn main() {
 
 fn rb_handler(args: &Args, json: bool) {
     if args.sensor {
+        let rb_moni_data = RBMoniData::new();
         if json {
-            println!("Print Sensor in JSON");
+            rb_moni_data.print_json();
         } else {
-            println!("Print Sensor");
+            rb_moni_data.print();
         }
     }
 }

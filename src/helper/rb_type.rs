@@ -1,6 +1,15 @@
 use serde::{Deserialize, Serialize};
 
 /// RB Data Type
+// All RB Monitoring Types
+#[derive(Debug, Serialize, Deserialize)]
+pub struct RBMoniData {
+    pub rb_info: RBInfo,
+    pub rb_temp: RBTemp,
+    pub rb_vcp: RBVcp,
+    pub rb_ph: RBPh,
+    pub rb_mag: RBMag,
+}
 // RB Information Data Type
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RBInfo {
