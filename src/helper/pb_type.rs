@@ -31,8 +31,6 @@ pub struct PBVcp {
 pub enum PBError {
     // /// Init Error
     // Init(PBInitError),
-    // /// VCP (Voltage, Current and Power) Error
-    // Vcp(PBVcpError),
     // /// LTB Power Switch
     // LTBPwrSwitch(LTBPwrSwitchError),
 
@@ -68,8 +66,6 @@ impl From<i2cdev::linux::LinuxI2CError> for PBError {
 
 
 
-
-
 #[derive(Debug)]
 pub enum PBLevel1Error {
     I2C(i2cdev::linux::LinuxI2CError),
@@ -84,10 +80,10 @@ impl From<i2cdev::linux::LinuxI2CError> for PBLevel1Error {
 
 #[derive(Debug)]
 pub enum PBInitError {
-    /// Temp Error
-    Temp(PBTempError),
-    /// VCP (Voltage, Current and Power) Error
-    Vcp(PBVcpError),
+    // Temp Error
+    // Temp(PBTempError),
+    // /// VCP (Voltage, Current and Power) Error
+    // Vcp(PBVcpError),
 }
 
 impl std::fmt::Display for PBInitError {
@@ -96,41 +92,18 @@ impl std::fmt::Display for PBInitError {
     }
 }
 
-impl From<PBTempError> for PBInitError {
-    fn from(e: PBTempError) -> Self {
-        PBInitError::Temp(e)
-    }
-}
+// impl From<PBTempError> for PBInitError {
+//     fn from(e: PBTempError) -> Self {
+//         PBInitError::Temp(e)
+//     }
+// }
 
-impl From<PBVcpError> for PBInitError {
-    fn from(e: PBVcpError) -> Self {
-        PBInitError::Vcp(e)
-    }
-}
+// impl From<PBVcpError> for PBInitError {
+//     fn from(e: PBVcpError) -> Self {
+//         PBInitError::Vcp(e)
+//     }
+// }
 
-#[derive(Debug)]
-pub enum PBTempError {
-    /// I2C Error
-    I2C(i2cdev::linux::LinuxI2CError),
-}
-
-impl From<i2cdev::linux::LinuxI2CError> for PBTempError {
-    fn from(e: i2cdev::linux::LinuxI2CError) -> Self {
-        PBTempError::I2C(e)
-    }
-}
-
-#[derive(Debug)]
-pub enum PBVcpError {
-    /// I2C Error
-    I2C(i2cdev::linux::LinuxI2CError),
-}
-
-impl From<i2cdev::linux::LinuxI2CError> for PBVcpError {
-    fn from(e: i2cdev::linux::LinuxI2CError) -> Self {
-        PBVcpError::I2C(e)
-    }
-}
 
 #[derive(Debug)]
 pub enum LTBPwrSwitchError {

@@ -1,5 +1,5 @@
 use crate::constant::*;
-use crate::helper::pb_type::{PBVcp, PBVcpError};
+use crate::helper::pb_type::{PBVcp, PBError};
 use crate::device::{ina219, ina226, max11617, pca9548a};
 
 impl PBVcp {
@@ -20,7 +20,7 @@ impl PBVcp {
             }
         }
     }
-    pub fn read_vcp() -> Result<PBVcp, PBVcpError> {
+    pub fn read_vcp() -> Result<PBVcp, PBError> {
         let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, PB_PCA9548A_ADDRESS);
     
         i2c_mux.select(PB_P3V6_PREAMP_INA226_CHANNEL)?;
@@ -92,7 +92,7 @@ impl PBVcp {
     }
 }
 
-pub fn config_vcp() -> Result<(), PBVcpError> {
+pub fn config_vcp() -> Result<(), PBError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, PB_PCA9548A_ADDRESS);
     
     i2c_mux.select(PB_P3V6_PREAMP_INA226_CHANNEL)?;
