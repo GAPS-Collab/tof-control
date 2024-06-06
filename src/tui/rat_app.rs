@@ -2,7 +2,7 @@ use crate::helper::{
     rb_type::{RBInfo, RBTemp, RBVcp, RBPh, RBMag},
     ltb_type::{LTBTemp, LTBThreshold},
     pb_type::{PBTemp, PBVcp},
-    preamp_type::{PreampTemp, PreampReadBias},
+    pa_type::{PATemp, PreampReadBias},
 };
 
 pub struct App<'a> {
@@ -128,14 +128,14 @@ impl PBData {
 }
 
 pub struct PreampData {
-    pub temp: PreampTemp,
+    pub temp: PATemp,
     pub bias: PreampReadBias,
 }
 
 impl PreampData {
     pub fn new() -> PreampData {
         PreampData {
-            temp: PreampTemp::new(),
+            temp: PATemp::new(),
             bias: PreampReadBias::new(),
         }
     }
