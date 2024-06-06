@@ -41,29 +41,3 @@ impl From<i2cdev::linux::LinuxI2CError> for LTBError {
         LTBError::I2C(e)
     }
 }
-
-#[derive(Debug)]
-pub enum LTBInitError {
-    /// Temp Error
-    Temp(LTBTempError),
-    /// Threshold Error
-    Threshold(LTBThresholdError),
-}
-
-impl std::fmt::Display for LTBInitError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "LTBInitError")
-    }
-}
-
-impl From<LTBTempError> for LTBInitError {
-    fn from(e: LTBTempError) -> Self {
-        LTBInitError::Temp(e)
-    }
-}
-
-impl From<LTBThresholdError> for LTBInitError {
-    fn from(e: LTBThresholdError) -> Self {
-        LTBInitError::Threshold(e)
-    }
-}
