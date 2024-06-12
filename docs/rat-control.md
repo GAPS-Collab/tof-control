@@ -38,6 +38,19 @@ rat-control -b/--board ltb --default
 ```rust
 rat-control -b/--board ltb --reset
 ```
+## Set Threshold Voltage
+### Set Threshold Voltage for Given Channel
+```rust
+rat-control -b/--board ltb -s/--set -c/--channel <Channel> -v/--voltage <Voltage>
+```
+### Set Threshold Voltages for All 3 Thresholds Simultaneously
+```rust
+rat-control -b/--board ltb -s/--set -v/--voltage <CH0Vol, CH1Vol, CH2Vol>
+```
+### Set Same Threshold Voltage for All 3 Thresholds Simultaneously
+```rust
+rat-control -b/--board ltb -s/--set -v/--voltage <Voltage>
+```
 
 # PB (Power Board) Controlling Command
 ## Get Sensor Data

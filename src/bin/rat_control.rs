@@ -18,7 +18,7 @@ struct Args {
     get: bool,
     #[arg(short='s', long="set", help="Set threshold for LTB or SiPM voltage for PA")]
     set: bool,
-    #[arg(short='c', long="channel", help="Channels to set for LTB or PA")]
+    #[arg(short='c', long="channel", value_delimiter=',', help="Channels to set for LTB or PA")]
     channel: Vec<u8>,
     #[arg(short='v', long="voltage", value_delimiter=',', help="Voltages to set for LTB or PA")]
     voltage: Vec<f32>,
@@ -111,6 +111,62 @@ fn ltb_handler(args: &Args, json: bool, sub_board: u8) {
                 },
                 Err(e) => {
                     eprintln!("LTB Threshold Voltage Reset Error: {}", e);
+                    std::process::exit(1);
+                }
+            }
+        }
+
+        // Set Threshold Voltages
+        if args.set {
+            if args.channel.len() == 1 {
+                // Set Threshold Voltage for Given Channel
+                if args.voltage.len() == 1 {
+                    match ltb_threshold::set_threshold(args.channel[0], args.voltage[0]) {
+                        Ok(()) => {
+                            std::process::exit(0);
+                        },
+                        Err(e) => {
+                            eprintln!("LTB Threshold Voltage Set Error: {}", e);
+                            std::process::exit(1);
+                        }
+                    }
+                } else {
+                    eprintln!("Lenght of threshold voltage must be 1");
+                    std::process::exit(1);
+                }
+            } else if args.channel.len() > 1 {
+                eprintln!("Lenght of threshold channel must be 1");
+                std::process::exit(1);
+            } else {
+                if args.voltage.len() == 3 {
+                    // Set Threshold Voltages for All 3 Thresholds Simultaneously
+                    let mut threshold_voltages: [f32; 3] = Default::default();
+                    for (i, v) in args.voltage.iter().enumerate() {
+                        threshold_voltages[i] = *v;
+                    }
+                    match ltb_threshold::set_thresholds(threshold_voltages) {
+                        Ok(()) => {
+                            std::process::exit(0);
+                        },
+                        Err(e) => {
+                            eprintln!("LTB Threshold Voltage Set Error: {}", e);
+                            std::process::exit(1);
+                        }
+                    }
+                } else if args.voltage.len() == 1 {
+                    //Set Same Threshold Voltage for All 3 Thresholds Simultaneously
+                    let threshold_voltages: [f32; 3] = [args.voltage[0], args.voltage[0], args.voltage[0]];
+                    match ltb_threshold::set_thresholds(threshold_voltages) {
+                        Ok(()) => {
+                            std::process::exit(0);
+                        },
+                        Err(e) => {
+                            eprintln!("LTB Threshold Voltage Set Error: {}", e);
+                            std::process::exit(1);
+                        }
+                    }
+                } else {
+                    eprintln!("Lenght of threshold voltages must be 1 or 3");
                     std::process::exit(1);
                 }
             }
