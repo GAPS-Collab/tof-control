@@ -1,6 +1,7 @@
 use clap::{Parser, ValueEnum};
 
 use tof_control::RATMoniData;
+use tof_control::ltb_control::ltb_threshold;
 use tof_control::helper::{
     rb_type::{RBMoniData, RBInfo},
     ltb_type::LTBMoniData,
@@ -88,6 +89,32 @@ fn ltb_handler(args: &Args, json: bool, sub_board: u8) {
                 ltb_moni_data.print();
             }
         }
+
+        // Set Default Threshold Voltages (0: 40.0mV, 1: 32.0mV, 2: 375.0mV)
+        if args.default {
+            match ltb_threshold::set_default_threshold() {
+                Ok(()) => {
+                    std::process::exit(0);
+                },
+                Err(e) => {
+                    eprintln!("LTB Threshold Voltage Set Error: {}", e);
+                    std::process::exit(1);
+                }
+            }
+        }
+
+        // Reset Threshold Voltage (0.0mV) for All 3 Thresholds
+        if args.reset {
+            match ltb_threshold::reset_threshold() {
+                Ok(()) => {
+                    std::process::exit(0);
+                },
+                Err(e) => {
+                    eprintln!("LTB Threshold Voltage Reset Error: {}", e);
+                    std::process::exit(1);
+                }
+            }
+        }
     }
 }
 
@@ -121,6 +148,32 @@ fn pa_handler(args: &Args, json: bool, sub_board: u8) {
             }
         }
 
+        // Set Default SiPM Bias Voltage (58.0V) for All 16 Preamps 
+        if args.default {
+            match PASetBias::set_default_bias() {
+                Ok(()) => {
+                    std::process::exit(0);
+                },
+                Err(e) => {
+                    eprintln!("PA SiPM Bias Voltage Set Error: {}", e);
+                    std::process::exit(1);
+                }
+            }
+        }
+
+        // Reset SiPM Bias Voltage to 0.0V for All 16 Preamps
+        if args.reset {
+            match PASetBias::reset_bias() {
+                Ok(()) => {
+                    std::process::exit(0);
+                },
+                Err(e) => {
+                    eprintln!("PA SiPM Bias Voltage Reset Error: {}", e);
+                    std::process::exit(1);
+                }
+            }
+        }
+
         // Set SiPM Bias Voltages
         if args.set {
             if args.voltage.len() == 1 {
@@ -150,32 +203,6 @@ fn pa_handler(args: &Args, json: bool, sub_board: u8) {
             } else {
                 eprintln!("Lenght of SiPM voltages must be 1 or 16");
                 std::process::exit(1);
-            }
-        }
-
-        // Set Default SiPM Bias Voltage (58.0V) for All 16 Preamps 
-        if args.default {
-            match PASetBias::set_default_bias() {
-                Ok(()) => {
-                    std::process::exit(0);
-                },
-                Err(e) => {
-                    eprintln!("PA SiPM Bias Voltage Set Error: {}", e);
-                    std::process::exit(1);
-                }
-            }
-        }
-
-        // Reset SiPM Bias Voltage to 0.0V for All 16 Preamps
-        if args.reset {
-            match PASetBias::reset_bias() {
-                Ok(()) => {
-                    std::process::exit(0);
-                },
-                Err(e) => {
-                    eprintln!("PA SiPM Bias Voltage Reset Error: {}", e);
-                    std::process::exit(1);
-                }
             }
         }
     }
