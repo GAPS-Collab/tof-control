@@ -21,7 +21,11 @@ struct Args {
     channel: Vec<u8>,
     #[arg(short='v', long="voltage", value_delimiter=',', help="Voltages to set for LTB or PA")]
     voltage: Vec<f32>,
-    #[arg(long, help = "Print in JSON format")]
+    #[arg(long, help="Set default values to the `-s/--set` command")]
+    default: bool,
+    #[arg(long, help="Reset values (0.0V) for LTB or SiPM voltage for PA")]
+    reset: bool,
+    #[arg(long, help="Print in JSON format")]
     json: bool,
 }
 
@@ -118,6 +122,19 @@ fn pa_handler(args: &Args, json: bool, sub_board: u8) {
         }
         // Set SiPM Bias Voltages
         if args.set {
+            // Set Default SiPM Voltage (58.0V)
+            if args.default {
+                match PASetBias::set_default_bias() {
+                    Ok(()) => {
+                        std::process::exit(0);
+                    },
+                    Err(e) => {
+                        eprintln!("PA SiPM Bias Voltage Set Error: {}", e);
+                        std::process::exit(1);
+                    }
+                }
+            }
+
             if args.voltage.len() == 1 {
                 match PASetBias::set_manual_bias(None, args.voltage[0]) {
                     Ok(()) => {},

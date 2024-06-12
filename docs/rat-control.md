@@ -53,11 +53,19 @@ rat-control -b/--board pa -g/--get
 rat-control -b/--board pa -g/--get --json
 ```
 ## Set SiPM Bias Voltage
+### Set Default Voltage (58.0V) for All 16 Preamp Boards
+```rust
+rat-control -b/--board pa -s/--set --default
+```
 ### Set Same Voltage for All 16 Preamp Boards
 ```rust
-rat-control -b/--board pa -s/--set <Voltage>
+rat-control -b/--board pa -s/--set -v/--voltage <Voltage>
 ```
 ### Set Different Voltages for Each Preamp Boards
 ```rust
-rat-control -b/--board pa -s/--set <PA1Vol,PA2Vol,PA3Vol,PA4Vol,PA5Vol,PA6Vol,PA7Vol,PA8Vol,PA9Vol,PA10Vol,PA11Vol,PA12Vol,PA13Vol,PA14Vol,PA15Vol,PA16Vol>
+rat-control -b/--board pa -s/--set -v/--voltage <PA1Vol,PA2Vol,PA3Vol,PA4Vol,PA5Vol,PA6Vol,PA7Vol,PA8Vol,PA9Vol,PA10Vol,PA11Vol,PA12Vol,PA13Vol,PA14Vol,PA15Vol,PA16Vol>
+```
+### Reset Voltage (0.0V) for All 16 Preamp Boards
+```rust
+rat-control -b/--board pa --reset
 ```
