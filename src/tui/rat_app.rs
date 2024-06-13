@@ -1,8 +1,8 @@
 use crate::helper::{
-    rb_type::{RBInfo, RBInfoDebug, RBTempDebug, RBVcp, RBPh, RBMag},
+    rb_type::{RBInfo, RBTemp, RBVcp, RBPh, RBMag},
     ltb_type::{LTBTemp, LTBThreshold},
     pb_type::{PBTemp, PBVcp},
-    preamp_type::{PreampTemp, PreampReadBias},
+    pa_type::{PATemp, PAReadBias},
 };
 
 pub struct App<'a> {
@@ -13,7 +13,7 @@ pub struct App<'a> {
     pub rb_data: RBData,
     pub ltb_data: LTBData,
     pub pb_data: PBData,
-    pub preamp_data: PreampData,
+    pub pa_data: PAData,
 }
 
 impl<'a> App<'a> {
@@ -26,7 +26,7 @@ impl<'a> App<'a> {
             rb_data: RBData::new(),
             ltb_data: LTBData::new(),
             pb_data: PBData::new(),
-            preamp_data: PreampData::new(),
+            pa_data: PAData::new(),
         }
     }
 
@@ -36,7 +36,7 @@ impl<'a> App<'a> {
         match RBInfo::read_sub_board().unwrap_or(0) {
             0 => tabs = vec!["RB"],
             1 => tabs = vec!["RB", "LTB"],
-            2 => tabs = vec!["RB", "PB", "Preamp"],
+            2 => tabs = vec!["RB", "PB", "PA"],
             _ => (),
         };
 
@@ -48,7 +48,7 @@ impl<'a> App<'a> {
             self.rb_data = RBData::new();
             self.ltb_data = LTBData::new();
             self.pb_data = PBData::new();
-            self.preamp_data = PreampData::new();
+            self.pa_data = PAData::new();
         }
     }
 }
@@ -80,8 +80,8 @@ impl<'a> TabsState<'a> {
 }
 
 pub struct RBData {
-    pub info: RBInfoDebug,
-    pub temp: RBTempDebug,
+    pub info: RBInfo,
+    pub temp: RBTemp,
     pub vcp: RBVcp,
     pub ph: RBPh,
     pub mag: RBMag,
@@ -90,8 +90,8 @@ pub struct RBData {
 impl RBData {
     pub fn new() -> RBData {
         RBData {
-            info: RBInfoDebug::new(),
-            temp: RBTempDebug::new(),
+            info: RBInfo::new(),
+            temp: RBTemp::new(),
             vcp: RBVcp::new(),
             ph: RBPh::new(),
             mag: RBMag::new(),
@@ -127,16 +127,16 @@ impl PBData {
     }
 }
 
-pub struct PreampData {
-    pub temp: PreampTemp,
-    pub bias: PreampReadBias,
+pub struct PAData {
+    pub temp: PATemp,
+    pub bias: PAReadBias,
 }
 
-impl PreampData {
-    pub fn new() -> PreampData {
-        PreampData {
-            temp: PreampTemp::new(),
-            bias: PreampReadBias::new(),
+impl PAData {
+    pub fn new() -> PAData {
+        PAData {
+            temp: PATemp::new(),
+            bias: PAReadBias::new(),
         }
     }
 }

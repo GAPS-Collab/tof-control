@@ -37,8 +37,8 @@ fn draw_pb_temp(f: &mut Frame, app: &mut App, area: Rect) {
 fn draw_pb_vcp(f: &mut Frame, app: &mut App, area: Rect) {
     let pb_vcp = &app.pb_data.vcp;
     let mut pb_vcp_list_items = Vec::<ListItem>::new();
-    pb_vcp_list_items.push(ListItem::new(Line::from(Span::styled(format!("Preamp 3.6V Line:      {:.3}[V] | {:.3}[A] | {:.3}[W]", pb_vcp.p3v6_preamp_vcp[0], pb_vcp.p3v6_preamp_vcp[1], pb_vcp.p3v6_preamp_vcp[2]), Style::default()))));
-    pb_vcp_list_items.push(ListItem::new(Line::from(Span::styled(format!("Preamp -1.6V Line:     {:.2}[V] | {:.3}[A] | {:.3}[W]", pb_vcp.n1v6_preamp_vcp[0], pb_vcp.n1v6_preamp_vcp[1], pb_vcp.n1v6_preamp_vcp[2]), Style::default()))));
+    pb_vcp_list_items.push(ListItem::new(Line::from(Span::styled(format!("PA 3.6V Line:          {:.3}[V] | {:.3}[A] | {:.3}[W]", pb_vcp.p3v6_pa_vcp[0], pb_vcp.p3v6_pa_vcp[1], pb_vcp.p3v6_pa_vcp[2]), Style::default()))));
+    pb_vcp_list_items.push(ListItem::new(Line::from(Span::styled(format!("PA -1.6V Line:         {:.2}[V] | {:.3}[A] | {:.3}[W]", pb_vcp.n1v6_pa_vcp[0], pb_vcp.n1v6_pa_vcp[1], pb_vcp.n1v6_pa_vcp[2]), Style::default()))));
     pb_vcp_list_items.push(ListItem::new(Line::from(Span::styled(format!("LTB (Trenz) 3.4V Line: {:.3}[V] | {:.3}[A] | {:.3}[W]", pb_vcp.p3v4f_ltb_vcp[0], pb_vcp.p3v4f_ltb_vcp[1], pb_vcp.p3v4f_ltb_vcp[2]), Style::default()))));
     pb_vcp_list_items.push(ListItem::new(Line::from(Span::styled(format!("LTB 3.4V Line:         {:.3}[V] | {:.3}[A] | {:.3}[W]", pb_vcp.p3v4d_ltb_vcp[0], pb_vcp.p3v4d_ltb_vcp[1], pb_vcp.p3v4d_ltb_vcp[2]), Style::default()))));
     pb_vcp_list_items.push(ListItem::new(Line::from(Span::styled(format!("LTB 3.6V Line:         {:.3}[V] | {:.3}[A] | {:.3}[W]", pb_vcp.p3v6_ltb_vcp[0], pb_vcp.p3v6_ltb_vcp[1], pb_vcp.p3v6_ltb_vcp[2]), Style::default()))));

@@ -10,7 +10,8 @@ use crossterm::{
 };
 use ratatui::prelude::*;
 
-use crate::tui::{cpu_app::App, cpu_ui};
+// use crate::tui::{cpu_app::App, cpu_ui};
+use crate::tui::cpu_app::App;
 
 pub fn run(tick_rate: Duration) -> Result<(), Box<dyn Error>> {
     enable_raw_mode()?;
@@ -34,7 +35,8 @@ pub fn run(tick_rate: Duration) -> Result<(), Box<dyn Error>> {
 }
 
 fn run_app<B: Backend>(
-    terminal: &mut Terminal<B>,
+    // terminal: &mut Terminal<B>,
+    _terminal: &mut Terminal<B>,
     mut app: App,
     tick_rate: Duration,
 ) -> io::Result<()> {

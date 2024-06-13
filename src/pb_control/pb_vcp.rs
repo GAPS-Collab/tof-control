@@ -1,5 +1,5 @@
 use crate::constant::*;
-use crate::helper::pb_type::{PBVcp, PBVcpError};
+use crate::helper::pb_type::{PBVcp, PBError};
 use crate::device::{ina219, ina226, max11617, pca9548a};
 
 impl PBVcp {
@@ -10,8 +10,8 @@ impl PBVcp {
             }
             Err(_) => {
                 Self {
-                    p3v6_preamp_vcp: [f32::MAX; 3],
-                    n1v6_preamp_vcp: [f32::MAX; 3],
+                    p3v6_pa_vcp: [f32::MAX; 3],
+                    n1v6_pa_vcp: [f32::MAX; 3],
                     p3v4f_ltb_vcp: [f32::MAX; 3],
                     p3v4d_ltb_vcp: [f32::MAX; 3],
                     p3v6_ltb_vcp: [f32::MAX; 3],
@@ -20,26 +20,26 @@ impl PBVcp {
             }
         }
     }
-    pub fn read_vcp() -> Result<PBVcp, PBVcpError> {
+    pub fn read_vcp() -> Result<PBVcp, PBError> {
         let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, PB_PCA9548A_ADDRESS);
     
-        i2c_mux.select(PB_P3V6_PREAMP_INA226_CHANNEL)?;
-        let p3v6_preamp_ina226 = ina226::INA226::new(
+        i2c_mux.select(PB_P3V6_PA_INA226_CHANNEL)?;
+        let p3v6_pa_ina226 = ina226::INA226::new(
             I2C_BUS,
-            PB_P3V6_PREAMP_INA226_ADDRESS,
-            PB_P3V6_PREAMP_INA226_RSHUNT,
-            PB_P3V6_PREAMP_INA226_MEC,
+            PB_P3V6_PA_INA226_ADDRESS,
+            PB_P3V6_PA_INA226_RSHUNT,
+            PB_P3V6_PA_INA226_MEC,
         );
-        p3v6_preamp_ina226.configure()?;
-        let p3v6_preamp_vcp = p3v6_preamp_ina226.read()?;
+        p3v6_pa_ina226.configure()?;
+        let p3v6_pa_vcp = p3v6_pa_ina226.read()?;
 
         i2c_mux.select(PB_ADC_1_CHANNEL)?;
         let max11617 = max11617::MAX11617::new(I2C_BUS, PB_MAX11617_ADDRESS);
         max11617.setup()?;
-        let n1v6_preamp_voltage = max11617.read(PB_N1V6_PREAMP_VOLTAGE_INA201_CHANNEL)? * -1.0;
-        let n1v6_preamp_current = max11617.read(PB_N1V6_PREAMP_CURRENT_INA201_CHANNEL)? / 50.0 / 0.1;
-        let n1v6_preamp_power = n1v6_preamp_voltage.abs() * n1v6_preamp_current;
-        let n1v6_preamp_vcp = [n1v6_preamp_voltage, n1v6_preamp_current, n1v6_preamp_power];
+        let n1v6_pa_voltage = max11617.read(PB_N1V6_PA_VOLTAGE_INA201_CHANNEL)? * -1.0;
+        let n1v6_pa_current = max11617.read(PB_N1V6_PA_CURRENT_INA201_CHANNEL)? / 50.0 / 0.1;
+        let n1v6_pa_power = n1v6_pa_voltage.abs() * n1v6_pa_current;
+        let n1v6_pa_vcp = [n1v6_pa_voltage, n1v6_pa_current, n1v6_pa_power];
 
         i2c_mux.select(PB_LTB_INA219_CHANNEL)?;
         let p3v4f_ltb_ina219 = ina219::INA219::new(
@@ -81,8 +81,8 @@ impl PBVcp {
 
         Ok(
             PBVcp {
-                p3v6_preamp_vcp,
-                n1v6_preamp_vcp,
+                p3v6_pa_vcp,
+                n1v6_pa_vcp,
                 p3v4f_ltb_vcp,
                 p3v4d_ltb_vcp,
                 p3v6_ltb_vcp,
@@ -92,19 +92,19 @@ impl PBVcp {
     }
 }
 
-pub fn config_vcp() -> Result<(), PBVcpError> {
+pub fn config_vcp() -> Result<(), PBError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, PB_PCA9548A_ADDRESS);
     
-    i2c_mux.select(PB_P3V6_PREAMP_INA226_CHANNEL)?;
-    let p3v6_preamp_ina226 = ina226::INA226::new(
+    i2c_mux.select(PB_P3V6_PA_INA226_CHANNEL)?;
+    let p3v6_pa_ina226 = ina226::INA226::new(
         I2C_BUS,
-        PB_P3V6_PREAMP_INA226_ADDRESS,
-        PB_P3V6_PREAMP_INA226_RSHUNT,
-        PB_P3V6_PREAMP_INA226_MEC,
+        PB_P3V6_PA_INA226_ADDRESS,
+        PB_P3V6_PA_INA226_RSHUNT,
+        PB_P3V6_PA_INA226_MEC,
     );
     for _ in 0..3 {
-        p3v6_preamp_ina226.configure()?;
-        p3v6_preamp_ina226.read()?;
+        p3v6_pa_ina226.configure()?;
+        p3v6_pa_ina226.read()?;
     }
 
     i2c_mux.select(PB_ADC_1_CHANNEL)?;

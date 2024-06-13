@@ -1,5 +1,5 @@
 use crate::constant::*;
-use crate::helper::pb_type::{PBTemp, PBTempError};
+use crate::helper::pb_type::{PBTemp, PBError};
 use crate::device::{pca9548a, tmp1075};
 
 impl PBTemp {
@@ -19,7 +19,7 @@ impl PBTemp {
         }
     }
 
-    pub fn read_temp() -> Result<PBTemp, PBTempError> {
+    pub fn read_temp() -> Result<PBTemp, PBError> {
         let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, PB_PCA9548A_ADDRESS);
         i2c_mux.select(PB_TMP1075_CHANNEL)?;
 
@@ -57,7 +57,7 @@ impl PBTemp {
     }
 }
 
-pub fn config_temp() -> Result<(), PBTempError> {
+pub fn config_temp() -> Result<(), PBError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, PB_PCA9548A_ADDRESS);
     i2c_mux.select(PB_TMP1075_CHANNEL)?;
 
@@ -78,7 +78,7 @@ pub fn config_temp() -> Result<(), PBTempError> {
     Ok(())
 }
 
-pub fn read_pds_temp() -> Result<f32, PBTempError> {
+pub fn read_pds_temp() -> Result<f32, PBError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, PB_PCA9548A_ADDRESS);
     i2c_mux.select(PB_TMP1075_CHANNEL)?;
 

@@ -1,10 +1,9 @@
-#![allow(unused)]
 use crate::constant::*;
 
 use crate::device::{pca9548a, si5345b};
-use crate::helper::rb_type::RBClkError;
+use crate::helper::rb_type::RBError;
 
-pub fn configure_clk_synth() -> Result<(), RBClkError> {
+pub fn configure_clk_synth() -> Result<(), RBError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_SI5345B_CHANNEL)?;
 
@@ -16,13 +15,13 @@ pub fn configure_clk_synth() -> Result<(), RBClkError> {
     Ok(())
 }
 
-pub fn program_nvm_clk_synth(verbose: bool) -> Result<(), RBClkError> {
+pub fn program_nvm_clk_synth(verbose: bool) -> Result<(), RBError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_SI5345B_CHANNEL)?;
 
     let si5345b = si5345b::SI5345B::new(I2C_BUS, RB_SI5345B_ADDRESS);
 
-    /// Check how many user banks available
+    // Check how many user banks available
     let available_nvm_bank = si5345b.read_available_nvm_bank()?;
     match available_nvm_bank {
         2 => {
@@ -47,7 +46,7 @@ pub fn program_nvm_clk_synth(verbose: bool) -> Result<(), RBClkError> {
         }
     }
 
-    /// Program SI5345B NVM
+    // Program SI5345B NVM
     if verbose {
         println!("Programming SI5345B NVM...");
     }
@@ -66,7 +65,7 @@ pub fn program_nvm_clk_synth(verbose: bool) -> Result<(), RBClkError> {
 }
 
 
-pub fn reset_clk_synth(rst_type: u8) -> Result<(), RBClkError> {
+pub fn reset_clk_synth(rst_type: u8) -> Result<(), RBError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_SI5345B_CHANNEL)?;
 

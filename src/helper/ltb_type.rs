@@ -1,103 +1,43 @@
 use serde::{Deserialize, Serialize};
 
 /// LTB Data Type
-#[derive(Debug)]
+// All LTB Monitoring Types
+#[derive(Debug, Serialize, Deserialize)]
 pub struct LTBMoniData {
-    pub temperature: LTBTemp,
-    pub threshold: LTBThreshold,
+    pub ltb_temp: LTBTemp,
+    pub ltb_thresh: LTBThreshold,
 }
-
-// LTB Temperature Sensor
+// LTB Temperature Sensor Data Type
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LTBTemp {
     pub trenz_temp: f32,
     pub board_temp: f32,
 }
-
-// LTB Threshold Voltages
+// LTB Threshold Voltage Data Type
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LTBThreshold {
-    pub thresholds: [f32; 3],
+    pub thresh_0: f32,
+    pub thresh_1: f32,
+    pub thresh_2: f32,
 }
 
 /// LTB Error Type
 #[derive(Debug)]
 pub enum LTBError {
-    /// Init Error
-    Init(LTBInitError),
-    /// Temp Error
-    Temp(LTBTempError),
-    /// Threshold Error
-    Threshold(LTBThresholdError),
+    // I2C Error
+    I2C(i2cdev::linux::LinuxI2CError),
+    // Setting Threshold Error
+    SetThreshold,
 }
 
-impl From<LTBInitError> for LTBError {
-    fn from(e: LTBInitError) -> Self {
-        LTBError::Init(e)
-    }
-}
-
-impl From<LTBTempError> for LTBError {
-    fn from(e: LTBTempError) -> Self {
-        LTBError::Temp(e)
-    }
-}
-
-impl From<LTBThresholdError> for LTBError {
-    fn from(e: LTBThresholdError) -> Self {
-        LTBError::Threshold(e)
-    }
-}
-
-#[derive(Debug)]
-pub enum LTBInitError {
-    /// Temp Error
-    Temp(LTBTempError),
-    /// Threshold Error
-    Threshold(LTBThresholdError),
-}
-
-impl std::fmt::Display for LTBInitError {
+impl std::fmt::Display for LTBError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "LTBInitError")
+        write!(f, "LTBError")
     }
 }
 
-impl From<LTBTempError> for LTBInitError {
-    fn from(e: LTBTempError) -> Self {
-        LTBInitError::Temp(e)
-    }
-}
-
-impl From<LTBThresholdError> for LTBInitError {
-    fn from(e: LTBThresholdError) -> Self {
-        LTBInitError::Threshold(e)
-    }
-}
-
-
-#[derive(Debug)]
-pub enum LTBTempError {
-    /// I2C Error
-    I2C(i2cdev::linux::LinuxI2CError),
-}
-
-impl From<i2cdev::linux::LinuxI2CError> for LTBTempError {
+impl From<i2cdev::linux::LinuxI2CError> for LTBError {
     fn from(e: i2cdev::linux::LinuxI2CError) -> Self {
-        LTBTempError::I2C(e)
-    }
-}
-
-#[derive(Debug)]
-pub enum LTBThresholdError {
-    /// I2C Error
-    I2C(i2cdev::linux::LinuxI2CError),
-    /// Setting Threshold Error
-    SetThreshold(),
-}
-
-impl From<i2cdev::linux::LinuxI2CError> for LTBThresholdError {
-    fn from(e: i2cdev::linux::LinuxI2CError) -> Self {
-        LTBThresholdError::I2C(e)
+        LTBError::I2C(e)
     }
 }

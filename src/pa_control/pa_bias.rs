@@ -1,9 +1,9 @@
 use crate::constant::*;
-use crate::helper::preamp_type::{PreampReadBias, PreampSetBias, PreampTemp, PreampBiasError};
+use crate::helper::pa_type::{PAReadBias, PASetBias, PATemp, PAError};
 use crate::device::{max11615, max11617, max5825, pca9548a};
 use crate::pb_control::pb_temp::read_pds_temp;
 
-impl PreampReadBias {
+impl PAReadBias {
     pub fn new() -> Self {
         match Self::read_bias() {
             Ok(read_biases) => {
@@ -16,14 +16,14 @@ impl PreampReadBias {
             }
         }
     }
-    pub fn read_bias() -> Result<PreampReadBias, PreampBiasError> {
+    pub fn read_bias() -> Result<PAReadBias, PAError> {
         let mut read_biases: [f32; 16] = Default::default();
 
         let preamp_channels = [
-            PREAMP_SEN_1_CHANNEL, PREAMP_SEN_2_CHANNEL, PREAMP_SEN_3_CHANNEL, PREAMP_SEN_4_CHANNEL,
-            PREAMP_SEN_5_CHANNEL, PREAMP_SEN_6_CHANNEL, PREAMP_SEN_7_CHANNEL, PREAMP_SEN_8_CHANNEL,
-            PREAMP_SEN_9_CHANNEL, PREAMP_SEN_10_CHANNEL, PREAMP_SEN_11_CHANNEL, PREAMP_SEN_12_CHANNEL,
-            PREAMP_SEN_13_CHANNEL, PREAMP_SEN_14_CHANNEL, PREAMP_SEN_15_CHANNEL, PREAMP_SEN_16_CHANNEL,
+            PA_SEN_1_CHANNEL, PA_SEN_2_CHANNEL, PA_SEN_3_CHANNEL, PA_SEN_4_CHANNEL,
+            PA_SEN_5_CHANNEL, PA_SEN_6_CHANNEL, PA_SEN_7_CHANNEL, PA_SEN_8_CHANNEL,
+            PA_SEN_9_CHANNEL, PA_SEN_10_CHANNEL, PA_SEN_11_CHANNEL, PA_SEN_12_CHANNEL,
+            PA_SEN_13_CHANNEL, PA_SEN_14_CHANNEL, PA_SEN_15_CHANNEL, PA_SEN_16_CHANNEL,
         ];
         let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, PB_PCA9548A_ADDRESS);
         i2c_mux.select(PB_ADC_1_CHANNEL)?;
@@ -59,7 +59,7 @@ impl PreampReadBias {
         i2c_mux.reset()?;
 
         Ok(
-            PreampReadBias {
+            PAReadBias {
                 read_biases,
             }
         )
@@ -72,14 +72,14 @@ impl PreampReadBias {
     }
 }
 
-impl PreampSetBias {
-    pub fn read_set_bias() -> Result<Self, PreampBiasError> {
+impl PASetBias {
+    pub fn read_set_bias() -> Result<Self, PAError> {
 
         let preamp_bias_channels = [
-            PREAMP_DAC_1_CHANNEL, PREAMP_DAC_2_CHANNEL, PREAMP_DAC_3_CHANNEL, PREAMP_DAC_4_CHANNEL,
-            PREAMP_DAC_5_CHANNEL, PREAMP_DAC_6_CHANNEL, PREAMP_DAC_7_CHANNEL, PREAMP_DAC_8_CHANNEL,
-            PREAMP_DAC_9_CHANNEL, PREAMP_DAC_10_CHANNEL, PREAMP_DAC_11_CHANNEL, PREAMP_DAC_12_CHANNEL,
-            PREAMP_DAC_13_CHANNEL, PREAMP_DAC_14_CHANNEL, PREAMP_DAC_15_CHANNEL, PREAMP_DAC_16_CHANNEL,
+            PA_DAC_1_CHANNEL, PA_DAC_2_CHANNEL, PA_DAC_3_CHANNEL, PA_DAC_4_CHANNEL,
+            PA_DAC_5_CHANNEL, PA_DAC_6_CHANNEL, PA_DAC_7_CHANNEL, PA_DAC_8_CHANNEL,
+            PA_DAC_9_CHANNEL, PA_DAC_10_CHANNEL, PA_DAC_11_CHANNEL, PA_DAC_12_CHANNEL,
+            PA_DAC_13_CHANNEL, PA_DAC_14_CHANNEL, PA_DAC_15_CHANNEL, PA_DAC_16_CHANNEL,
         ];
     
         let mut set_biases: [f32; 16] = Default::default();
@@ -106,16 +106,15 @@ impl PreampSetBias {
             }
         )
     }
+    pub fn set_default_bias() -> Result<(), PAError> {
 
-    pub fn set_default_bias() -> Result<(), PreampBiasError> {
-
-        let bias_voltage = Self::bias_to_adc(PREAMP_DEFAULT_BIAS);
+        let bias_voltage = Self::bias_to_adc(PA_DEFAULT_BIAS);
     
         let preamp_bias_channels = [
-            PREAMP_DAC_1_CHANNEL, PREAMP_DAC_2_CHANNEL, PREAMP_DAC_3_CHANNEL, PREAMP_DAC_4_CHANNEL,
-            PREAMP_DAC_5_CHANNEL, PREAMP_DAC_6_CHANNEL, PREAMP_DAC_7_CHANNEL, PREAMP_DAC_8_CHANNEL,
-            PREAMP_DAC_9_CHANNEL, PREAMP_DAC_10_CHANNEL, PREAMP_DAC_11_CHANNEL, PREAMP_DAC_12_CHANNEL,
-            PREAMP_DAC_13_CHANNEL, PREAMP_DAC_14_CHANNEL, PREAMP_DAC_15_CHANNEL, PREAMP_DAC_16_CHANNEL,
+            PA_DAC_1_CHANNEL, PA_DAC_2_CHANNEL, PA_DAC_3_CHANNEL, PA_DAC_4_CHANNEL,
+            PA_DAC_5_CHANNEL, PA_DAC_6_CHANNEL, PA_DAC_7_CHANNEL, PA_DAC_8_CHANNEL,
+            PA_DAC_9_CHANNEL, PA_DAC_10_CHANNEL, PA_DAC_11_CHANNEL, PA_DAC_12_CHANNEL,
+            PA_DAC_13_CHANNEL, PA_DAC_14_CHANNEL, PA_DAC_15_CHANNEL, PA_DAC_16_CHANNEL,
         ];
     
         let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, PB_PCA9548A_ADDRESS);
@@ -137,8 +136,7 @@ impl PreampSetBias {
         Ok(())
     
     }
-
-    pub fn set_manual_bias(channel: Option<u8>, bias: f32) -> Result<(), PreampBiasError> {
+    pub fn set_manual_bias(channel: Option<u8>, bias: f32) -> Result<(), PAError> {
 
         if bias < 0.0 || bias > 67.0 {
             eprintln!("Bias voltage must be between 0V to 67V");
@@ -148,10 +146,10 @@ impl PreampSetBias {
         let bias_voltage = Self::bias_to_adc(bias);
 
         let preamp_bias_channels = [
-            PREAMP_DAC_1_CHANNEL, PREAMP_DAC_2_CHANNEL, PREAMP_DAC_3_CHANNEL, PREAMP_DAC_4_CHANNEL,
-            PREAMP_DAC_5_CHANNEL, PREAMP_DAC_6_CHANNEL, PREAMP_DAC_7_CHANNEL, PREAMP_DAC_8_CHANNEL,
-            PREAMP_DAC_9_CHANNEL, PREAMP_DAC_10_CHANNEL, PREAMP_DAC_11_CHANNEL, PREAMP_DAC_12_CHANNEL,
-            PREAMP_DAC_13_CHANNEL, PREAMP_DAC_14_CHANNEL, PREAMP_DAC_15_CHANNEL, PREAMP_DAC_16_CHANNEL,
+            PA_DAC_1_CHANNEL, PA_DAC_2_CHANNEL, PA_DAC_3_CHANNEL, PA_DAC_4_CHANNEL,
+            PA_DAC_5_CHANNEL, PA_DAC_6_CHANNEL, PA_DAC_7_CHANNEL, PA_DAC_8_CHANNEL,
+            PA_DAC_9_CHANNEL, PA_DAC_10_CHANNEL, PA_DAC_11_CHANNEL, PA_DAC_12_CHANNEL,
+            PA_DAC_13_CHANNEL, PA_DAC_14_CHANNEL, PA_DAC_15_CHANNEL, PA_DAC_16_CHANNEL,
         ];
 
         let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, PB_PCA9548A_ADDRESS);
@@ -193,10 +191,8 @@ impl PreampSetBias {
         i2c_mux.reset()?;
     
         Ok(())
-    
     }
-
-    pub fn set_manual_biases(biases: [f32; 16]) -> Result<(), PreampBiasError> {
+    pub fn set_manual_biases(biases: [f32; 16]) -> Result<(), PAError> {
         
         for bias in biases {
             if bias < 0.0 || bias > 67.0 {
@@ -206,10 +202,10 @@ impl PreampSetBias {
         }
 
         let preamp_bias_channels = [
-            PREAMP_DAC_1_CHANNEL, PREAMP_DAC_2_CHANNEL, PREAMP_DAC_3_CHANNEL, PREAMP_DAC_4_CHANNEL,
-            PREAMP_DAC_5_CHANNEL, PREAMP_DAC_6_CHANNEL, PREAMP_DAC_7_CHANNEL, PREAMP_DAC_8_CHANNEL,
-            PREAMP_DAC_9_CHANNEL, PREAMP_DAC_10_CHANNEL, PREAMP_DAC_11_CHANNEL, PREAMP_DAC_12_CHANNEL,
-            PREAMP_DAC_13_CHANNEL, PREAMP_DAC_14_CHANNEL, PREAMP_DAC_15_CHANNEL, PREAMP_DAC_16_CHANNEL,
+            PA_DAC_1_CHANNEL, PA_DAC_2_CHANNEL, PA_DAC_3_CHANNEL, PA_DAC_4_CHANNEL,
+            PA_DAC_5_CHANNEL, PA_DAC_6_CHANNEL, PA_DAC_7_CHANNEL, PA_DAC_8_CHANNEL,
+            PA_DAC_9_CHANNEL, PA_DAC_10_CHANNEL, PA_DAC_11_CHANNEL, PA_DAC_12_CHANNEL,
+            PA_DAC_13_CHANNEL, PA_DAC_14_CHANNEL, PA_DAC_15_CHANNEL, PA_DAC_16_CHANNEL,
         ];
 
         let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, PB_PCA9548A_ADDRESS);
@@ -230,21 +226,20 @@ impl PreampSetBias {
 
         Ok(())
     }
-
-    pub fn set_bias() -> Result<(), PreampBiasError> {
+    pub fn set_bias() -> Result<(), PAError> {
 
         // let mut bias_voltage = Default::default();
     
         let preamp_bias_channels = [
-            PREAMP_DAC_1_CHANNEL, PREAMP_DAC_2_CHANNEL, PREAMP_DAC_3_CHANNEL, PREAMP_DAC_4_CHANNEL,
-            PREAMP_DAC_5_CHANNEL, PREAMP_DAC_6_CHANNEL, PREAMP_DAC_7_CHANNEL, PREAMP_DAC_8_CHANNEL,
-            PREAMP_DAC_9_CHANNEL, PREAMP_DAC_10_CHANNEL, PREAMP_DAC_11_CHANNEL, PREAMP_DAC_12_CHANNEL,
-            PREAMP_DAC_13_CHANNEL, PREAMP_DAC_14_CHANNEL, PREAMP_DAC_15_CHANNEL, PREAMP_DAC_16_CHANNEL,
+            PA_DAC_1_CHANNEL, PA_DAC_2_CHANNEL, PA_DAC_3_CHANNEL, PA_DAC_4_CHANNEL,
+            PA_DAC_5_CHANNEL, PA_DAC_6_CHANNEL, PA_DAC_7_CHANNEL, PA_DAC_8_CHANNEL,
+            PA_DAC_9_CHANNEL, PA_DAC_10_CHANNEL, PA_DAC_11_CHANNEL, PA_DAC_12_CHANNEL,
+            PA_DAC_13_CHANNEL, PA_DAC_14_CHANNEL, PA_DAC_15_CHANNEL, PA_DAC_16_CHANNEL,
         ];
     
         let mut bias_voltages: [u16; 16] = Default::default();
 
-        let read_biases = PreampReadBias::read_bias()?.read_biases;
+        let read_biases = PAReadBias::read_bias()?.read_biases;
         let set_biases = Self::read_set_bias()?.set_biases;
     
         for i in 0..=15 {
@@ -305,16 +300,15 @@ impl PreampSetBias {
     
         Ok(())
     }
-
-    pub fn sipm_temp_comp(ch: usize) -> Result<f32, PreampBiasError> {
+    pub fn sipm_temp_comp(ch: usize) -> Result<f32, PAError> {
         let bias_voltage;
         
-        let preamp_temp = PreampTemp::read_signle_temp(ch)?;
+        let preamp_temp = PATemp::read_signle_temp(ch)?;
         if preamp_temp == f32::MAX {
             bias_voltage = 0.0
         } else {
             if (0..=15).contains(&ch) {
-                bias_voltage = PREAMP_DEFAULT_BIAS + (preamp_temp - 20.0) * 0.054;
+                bias_voltage = PA_DEFAULT_BIAS + (preamp_temp - 20.0) * 0.054;
             } else {
                 bias_voltage = 0.0;
             }
@@ -327,16 +321,14 @@ impl PreampSetBias {
 
         Ok(bias_voltage)
     }
-
-    pub fn pb_temp_comp(bias_stc: f32) -> Result<f32, PreampBiasError> {
+    pub fn pb_temp_comp(bias_stc: f32) -> Result<f32, PAError> {
         let pb_temp = read_pds_temp()?;
 
         let bias_voltage = bias_stc - 0.2 + 0.005 * pb_temp + 4.0 * 10f32.powi(-5) * pb_temp.powi(2);
 
         Ok(bias_voltage)
     }
-
-    pub fn reset_bias() -> Result<(), PreampBiasError> {
+    pub fn reset_bias() -> Result<(), PAError> {
         let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, PB_PCA9548A_ADDRESS);
     
         i2c_mux.select(PB_DAC_1_CHANNEL)?;
@@ -350,13 +342,11 @@ impl PreampSetBias {
         Ok(())
     
     }
-
     fn bias_to_adc(bias_voltage: f32) -> u16 {
         let adc = (bias_voltage / 22.3) / PB_DAC_REF_VOLTAGE * 2f32.powi(12);
     
         adc as u16
     }
-    
     fn adc_to_bias(adc: u16) -> f32 {
         let bias_voltage = adc as f32 * PB_DAC_REF_VOLTAGE * 22.3 * 2f32.powi(-12);
     

@@ -9,7 +9,7 @@ use tof_control::constant::{I2C_BUS, LTB_TRENZ_ADDRESS, PB_PCA9548A_ADDRESS};
 use tof_control::rb_control::rb_init;
 use tof_control::ltb_control::ltb_init;
 use tof_control::pb_control::pb_init;
-use tof_control::preamp_control::preamp_init;
+use tof_control::pa_control::pa_init;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]

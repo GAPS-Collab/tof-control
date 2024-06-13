@@ -1,32 +1,33 @@
-use chrono::{Utc, DateTime};
-
 use clap::{Parser, ValueEnum};
-use serde::{Deserialize, Serialize};
 
+use tof_control::RATMoniData;
+use tof_control::ltb_control::ltb_threshold;
 use tof_control::helper::{
-    rb_type::{RBInfo, RBInfoDebug, RBTempDebug, RBVcp, RBPh, RBMag},
-    ltb_type::{LTBTemp, LTBThreshold},
-    pb_type::{PBTemp, PBVcp},
-    preamp_type::{PreampTemp, PreampSetBias, PreampReadBias},
+    rb_type::{RBMoniData, RBInfo},
+    ltb_type::LTBMoniData,
+    pb_type::PBMoniData,
+    pa_type::{PAMoniData, PASetBias},
 };
-use tof_control::ltb_control::{ltb_threshold, ltb_init};
-use tof_control::preamp_control::preamp_init;
 
 #[derive(Parser, Debug)]
 #[command(author = "Takeru Hayashi", version, about, long_about = None)]
-struct Cli {
-    #[arg(short = 'b', long = "board", help = "Board to operate (rb, pb, ltb, or preamp)")]
+struct Args {
+    #[arg(short='b', long="board", help="Board to control (rb, pb, ltb, or preamp)")]
     board: Option<Board>,
-    #[clap(short, long, help = "Show status of board")]
-    init: bool,
-    #[clap(short, long, help = "Set Value")]
-    set: Option<f32>,
-    #[clap(short, long, help = "Get Value")]
+    #[arg(short='g', long="get", help="Get sensor data")]
     get: bool,
-    #[clap(short, long, help = "Get JSON")]
+    #[arg(short='s', long="set", help="Set threshold for LTB or SiPM voltage for PA")]
+    set: bool,
+    #[arg(short='c', long="channel", value_delimiter=',', help="Channels to set for LTB or PA")]
+    channel: Vec<u8>,
+    #[arg(short='v', long="voltage", value_delimiter=',', help="Voltages to set for LTB or PA")]
+    voltage: Vec<f32>,
+    #[arg(long, help="Set default values for LTB or SiPM voltage for PA")]
+    default: bool,
+    #[arg(long, help="Reset values (0.0V) for LTB or SiPM voltage for PA")]
+    reset: bool,
+    #[arg(long, help="Print in JSON format")]
     json: bool,
-    #[arg(short, long, help = "Verbose mode")]
-    verbose: bool,
 }
 
 #[derive(ValueEnum, Clone, Debug)]
@@ -34,307 +35,242 @@ enum Board {
     RB,
     LTB,
     PB,
-    Preamp,
+    PA,
 }
 
 fn main() {
-    let cli = Cli::parse();
+    let args = Args::parse();
 
-    // let board = &cli.board;
+    let json = args.json;
 
     let sub_board = RBInfo::new().sub_board;
 
-    if cli.json {
-
-        if sub_board == 1 {
-            let rat_json_rb1 = rat_json_rb1();
-            println!("{}", rat_json_rb1);
-        } else if sub_board == 2 {
-            let rat_json_rb2 = rat_json_rb2();
-            println!("{}", rat_json_rb2);
-        }
-        
-        std::process::exit(0);
-    }
-
-    if let Some(board) = cli.board {
+    if let Some(board) = &args.board {
         match board {
             Board::RB => {
-                println!("RB funcstions are not implemented yet.");
+                rb_handler(&args, json);
             }
             Board::LTB => {
-                if sub_board != 1 {
-                    println!("LTB is not connected.");
-                    std::process::exit(0);
-                }
-                if let Some(voltage) = cli.set {
-                    for i in 0..3 {
-                        match ltb_threshold::set_threshold(i, voltage) {
-                            Ok(_) => {},
-                            Err(e) => {
-                                eprintln!("{:?}", e);
-                                std::process::exit(1);
-                            }
-                        }
-                    }
-                    println!("All thresholds are set to {:.1} mV.", voltage);
-                }
-                if cli.init {
-                    match ltb_init::initialize() {
-                        Ok(_) => {},
-                        Err(e) => eprintln!("{:?}", e),
-                    }
-                    println!("All thresholds are initialized.");
-                    println!("\tThreshold 0:        40.0[mV]");
-                    println!("\tThreshold 1:        32.0[mV]");
-                    println!("\tThreshold 2:        375.0[mV]");
-                }
-                if cli.get {
-                    get_ltb_sensor();
-                }
+                ltb_handler(&args, json, sub_board);
             }
             Board::PB => {
-                if sub_board != 2 {
-                    println!("PB is not connected.");
-                    std::process::exit(0);
-                }
-                println!("PB funcstions are not implemented yet.");
+                pb_handler(&args, json, sub_board);
             }
-            Board::Preamp => {
-                if sub_board != 2 {
-                    println!("Preamps are not connected.");
+            Board::PA => {
+                pa_handler(&args, json, sub_board);
+            }
+        }
+    } else {
+        rat_handler(&args, json);
+    }
+}
+
+fn rb_handler(args: &Args, json: bool) {
+    if args.get {
+        let rb_moni_data = RBMoniData::new();
+        if json {
+            rb_moni_data.print_json();
+        } else {
+            rb_moni_data.print();
+        }
+    }
+}
+
+fn ltb_handler(args: &Args, json: bool, sub_board: u8) {
+    if sub_board != 1 {
+        println!("LTB is not connected.");
+        std::process::exit(0);
+    } else {
+        if args.get {
+            let ltb_moni_data = LTBMoniData::new();
+            if json {
+                ltb_moni_data.print_json();
+            } else {
+                ltb_moni_data.print();
+            }
+        }
+
+        // Set Default Threshold Voltages (0: 40.0mV, 1: 32.0mV, 2: 375.0mV)
+        if args.default {
+            match ltb_threshold::set_default_threshold() {
+                Ok(()) => {
                     std::process::exit(0);
+                },
+                Err(e) => {
+                    eprintln!("LTB Threshold Voltage Set Error: {}", e);
+                    std::process::exit(1);
                 }
-                if let Some(voltage) = cli.set {
-                    match PreampSetBias::set_manual_bias(None, voltage) {
-                        Ok(_) => {},
+            }
+        }
+
+        // Reset Threshold Voltage (0.0mV) for All 3 Thresholds
+        if args.reset {
+            match ltb_threshold::reset_threshold() {
+                Ok(()) => {
+                    std::process::exit(0);
+                },
+                Err(e) => {
+                    eprintln!("LTB Threshold Voltage Reset Error: {}", e);
+                    std::process::exit(1);
+                }
+            }
+        }
+
+        // Set Threshold Voltages
+        if args.set {
+            if args.channel.len() == 1 {
+                // Set Threshold Voltage for Given Channel
+                if args.voltage.len() == 1 {
+                    match ltb_threshold::set_threshold(args.channel[0], args.voltage[0]) {
+                        Ok(()) => {
+                            std::process::exit(0);
+                        },
                         Err(e) => {
-                            eprintln!("{:?}", e);
+                            eprintln!("LTB Threshold Voltage Set Error: {}", e);
                             std::process::exit(1);
                         }
                     }
-                    println!("All SiPM bias voltages are set to {:.1} mV.", voltage);
+                } else {
+                    eprintln!("Lenght of threshold voltage must be 1");
+                    std::process::exit(1);
                 }
-                if cli.init {
-                    match PreampSetBias::set_manual_bias(None, 0.0) {
-                        Ok(_) => {},
+            } else if args.channel.len() > 1 {
+                eprintln!("Lenght of threshold channel must be 1");
+                std::process::exit(1);
+            } else {
+                if args.voltage.len() == 3 {
+                    // Set Threshold Voltages for All 3 Thresholds Simultaneously
+                    let mut threshold_voltages: [f32; 3] = Default::default();
+                    for (i, v) in args.voltage.iter().enumerate() {
+                        threshold_voltages[i] = *v;
+                    }
+                    match ltb_threshold::set_thresholds(threshold_voltages) {
+                        Ok(()) => {
+                            std::process::exit(0);
+                        },
                         Err(e) => {
-                            eprintln!("{:?}", e);
+                            eprintln!("LTB Threshold Voltage Set Error: {}", e);
                             std::process::exit(1);
                         }
                     }
-                    match preamp_init::initialize() {
-                        Ok(_) => {},
+                } else if args.voltage.len() == 1 {
+                    //Set Same Threshold Voltage for All 3 Thresholds Simultaneously
+                    let threshold_voltages: [f32; 3] = [args.voltage[0], args.voltage[0], args.voltage[0]];
+                    match ltb_threshold::set_thresholds(threshold_voltages) {
+                        Ok(()) => {
+                            std::process::exit(0);
+                        },
                         Err(e) => {
-                            eprintln!("{:?}", e);
+                            eprintln!("LTB Threshold Voltage Set Error: {}", e);
                             std::process::exit(1);
                         }
                     }
-                    println!("All SiPM bias are initialized (58.0 V with temperature compensated).");
-                }
-                if cli.get {
-                    get_preamp_sensor();
+                } else {
+                    eprintln!("Lenght of threshold voltages must be 1 or 3");
+                    std::process::exit(1);
                 }
             }
         }
     }
 }
 
-fn get_ltb_sensor() {
-    let ltb_temp = LTBTemp::new();
-    let ltb_threshold = LTBThreshold::new();
-
-    println!("LTB Temperature");
-    println!("\tTrenz Temp:             {:.3}[°C]", ltb_temp.trenz_temp);
-    println!("\tBoard Temp:             {:.3}[°C]", ltb_temp.board_temp);
-
-    println!("LTB Threshold");
-    println!("\tThreshold 0:            {:.3}[mV]", ltb_threshold.thresholds[0]);
-    println!("\tThreshold 1:            {:.3}[mV]", ltb_threshold.thresholds[1]);
-    println!("\tThreshold 2:            {:.3}[mV]", ltb_threshold.thresholds[2]);
+fn pb_handler(args: &Args, json: bool, sub_board: u8) {
+    if sub_board != 2 {
+        println!("PB is not connected.");
+        std::process::exit(0);
+    } else {
+        if args.get {
+            let pb_moni_data = PBMoniData::new();
+            if json {
+                pb_moni_data.print_json();
+            } else {
+                pb_moni_data.print();
+            }
+        }
+    }
 }
 
-fn get_preamp_sensor() {
-    let preamp_temp = PreampTemp::new();
-    let preamp_bias = PreampReadBias::new();
+fn pa_handler(args: &Args, json: bool, sub_board: u8) {
+    if sub_board != 2 {
+        println!("Preamps are not connected.");
+        std::process::exit(0);
+    } else {
+        if args.get {
+            let pa_moni_data = PAMoniData::new();
+            if json {
+                pa_moni_data.print_json();
+            } else {
+                pa_moni_data.print();
+            }
+        }
 
-    println!("Preamp Temperature");
-    println!("\tPreamp 1 Temp:          {:.3}[°C]", preamp_temp.preamp_temps[0]);
-    println!("\tPreamp 2 Temp:          {:.3}[°C]", preamp_temp.preamp_temps[1]);
-    println!("\tPreamp 3 Temp:          {:.3}[°C]", preamp_temp.preamp_temps[2]);
-    println!("\tPreamp 4 Temp:          {:.3}[°C]", preamp_temp.preamp_temps[3]);
-    println!("\tPreamp 5 Temp:          {:.3}[°C]", preamp_temp.preamp_temps[4]);
-    println!("\tPreamp 6 Temp:          {:.3}[°C]", preamp_temp.preamp_temps[5]);
-    println!("\tPreamp 7 Temp:          {:.3}[°C]", preamp_temp.preamp_temps[6]);
-    println!("\tPreamp 8 Temp:          {:.3}[°C]", preamp_temp.preamp_temps[7]);
-    println!("\tPreamp 9 Temp:          {:.3}[°C]", preamp_temp.preamp_temps[8]);
-    println!("\tPreamp 10 Temp:         {:.3}[°C]", preamp_temp.preamp_temps[9]);
-    println!("\tPreamp 11 Temp:         {:.3}[°C]", preamp_temp.preamp_temps[10]);
-    println!("\tPreamp 12 Temp:         {:.3}[°C]", preamp_temp.preamp_temps[11]);
-    println!("\tPreamp 13 Temp:         {:.3}[°C]", preamp_temp.preamp_temps[12]);
-    println!("\tPreamp 14 Temp:         {:.3}[°C]", preamp_temp.preamp_temps[13]);
-    println!("\tPreamp 15 Temp:         {:.3}[°C]", preamp_temp.preamp_temps[14]);
-    println!("\tPreamp 16 Temp:         {:.3}[°C]", preamp_temp.preamp_temps[15]);
+        // Set Default SiPM Bias Voltage (58.0V) for All 16 Preamps 
+        if args.default {
+            match PASetBias::set_default_bias() {
+                Ok(()) => {
+                    std::process::exit(0);
+                },
+                Err(e) => {
+                    eprintln!("PA SiPM Bias Voltage Set Error: {}", e);
+                    std::process::exit(1);
+                }
+            }
+        }
 
-    println!("Preamp SiPM Bias Voltage");
-    println!("\tPreamp 1 SiPM Bias:     {:.3}[V]", preamp_bias.read_biases[0]);
-    println!("\tPreamp 2 SiPM Bias:     {:.3}[V]", preamp_bias.read_biases[1]);
-    println!("\tPreamp 3 SiPM Bias:     {:.3}[V]", preamp_bias.read_biases[2]);
-    println!("\tPreamp 4 SiPM Bias:     {:.3}[V]", preamp_bias.read_biases[3]);
-    println!("\tPreamp 5 SiPM Bias:     {:.3}[V]", preamp_bias.read_biases[4]);
-    println!("\tPreamp 6 SiPM Bias:     {:.3}[V]", preamp_bias.read_biases[5]);
-    println!("\tPreamp 7 SiPM Bias:     {:.3}[V]", preamp_bias.read_biases[6]);
-    println!("\tPreamp 8 SiPM Bias:     {:.3}[V]", preamp_bias.read_biases[7]);
-    println!("\tPreamp 9 SiPM Bias:     {:.3}[V]", preamp_bias.read_biases[8]);
-    println!("\tPreamp 10 SiPM Bias:    {:.3}[V]", preamp_bias.read_biases[9]);
-    println!("\tPreamp 11 SiPM Bias:    {:.3}[V]", preamp_bias.read_biases[10]);
-    println!("\tPreamp 12 SiPM Bias:    {:.3}[V]", preamp_bias.read_biases[11]);
-    println!("\tPreamp 13 SiPM Bias:    {:.3}[V]", preamp_bias.read_biases[12]);
-    println!("\tPreamp 14 SiPM Bias:    {:.3}[V]", preamp_bias.read_biases[13]);
-    println!("\tPreamp 15 SiPM Bias:    {:.3}[V]", preamp_bias.read_biases[14]);
-    println!("\tPreamp 16 SiPM Bias:    {:.3}[V]", preamp_bias.read_biases[15]);
+        // Reset SiPM Bias Voltage to 0.0V for All 16 Preamps
+        if args.reset {
+            match PASetBias::reset_bias() {
+                Ok(()) => {
+                    std::process::exit(0);
+                },
+                Err(e) => {
+                    eprintln!("PA SiPM Bias Voltage Reset Error: {}", e);
+                    std::process::exit(1);
+                }
+            }
+        }
+
+        // Set SiPM Bias Voltages
+        if args.set {
+            if args.voltage.len() == 1 {
+                match PASetBias::set_manual_bias(None, args.voltage[0]) {
+                    Ok(()) => {
+                        std::process::exit(0);
+                    },
+                    Err(e) => {
+                        eprintln!("PA SiPM Bias Voltage Set Error: {}", e);
+                        std::process::exit(1);
+                    }
+                }
+            } else if args.voltage.len() == 16 {
+                let mut sipm_voltages: [f32; 16] = Default::default();
+                for (i, v) in args.voltage.iter().enumerate() {
+                    sipm_voltages[i] = *v;
+                }
+                match PASetBias::set_manual_biases(sipm_voltages) {
+                    Ok(()) => {
+                        std::process::exit(0);
+                    },
+                    Err(e) => {
+                        eprintln!("PA SiPM Bias Voltage Set Error: {}", e);
+                        std::process::exit(1);
+                    }
+                }
+            } else {
+                eprintln!("Lenght of SiPM voltages must be 1 or 16");
+                std::process::exit(1);
+            }
+        }
+    }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-struct RBJson {
-    rb_info: RBInfoDebug,
-    rb_temp: RBTempDebug,
-    rb_vcp: RBVcp,
-    rb_ph: RBPh,
-    rb_mag: RBMag,
-}
-
-fn rb_json() -> RBJson {
-    let rb_info = RBInfoDebug::new();
-    let rb_temp = RBTempDebug::new();
-    let rb_vcp = RBVcp::new();
-    let rb_ph = RBPh::new();
-    let rb_mag = RBMag::new();
-
-    let rb_json = RBJson {
-        rb_info,
-        rb_temp,
-        rb_vcp,
-        rb_ph,
-        rb_mag,
-    };
-    // let rb_json_str = serde_json::to_string_pretty(&rb_json).unwrap();
-
-    // rb_json_str
-    rb_json
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct LTBJson {
-    ltb_temp: LTBTemp,
-    ltb_threshold: LTBThreshold,
-}
-
-fn ltb_json() -> LTBJson {
-    let ltb_temp = LTBTemp::new();
-    let ltb_threshold = LTBThreshold::new();
-
-    let ltb_json = LTBJson {
-        ltb_temp,
-        ltb_threshold,
-    };
-    // let ltb_json_str = serde_json::to_string_pretty(&ltb_json).unwrap();
-
-    // ltb_json_str
-    ltb_json
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct PBJson {
-    pb_temp: PBTemp,
-    pb_vcp: PBVcp,
-}
-
-fn pb_json() -> PBJson {
-    let pb_temp = PBTemp::new();
-    let pb_vcp = PBVcp::new();
-
-    let pb_json = PBJson {
-        pb_temp,
-        pb_vcp,
-    };
-    // let pb_json_str = serde_json::to_string_pretty(&pb_json).unwrap();
-
-    // pb_json_str
-    pb_json
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct PreampJson {
-    preamp_temp: PreampTemp,
-    preamp_bias: PreampReadBias,
-}
-
-fn preamp_json() -> PreampJson {
-    let preamp_temp = PreampTemp::new();
-    let preamp_bias = PreampReadBias::new();
-
-    let preamp_json = PreampJson {
-        preamp_temp,
-        preamp_bias,
-    };
-    // let preamp_json_str = serde_json::to_string_pretty(&preamp_json).unwrap();
-
-    // preamp_json_str
-    preamp_json
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct RATJsonRB1 {
-    rat: u8,
-    dt: String,
-    rb: RBJson,
-    ltb: LTBJson,
-}
-fn rat_json_rb1() -> String {
-    let dt = format!("{:?}",Utc::now());
-    let rb = rb_json();
-    let ltb = ltb_json();
-
-    let rat = rb.rb_info.rat_num;
-
-    let rat_json = RATJsonRB1 {
-        rat,
-        dt,
-        rb,
-        ltb,
-    };
-
-    let rat_json_str = serde_json::to_string_pretty(&rat_json).unwrap();
-    
-    rat_json_str
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct RATJsonRB2 {
-    rat: u8,
-    dt: String,
-    rb: RBJson,
-    pb: PBJson,
-    preamp: PreampJson,
-}
-fn rat_json_rb2() -> String {
-    let dt = format!("{:?}",Utc::now());
-    let rb = rb_json();
-    let pb = pb_json();
-    let preamp = preamp_json();
-
-    let rat = rb.rb_info.rat_num;
-
-    let rat_json = RATJsonRB2 {
-        rat,
-        dt,
-        rb,
-        pb,
-        preamp,
-    };
-
-    let rat_json_str = serde_json::to_string_pretty(&rat_json).unwrap();
-    
-    rat_json_str
+fn rat_handler(args: &Args, json: bool) {
+    if args.get {
+        let rat_moni_data = RATMoniData::new();
+        if json {
+            rat_moni_data.print_json();
+        } else {
+            rat_moni_data.print();
+        }
+    }
 }

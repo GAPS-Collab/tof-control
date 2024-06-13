@@ -1,6 +1,5 @@
 use crate::constant::*;
-
-use crate::helper::rb_type::{RBPh, RBPhError};
+use crate::helper::rb_type::{RBPh, RBError};
 use crate::device::{bme280, pca9548a};
 
 impl RBPh {
@@ -17,7 +16,7 @@ impl RBPh {
             }
         }
     }
-    pub fn read_ph() -> Result<RBPh, RBPhError> {
+    pub fn read_ph() -> Result<RBPh, RBError> {
         let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_1);
 
         i2c_mux.select(RB_BME280_CHANNEL)?;
@@ -38,7 +37,7 @@ impl RBPh {
     }
 }
 
-pub fn config_ph() -> Result<(), RBPhError> {
+pub fn config_ph() -> Result<(), RBError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_1);
     i2c_mux.select(RB_BME280_CHANNEL)?;
     let bme280 = bme280::BME280::new(I2C_BUS, RB_BME280_ADDRESS);

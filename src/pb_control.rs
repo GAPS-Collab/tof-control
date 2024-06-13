@@ -3,37 +3,31 @@ pub mod pb_ltb_pwr;
 pub mod pb_temp;
 pub mod pb_vcp;
 
-use crate::helper::pb_type::{PBLevel1, PBLevel1Error};
-use crate::device::{pca9548a, tmp1075};
-use crate::constant::*;
-/// PB Level 1 Environmental Sensor Data
-impl PBLevel1 {
+// PBMoniData Implementation
+use serde_json;
+use crate::helper::pb_type::{PBMoniData, PBTemp, PBVcp};
+
+impl PBMoniData {
     pub fn new() -> Self {
-        match Self::get_data() {
-            Ok(pb_level1) => {
-                pb_level1
+        Self {
+            pb_temp: PBTemp::new(),
+            pb_vcp: PBVcp::new(),
+        }
+    }
+    pub fn print(&self) {
+        println!("PB Temperature:");
+        println!("{:?}", self.pb_temp);
+        println!("PB Voltage, Current and Power:");
+        println!("{:?}", self.pb_vcp);
+    }
+    pub fn print_json(&self) {
+        match serde_json::to_string(self) {
+            Ok(pb_moni_json) => {
+                println!("{}", pb_moni_json);
             }
-            Err(_) => {
-                Self {
-                    pds_temp: f32::MAX,
-                }
+            Err(e) => {
+                eprintln!("PBMoniData JSON Error: {}", e);
             }
         }
-        
-    }
-    pub fn get_data() -> Result<PBLevel1, PBLevel1Error> {
-        let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, PB_PCA9548A_ADDRESS);
-
-        let pds_tmp1075 = tmp1075::TMP1075::new(I2C_BUS, PB_PDS_TMP1075_ADDRESS);
-        pds_tmp1075.config()?;
-        let pds_temp = pds_tmp1075.read()?;
-
-        i2c_mux.reset()?;
-
-        Ok(
-            PBLevel1 {
-                pds_temp,
-            }
-        )
     }
 }

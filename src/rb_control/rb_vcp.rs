@@ -1,6 +1,5 @@
 use crate::constant::*;
-
-use crate::helper::rb_type::{RBVcp, RBVcpError};
+use crate::helper::rb_type::{RBVcp, RBError};
 use crate::device::{ina226, max11645, pca9548a};
 
 impl RBVcp {
@@ -23,7 +22,7 @@ impl RBVcp {
             }
         }
     }
-    pub fn read_vcp() -> Result<RBVcp, RBVcpError> {
+    pub fn read_vcp() -> Result<RBVcp, RBError> {
         let i2c_mux_1 = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_1);
         let i2c_mux_2 = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
 
@@ -89,7 +88,7 @@ impl RBVcp {
     }
 }
 
-pub fn config_vcp() -> Result<(), RBVcpError> {
+pub fn config_vcp() -> Result<(), RBError> {
     let i2c_mux_1 = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_1);
     let i2c_mux_2 = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
 
