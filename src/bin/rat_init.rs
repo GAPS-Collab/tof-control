@@ -64,7 +64,7 @@ fn initialize_pb() {
 }
 
 fn initialize_preamp() {
-    match preamp_init::initialize() {
+    match pa_init::initialize() {
         Ok(_) => {},
         Err(e) => {
             write_err_log(e.to_string()).unwrap();

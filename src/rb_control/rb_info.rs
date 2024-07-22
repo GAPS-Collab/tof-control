@@ -71,7 +71,7 @@ impl RBInfo {
     }
     pub fn read_board_id() -> Result<u8, RBError> {
         let mut board_id = read_control_reg(BOARD_ID)? as u8;
-        if board_id > 50 {
+        if board_id >= u8::MAX {
             board_id = u8::MAX;
         }
         
