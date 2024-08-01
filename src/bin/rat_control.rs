@@ -232,33 +232,53 @@ fn pa_handler(args: &Args, json: bool, sub_board: u8) {
 
         // Set SiPM Bias Voltages
         if args.set {
-            if args.voltage.len() == 1 {
-                match PASetBias::set_manual_bias(None, args.voltage[0]) {
-                    Ok(()) => {
-                        std::process::exit(0);
-                    },
-                    Err(e) => {
-                        eprintln!("PA SiPM Bias Voltage Set Error: {}", e);
-                        std::process::exit(1);
+            if args.channel.len() == 1 {
+                if args.voltage.len() != 1 {
+                    eprintln!("Lenght of PA SiPM voltage must be 1");
+                    std::process::exit(1);
+                } else {
+                    match PASetBias::set_manual_bias(Some(args.channel[0]), args.voltage[0]) {
+                        Ok(()) => {
+                            std::process::exit(0);
+                        },
+                        Err(e) => {
+                            eprintln!("PA SiPM Bias Voltage Set Error: {}", e);
+                            std::process::exit(1);
+                        }
                     }
                 }
-            } else if args.voltage.len() == 16 {
-                let mut sipm_voltages: [f32; 16] = Default::default();
-                for (i, v) in args.voltage.iter().enumerate() {
-                    sipm_voltages[i] = *v;
-                }
-                match PASetBias::set_manual_biases(sipm_voltages) {
-                    Ok(()) => {
-                        std::process::exit(0);
-                    },
-                    Err(e) => {
-                        eprintln!("PA SiPM Bias Voltage Set Error: {}", e);
-                        std::process::exit(1);
-                    }
-                }
-            } else {
-                eprintln!("Lenght of SiPM voltages must be 1 or 16");
+            } else if args.channel.len() > 1 {
+                eprintln!("Lenght of PA SiPM channel must be 1");
                 std::process::exit(1);
+            } else {
+                if args.voltage.len() == 1 {
+                    match PASetBias::set_manual_bias(None, args.voltage[0]) {
+                        Ok(()) => {
+                            std::process::exit(0);
+                        },
+                        Err(e) => {
+                            eprintln!("PA SiPM Bias Voltage Set Error: {}", e);
+                            std::process::exit(1);
+                        }
+                    }
+                } else if args.voltage.len() == 16 {
+                    let mut sipm_voltages: [f32; 16] = Default::default();
+                    for (i, v) in args.voltage.iter().enumerate() {
+                        sipm_voltages[i] = *v;
+                    }
+                    match PASetBias::set_manual_biases(sipm_voltages) {
+                        Ok(()) => {
+                            std::process::exit(0);
+                        },
+                        Err(e) => {
+                            eprintln!("PA SiPM Bias Voltage Set Error: {}", e);
+                            std::process::exit(1);
+                        }
+                    }
+                } else {
+                    eprintln!("Lenght of SiPM voltages must be 1 or 16");
+                    std::process::exit(1);
+                }
             }
         }
     }
