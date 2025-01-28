@@ -120,11 +120,12 @@ impl CPUInfoDebug {
 
         uptime
     }
+    // FIXME - hardcoded mountpoint for tofdata (data drive)
     pub fn read_disk_usage(sys: &System) -> u8 {
         let mut available_space = Default::default();
         let mut total_space = Default::default();
         for disk in sys.disks() {
-            if disk.mount_point().as_os_str() == "/" {
+            if disk.mount_point().as_os_str() == "/tofdata" {
                 available_space = disk.available_space();
                 total_space = disk.total_space();
             }
