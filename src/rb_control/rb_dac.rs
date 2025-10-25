@@ -53,6 +53,20 @@ pub fn set_dac_500() -> Result<(), RBError> {
     Ok(())
 }
 
+pub fn set_input_range(lower_bound: f32) -> Result<(), RBError> {
+    let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
+    i2c_mux.select(RB_AD5675_CHANNEL)?;
+    let ad5675 = ad5675::AD5675::new(RB_AD5675_ADDRESS);
+
+    let rofs: u16 = ((1.05 - (lower_bound / 1000.0)) * 32000.0) as u16;
+    println!("Setting ROFS to: {}", rofs);
+
+    ad5675.write_dac(2, rofs);
+    i2c_mux.reset()?;
+
+    Ok(())
+}
+
 pub fn dac_noi_mode() -> Result<(), RBError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_AD5675_CHANNEL)?;

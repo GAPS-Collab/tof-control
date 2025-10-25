@@ -4,13 +4,18 @@ pub struct CPCTemp {
 }
 
 #[derive(Debug)]
-pub enum CPCTempError {
+pub struct CPCVcp {
+    pub cpc_vcp: [f32; 3],
+}
+
+#[derive(Debug)]
+pub enum CPCError {
     /// I2C Error
     I2C(i2cdev::linux::LinuxI2CError),
 }
 
-impl From<i2cdev::linux::LinuxI2CError> for CPCTempError {
+impl From<i2cdev::linux::LinuxI2CError> for CPCError {
     fn from(e: i2cdev::linux::LinuxI2CError) -> Self {
-        CPCTempError::I2C(e)
+        CPCError::I2C(e)
     }
 }

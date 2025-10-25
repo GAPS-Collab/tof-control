@@ -1,5 +1,6 @@
 #![allow(unused)]
 use libc::{ioctl, O_RDWR, STDOUT_FILENO};
+use ratatui::buffer;
 use std::fs::File;
 use std::os::fd::{AsRawFd, IntoRawFd, RawFd};
 use std::os::raw::{c_uint, c_ulong};
@@ -7,6 +8,9 @@ use std::os::raw::{c_uint, c_ulong};
 use crate::constant::*;
 
 use i2c_linux_sys::*;
+
+use i2cdev::core::*;
+use i2cdev::linux::{LinuxI2CDevice, LinuxI2CMessage, LinuxI2CError};
 
 const READBACK_ENABLE: u16 = 0x90;
 const POWER_DOWN_UP: u16 = 0x40;
@@ -38,24 +42,4 @@ impl AD5675 {
         buffer = buffer | (value & 0x00FF) << 8;
         i2c_linux_sys::i2c_smbus_write_word_data(self.fd, 0x30 + channel, buffer);
     }
-    // pub fn read_dac(&self, channel: u8) {
-    //     i2c_linux_sys::i2c_set_slave_address(self.fd, self.address, false);
-    //     // i2c_linux_sys::i2c_smbus_write_byte(self.fd, READBACK_ENABLE as u8);
-    //     // let mut buffer: [u8; 2] = [0, 0];
-    //     let mut reg: u8 = 0x10|channel;
-    //     // i2c_linux_sys::i2c_smbus_read_i2c_block_data(self.fd, channel, &mut buffer);
-    //     // i2c_linux_sys::i2c_smbus_read_i2c_block_data(self.fd, 0x30+channel, &mut buffer);
-    //     let mut i2c_msg_custom = i2c_linux_sys::i2c_msg {
-    //         addr: self.address,
-    //         flags: i2c_linux_sys::Flags::RD,
-    //         len: 2,
-    //         buf: &mut reg,
-    //     };
-    //     let mut i2c_rdwr_ioctl_data_custom = i2c_linux_sys::i2c_rdwr_ioctl_data {
-    //         msgs: &mut i2c_msg_custom,
-    //         nmsgs: 2,
-    //     };
-    //     let data = unsafe { i2c_linux_sys::ioctls::i2c_rdwr(self.fd, &mut i2c_rdwr_ioctl_data_custom) };
-    //     println!("{:?}", data);
-    // }
 }

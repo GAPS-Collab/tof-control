@@ -1,6 +1,6 @@
 [package]
 name = "tof-control"
-version = "0.9.6"
+version = "0.9.7"
 edition = "2021"
 # build = "build.rs"
 
@@ -11,6 +11,14 @@ edition = "2021"
 
 [profile.release]
 opt-level = "z"
+
+[[bin]]
+name = "rb-mode"
+path = "src/bin/rb_mode.rs"
+
+[[bin]]
+name = "rb-check-mode"
+path = "src/bin/rb_check_mode.rs"
 
 [[bin]]
 name = "rat-hkp"

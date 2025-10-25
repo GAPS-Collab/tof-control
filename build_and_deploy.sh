@@ -167,10 +167,13 @@ elif [ "$1" = "cpu-control" ]; then
 
 elif [ "$1" = "cpc-control" ]; then
     # rm -rf target/x86_64-unknown*
-    CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
-    cross build --release --bin cpc-control --target=x86_64-unknown-linux-musl
+    # CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
+    # cross build --release --bin cpc-control --target=x86_64-unknown-linux-musl
+    CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
+    cross build --release --bin cpc-control --target=aarch64-unknown-linux-musl
     # scp target/x86_64-unknown-linux-musl/release/cpc-control tof-computer:/home/gaps/dev
-    scp target/x86_64-unknown-linux-musl/release/cpc-control gaps@10.97.108.35:/home/gaps/dev
+    # scp target/x86_64-unknown-linux-musl/release/cpc-control gaps@10.97.108.35:/home/gaps/dev
+    scp target/aarch64-unknown-linux-musl/release/cpc-control tof-pi2:/home/gaps
 
 elif [ "$1" = "tcpc-control" ]; then
     CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
@@ -210,15 +213,28 @@ elif [ "$1" = "tof-stress" ]; then
     scp target/x86_64-unknown-linux-musl/release/tof-stress tof-nts-computer:/home/gaps/tof-nas/tof-rb/software
 
 elif [ "$1" = "rb-dac" ]; then
-    rm -rf target/
+    # rm -rf target/
     CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
     cross build --release --bin rb-dac --target=armv7-unknown-linux-musleabi
-    scp target/armv7-unknown-linux-musleabi/release/rb-dac tof-nts-computer:/home/gaps/tof-nas/tof-rb/software
+    # scp target/armv7-unknown-linux-musleabi/release/rb-dac tof-nts-computer:/home/gaps/takeruhayashi/rb_dac_test
+    # scp target/armv7-unknown-linux-musleabi/release/rb-dac tof-cpu:/home/gaps/test/rb_input_range_test
+    # scp target/armv7-unknown-linux-musleabi/release/rb-dac tof-rb10:/home/gaps/test
+    scp target/armv7-unknown-linux-musleabi/release/rb-dac tof-rb16:/home/gaps/dev
 
 elif [ "$1" = "rat-hkp" ]; then
     CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
     cross build --release --bin rat-hkp --target=armv7-unknown-linux-musleabi
     scp target/armv7-unknown-linux-musleabi/release/rat-hkp tof-rb37:/home/gaps/dev
+
+elif [ "$1" = "rb-check-mode" ]; then
+    CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
+    cross build --release --bin rb-check-mode --target=armv7-unknown-linux-musleabi
+    scp target/armv7-unknown-linux-musleabi/release/rb-check-mode tof-rb16:/home/gaps/dev
+
+elif [ "$1" = "rb-mode" ]; then
+    CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
+    cross build --release --bin rb-mode --target=armv7-unknown-linux-musleabi
+    scp target/armv7-unknown-linux-musleabi/release/rb-mode tof-rb16:/home/gaps/dev
 
 else
     CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" \
