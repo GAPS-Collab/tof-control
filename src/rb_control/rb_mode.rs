@@ -1,3 +1,4 @@
+use crate::constant::*;
 use crate::helper::rb_type::RBError;
 use crate::rb_control::{rb_dac, rb_input, rb_gpioe};
 
@@ -54,4 +55,41 @@ pub fn read_input_mode() -> Result<String, RBError> {
     }
 
     Ok(input_mode.to_string())
+}
+
+pub fn verify_input_mode(mode: &str) -> Result<bool, RBError> {
+    let expected_input_mode: String = mode.to_uppercase();
+
+    let current_input_mode = read_input_mode()?;
+    let current_input_dac = rb_dac::read_single_dac(1)?;
+
+    let mut mode_bool: bool = false;
+
+    match expected_input_mode.as_str() {
+        "NOI" => {
+            if current_input_mode == "NOI" && current_input_dac == RB_AD5675_DAC1 {
+                mode_bool = true;
+            }
+        }
+        "VCAL" => {
+            if current_input_mode == "NOI" && current_input_dac == RB_AD5675_DAC1_VCAL {
+                mode_bool = true;
+            }
+        }
+        "TCAL" => {
+            if current_input_mode == "TCAL" && current_input_dac == RB_AD5675_DAC1 {
+                mode_bool = true;
+            }
+        }
+        "SMA" => {
+            if current_input_mode == "SMA" && current_input_dac == RB_AD5675_DAC1 {
+                mode_bool = true;
+            }
+        }
+        _ => {
+            return Err(RBError::InvalidInputMode);
+        }
+    }
+
+    return Ok(mode_bool);
 }

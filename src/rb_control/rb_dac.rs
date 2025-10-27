@@ -114,7 +114,11 @@ pub fn dac_noi_mode() -> Result<(), RBError> {
     i2c_mux.select(RB_AD5675_CHANNEL)?;
     let ad5675 = ad5675::AD5675::new(I2C_BUS, RB_AD5675_ADDRESS);
 
+    ad5675.write_dac(0, RB_AD5675_DAC0)?;
     ad5675.write_dac(1, RB_AD5675_DAC1)?;
+    ad5675.write_dac(2, RB_AD5675_DAC2)?;
+    ad5675.write_dac(3, RB_AD5675_DAC3)?;
+    ad5675.write_dac(4, RB_AD5675_DAC4)?;
 
     i2c_mux.reset()?;
 
@@ -126,7 +130,11 @@ pub fn dac_vcal_mode() -> Result<(), RBError> {
     i2c_mux.select(RB_AD5675_CHANNEL)?;
     let ad5675 = ad5675::AD5675::new(I2C_BUS, RB_AD5675_ADDRESS);
 
+    ad5675.write_dac(0, RB_AD5675_DAC0)?;
     ad5675.write_dac(1, RB_AD5675_DAC1_VCAL)?;
+    ad5675.write_dac(2, RB_AD5675_DAC2)?;
+    ad5675.write_dac(3, RB_AD5675_DAC3)?;
+    ad5675.write_dac(4, RB_AD5675_DAC4)?;
 
     i2c_mux.reset()?;
 
@@ -138,7 +146,11 @@ pub fn dac_tcal_mode() -> Result<(), RBError> {
     i2c_mux.select(RB_AD5675_CHANNEL)?;
     let ad5675 = ad5675::AD5675::new(I2C_BUS, RB_AD5675_ADDRESS);
 
+    ad5675.write_dac(0, RB_AD5675_DAC0)?;
     ad5675.write_dac(1, RB_AD5675_DAC1)?;
+    ad5675.write_dac(2, RB_AD5675_DAC2)?;
+    ad5675.write_dac(3, RB_AD5675_DAC3)?;
+    ad5675.write_dac(4, RB_AD5675_DAC4)?;
 
     i2c_mux.reset()?;
 
@@ -150,7 +162,11 @@ pub fn dac_sma_mode() -> Result<(), RBError> {
     i2c_mux.select(RB_AD5675_CHANNEL)?;
     let ad5675 = ad5675::AD5675::new(I2C_BUS, RB_AD5675_ADDRESS);
 
+    ad5675.write_dac(0, RB_AD5675_DAC0)?;
     ad5675.write_dac(1, RB_AD5675_DAC1)?;
+    ad5675.write_dac(2, RB_AD5675_DAC2)?;
+    ad5675.write_dac(3, RB_AD5675_DAC3)?;
+    ad5675.write_dac(4, RB_AD5675_DAC4)?;
 
     i2c_mux.reset()?;
 
