@@ -5,7 +5,7 @@ use crate::device::{ad5675, pca9548a};
 pub fn set_dac() -> Result<(), RBError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_AD5675_CHANNEL)?;
-    let ad5675 = ad5675::AD5675::new(RB_AD5675_ADDRESS);
+    let ad5675 = ad5675::AD5675::new(I2C_BUS, RB_AD5675_ADDRESS);
 
     /*	DAC settings
         Next few lines will configure the DAC outputs for DRS4/analog front end
@@ -22,18 +22,18 @@ pub fn set_dac() -> Result<(), RBError> {
 
     // DRS4 analog input offset/bias: IN+_OFS, IN-_OFS
     // in_neg
-    ad5675.write_dac(0, 25600);
+    ad5675.write_dac(0, RB_AD5675_DAC0)?;
     // in_pos
-    ad5675.write_dac(1, 25600);
+    ad5675.write_dac(1, RB_AD5675_DAC1)?;
     // offset
     // DRS ROFS 1V, 1.6V max
     // ad5675.write_dac(2, 35200);
-    ad5675.write_dac(2, 42500);
+    ad5675.write_dac(2, RB_AD5675_DAC2)?;
     // THS4509 common mode voltage: V_CM
     // For +3.5 V and -1.5 V split supply, half range is 1 V
-    ad5675.write_dac(3, 32000);
+    ad5675.write_dac(3, RB_AD5675_DAC3)?;
     // DRS BIAS 0.7V
-    ad5675.write_dac(4, 22400);
+    ad5675.write_dac(4, RB_AD5675_DAC4)?;
 
     i2c_mux.reset()?;
 
@@ -41,12 +41,54 @@ pub fn set_dac() -> Result<(), RBError> {
     
 }
 
+pub fn read_dac() -> Result<[u16; 5], RBError> {
+    let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
+    i2c_mux.select(RB_AD5675_CHANNEL)?;
+    let ad5675 = ad5675::AD5675::new(I2C_BUS, RB_AD5675_ADDRESS);
+
+    let mut dac_values: [u16; 5] = [u16::max_value(); 5];
+    for i in 0..=4 {
+        let dac = ad5675.read_dac(i)?;
+        dac_values[i as usize] = dac;
+    }
+
+    i2c_mux.reset()?;
+
+    Ok(dac_values)
+}
+
+pub fn read_single_dac(channel: u8) -> Result<u16, RBError> {
+    let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
+    i2c_mux.select(RB_AD5675_CHANNEL)?;
+    let ad5675 = ad5675::AD5675::new(I2C_BUS, RB_AD5675_ADDRESS);
+
+    let dac = ad5675.read_dac(channel)?;
+
+    i2c_mux.reset()?;
+
+    Ok(dac)
+}
+
+pub fn zero_dac() -> Result<(), RBError> {
+    let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
+    i2c_mux.select(RB_AD5675_CHANNEL)?;
+    let ad5675 = ad5675::AD5675::new(I2C_BUS, RB_AD5675_ADDRESS);
+
+    for i in 0..=4 {
+        ad5675.write_dac(i, 0)?;
+    }
+
+    i2c_mux.reset()?;
+
+    Ok(())
+}
+
 pub fn set_dac_500() -> Result<(), RBError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_AD5675_CHANNEL)?;
-    let ad5675 = ad5675::AD5675::new(RB_AD5675_ADDRESS);
+    let ad5675 = ad5675::AD5675::new(I2C_BUS, RB_AD5675_ADDRESS);
 
-    ad5675.write_dac(2, 49600);
+    ad5675.write_dac(2, 49600)?;
 
     i2c_mux.reset()?;
 
@@ -56,12 +98,12 @@ pub fn set_dac_500() -> Result<(), RBError> {
 pub fn set_input_range(lower_bound: f32) -> Result<(), RBError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_AD5675_CHANNEL)?;
-    let ad5675 = ad5675::AD5675::new(RB_AD5675_ADDRESS);
+    let ad5675 = ad5675::AD5675::new(I2C_BUS, RB_AD5675_ADDRESS);
 
     let rofs: u16 = ((1.05 - (lower_bound / 1000.0)) * 32000.0) as u16;
     println!("Setting ROFS to: {}", rofs);
 
-    ad5675.write_dac(2, rofs);
+    ad5675.write_dac(2, rofs)?;
     i2c_mux.reset()?;
 
     Ok(())
@@ -70,9 +112,9 @@ pub fn set_input_range(lower_bound: f32) -> Result<(), RBError> {
 pub fn dac_noi_mode() -> Result<(), RBError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_AD5675_CHANNEL)?;
-    let ad5675 = ad5675::AD5675::new(RB_AD5675_ADDRESS);
+    let ad5675 = ad5675::AD5675::new(I2C_BUS, RB_AD5675_ADDRESS);
 
-    ad5675.write_dac(1, 25600);
+    ad5675.write_dac(1, RB_AD5675_DAC1)?;
 
     i2c_mux.reset()?;
 
@@ -82,9 +124,9 @@ pub fn dac_noi_mode() -> Result<(), RBError> {
 pub fn dac_vcal_mode() -> Result<(), RBError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_AD5675_CHANNEL)?;
-    let ad5675 = ad5675::AD5675::new(RB_AD5675_ADDRESS);
+    let ad5675 = ad5675::AD5675::new(I2C_BUS, RB_AD5675_ADDRESS);
 
-    ad5675.write_dac(1, 46400);
+    ad5675.write_dac(1, RB_AD5675_DAC1_VCAL)?;
 
     i2c_mux.reset()?;
 
@@ -94,9 +136,9 @@ pub fn dac_vcal_mode() -> Result<(), RBError> {
 pub fn dac_tcal_mode() -> Result<(), RBError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_AD5675_CHANNEL)?;
-    let ad5675 = ad5675::AD5675::new(RB_AD5675_ADDRESS);
+    let ad5675 = ad5675::AD5675::new(I2C_BUS, RB_AD5675_ADDRESS);
 
-    ad5675.write_dac(1, 25600);
+    ad5675.write_dac(1, RB_AD5675_DAC1)?;
 
     i2c_mux.reset()?;
 
@@ -106,9 +148,9 @@ pub fn dac_tcal_mode() -> Result<(), RBError> {
 pub fn dac_sma_mode() -> Result<(), RBError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_AD5675_CHANNEL)?;
-    let ad5675 = ad5675::AD5675::new(RB_AD5675_ADDRESS);
+    let ad5675 = ad5675::AD5675::new(I2C_BUS, RB_AD5675_ADDRESS);
 
-    ad5675.write_dac(1, 25600);
+    ad5675.write_dac(1, RB_AD5675_DAC1)?;
 
     i2c_mux.reset()?;
 
