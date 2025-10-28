@@ -36,8 +36,16 @@ pub fn draw_rb_tab(f: &mut Frame, app: &mut App, area: Rect) {
         ])
         .split(sub_chunks_2[1]);
 
+    let sub_chunks_4 = Layout::default()
+        .constraints([
+            Constraint::Percentage(60),
+            Constraint::Percentage(40),
+        ])
+        .split(chunks[0]);
 
-    draw_rb_info(f, app, chunks[0]);
+
+    draw_rb_info(f, app, sub_chunks_4[0]);
+    draw_rb_mode(f, app, sub_chunks_4[1]);
     draw_rb_temp(f, app, sub_chunks_2[0]);
     draw_rb_ph(f, app, sub_chunks_3[0]);
     draw_rb_mag(f, app, sub_chunks_3[1]);
@@ -66,20 +74,33 @@ fn draw_rb_info(f: &mut Frame, app: &mut App, area: Rect) {
     rb_info_list_items.push(ListItem::new(Line::from(Span::styled(format!("Board ID:                {}", rb_info.board_id), Style::default()))));
     rb_info_list_items.push(ListItem::new(Line::from(Span::styled(format!("Firmware Version:        {}", rb_info.fw_version), Style::default()))));
     rb_info_list_items.push(ListItem::new(Line::from(Span::styled(format!("Firmware Hash:           {}", rb_info.fw_hash), Style::default()))));
-    rb_info_list_items.push(ListItem::new(Line::from(Span::styled(format!("Sub Board:               {}", if rb_info.sub_board == 1 { "LTB" } else if rb_info.sub_board == 2 { "PB/Preamp" } else { "NC" }), Style::default()))));
+    rb_info_list_items.push(ListItem::new(Line::from(Span::styled(format!("Sub Board:               {}", if rb_info.sub_board == 1 { "LTB" } else if rb_info.sub_board == 2 { "PB/Preamp" } else if rb_info.sub_board == 3 {"LTB/PB/Preamp"} else { "NC" }), Style::default()))));
     rb_info_list_items.push(ListItem::new(Line::from(Span::styled(format!("RAT Number:              {}", if let 1..=22 = rb_info.rat_num {rb_info.rat_num.to_string()} else { "Not in RAT".to_string() }), Style::default()))));
     rb_info_list_items.push(ListItem::new(Line::from(Span::styled(format!("RAT Position:            {}", match rb_info.rat_pos { 0 => { "Not Flight RAT" }, 1 => { "CBE" }, 2 => { "UMB" }, 3 => { "COR" }, 4 => { "CBE/COR" }, _ => { "Not in RAT" } }), Style::default()))));
     rb_info_list_items.push(ListItem::new(Line::from(Span::styled(format!("RB Position in RAT:      {}", match rb_info.rb_pos { 1 => { "RB1" }, 2 => { "RB2" }, _ => { "Not in RAT" } }), Style::default()))));
     rb_info_list_items.push(ListItem::new(Line::from(Span::styled(format!("Loss-of-Lock:            {}", if rb_info.lol == 0x01 { "Unlocked" } else { "Locked" }), Style::default()))));
     rb_info_list_items.push(ListItem::new(Line::from(Span::styled(format!("Loss-of-Lock (Stable):   {}", if rb_info.lol_stable == 0x01 { "Unlocked Past Second" } else { "Locked Past Second" }), Style::default()))));
     rb_info_list_items.push(ListItem::new(Line::from(Span::styled(format!("Uptime:                  {}[s]", rb_info.uptime), Style::default()))));
-    rb_info_list_items.push(ListItem::new(Line::from(Span::styled(format!("Input Mode:              {}", rb_info.input_mode), Style::default()))));
+    // rb_info_list_items.push(ListItem::new(Line::from(Span::styled(format!("Input Mode:              {}", rb_info.input_mode), Style::default()))));
     
     let rb_info_list = List::new(rb_info_list_items)
     .block(Block::default().borders(Borders::ALL).title(Span::styled("RB Information", 
     Style::default().fg(Color::Magenta).add_modifier(Modifier::BOLD))));
 
     f.render_widget(rb_info_list, area)
+}
+
+fn draw_rb_mode(f: &mut Frame, app: &mut App, area: Rect) {
+    let rb_mode = &app.rb_data.info.input_mode;
+
+    let mut rb_mode_list_items = Vec::<ListItem>::new();
+    rb_mode_list_items.push(ListItem::new(Line::from(Span::styled(format!("Input Mode:              {}", rb_mode), Style::default()))));
+
+    let rb_mode_list = List::new(rb_mode_list_items)
+    .block(Block::default().borders(Borders::ALL).title(Span::styled("RB Input Mode", 
+    Style::default().fg(Color::Magenta).add_modifier(Modifier::BOLD))));
+
+    f.render_widget(rb_mode_list, area)
 }
 
 fn draw_rb_temp(f: &mut Frame, app: &mut App, area: Rect) {

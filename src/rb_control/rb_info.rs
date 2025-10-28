@@ -83,11 +83,14 @@ impl RBInfo {
         let mut ltb_i2c = LinuxI2CDevice::new(&format!("/dev/i2c-{}", I2C_BUS), LTB_TRENZ_ADDRESS)?;
         let mut pb_i2c = LinuxI2CDevice::new(&format!("/dev/i2c-{}", I2C_BUS), PB_PCA9548A_ADDRESS)?;
 
-        if ltb_i2c.smbus_read_byte().is_ok() {
+        let ltb_on = ltb_i2c.smbus_read_byte().is_ok();
+        let pb_on = pb_i2c.smbus_read_byte().is_ok();
+
+        if ltb_on && !pb_on {
             sub_board = 1;
-        } else if pb_i2c.smbus_read_byte().is_ok() {
+        } else if !ltb_on && pb_on {
             sub_board = 2;
-        } else if ltb_i2c.smbus_read_byte().is_ok() && pb_i2c.smbus_read_byte().is_ok() {
+        } else if ltb_on && pb_on {
             sub_board = 3;
         } else {
             sub_board = 0;
