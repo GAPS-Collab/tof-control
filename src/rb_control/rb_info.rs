@@ -87,6 +87,8 @@ impl RBInfo {
             sub_board = 1;
         } else if pb_i2c.smbus_read_byte().is_ok() {
             sub_board = 2;
+        } else if ltb_i2c.smbus_read_byte().is_ok() && pb_i2c.smbus_read_byte().is_ok() {
+            sub_board = 3;
         } else {
             sub_board = 0;
         }
