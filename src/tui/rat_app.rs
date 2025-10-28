@@ -37,6 +37,7 @@ impl<'a> App<'a> {
             0 => tabs = vec!["RB"],
             1 => tabs = vec!["RB", "LTB"],
             2 => tabs = vec!["RB", "PB", "PA"],
+            3 => tabs = vec!["RB", "LTB", "PB", "PA"],
             _ => (),
         };
 
