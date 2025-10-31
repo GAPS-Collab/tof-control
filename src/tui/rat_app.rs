@@ -37,6 +37,7 @@ impl<'a> App<'a> {
             0 => tabs = vec!["RB"],
             1 => tabs = vec!["RB", "LTB"],
             2 => tabs = vec!["RB", "PB", "PA"],
+            3 => tabs = vec!["RB", "LTB", "PB", "PA"],
             _ => (),
         };
 
@@ -59,8 +60,8 @@ pub struct TabsState<'a> {
 }
 
 impl<'a> TabsState<'a> {
-    pub fn new(titles: Vec<&'a str>) -> TabsState {
-        TabsState {
+    pub fn new(titles: Vec<&'a str>) -> Self {
+        Self {
             titles,
             index: 0,
         }

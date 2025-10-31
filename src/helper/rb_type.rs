@@ -74,6 +74,8 @@ pub enum RBError {
     ParseInt(std::num::ParseIntError),
     // OsString Error
     OsString,
+    // Invalid Input Mode Error
+    InvalidInputMode
 }
 
 impl std::fmt::Display for RBError {

@@ -52,6 +52,15 @@ pub fn draw(f: &mut Frame, app: &mut App) {
                 _ => {},
             }
         }
+        4 => {
+            match app.tabs.index {
+                0 => draw_rb_tab(f, app, chunks[1]),
+                1 => draw_ltb_tab(f, app, chunks[1]),
+                2 => draw_pb_tab(f, app, chunks[1]),
+                3 => draw_pa_tab(f, app, chunks[1]),
+                _ => {},
+            }
+        }
         _ => {}
     }
 
