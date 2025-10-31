@@ -2,9 +2,17 @@ use crate::constant::*;
 use crate::helper::rb_type::RBError;
 use crate::rb_control::{rb_dac, rb_input, rb_gpioe};
 
+use std::thread::sleep;
+use std::time::Duration;
+
 pub fn select_noi_mode() -> Result<(), RBError> {
     rb_dac::dac_noi_mode()?;
     rb_input::disable_rf_input()?;
+
+    while (verify_input_mode("NOI")?) == false {
+        sleep(Duration::from_millis(10));
+        select_noi_mode()?;
+    }
 
     Ok(())
 }
@@ -13,6 +21,11 @@ pub fn select_vcal_mode() -> Result<(), RBError> {
     rb_dac::dac_vcal_mode()?;
     rb_input::disable_rf_input()?;
 
+    while (verify_input_mode("VCAL")?) == false {
+        sleep(Duration::from_millis(10));
+        select_noi_mode()?;
+    }
+
     Ok(())
 }
 
@@ -20,12 +33,22 @@ pub fn select_tcal_mode() -> Result<(), RBError> {
     rb_dac::dac_tcal_mode()?;
     rb_input::enable_tca_input()?;
 
+    while (verify_input_mode("TCAL")?) == false {
+        sleep(Duration::from_millis(10));
+        select_noi_mode()?;
+    }
+
     Ok(())
 }
 
 pub fn select_sma_mode() -> Result<(), RBError> {
     rb_dac::dac_sma_mode()?;
     rb_input::enable_sma_input()?;
+
+    while (verify_input_mode("SMA")?) == false {
+        sleep(Duration::from_millis(10));
+        select_noi_mode()?;
+    }
 
     Ok(())
 }
