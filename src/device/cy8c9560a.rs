@@ -1,7 +1,6 @@
 #![allow(unused)]
 use crate::constant::*;
 
-use i2c_linux_sys::i2c_smbus_read_i2c_block_data;
 use i2cdev::core::*;
 use i2cdev::linux::{LinuxI2CDevice, LinuxI2CError};
 
