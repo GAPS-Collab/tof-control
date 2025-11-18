@@ -1,6 +1,43 @@
 use crate::constant::*;
-use crate::helper::rb_type::RBError;
+use crate::helper::rb_type::{RBDac, RBError};
 use crate::device::{ad5675, pca9548a};
+
+impl RBDac {
+    pub fn new() -> Self {
+        match Self::read_dac() {
+            Ok(rb_dac) => {
+                rb_dac
+            }
+            Err(_) => {
+                Self {
+                    in_neg: f32::MAX,
+                    in_pos: f32::MAX,
+                    drs_rofs: f32::MAX,
+                    v_cm: f32::MAX,
+                    drs_bias: f32::MAX,
+                }
+            }
+        }
+    }
+    pub fn read_dac() -> Result<RBDac, RBError> {
+        let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
+        i2c_mux.select(RB_AD5675_CHANNEL)?;
+        let ad5675 = ad5675::AD5675::new(I2C_BUS, RB_AD5675_ADDRESS);
+
+        let in_neg: f32 = ad5675.read_dac_voltage(0)?;
+        let in_pos: f32 = ad5675.read_dac_voltage(1)?;
+        let drs_rofs: f32 = ad5675.read_dac_voltage(2)?;
+        let v_cm: f32 = ad5675.read_dac_voltage(3)?;
+        let drs_bias: f32 = ad5675.read_dac_voltage(4)?;
+
+        i2c_mux.reset()?;
+
+        Ok(
+            RBDac { in_neg, in_pos, drs_rofs, v_cm, drs_bias }
+        )
+    }
+
+}
 
 pub fn set_dac() -> Result<(), RBError> {
     let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);

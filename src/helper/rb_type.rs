@@ -64,10 +64,10 @@ pub struct RBMag {
 // RB DAC Readout Data Type
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RBDac {
-    pub vout_m          : f32,
-    pub vout_p          : f32,
-    pub rofs            : f32,
-    pub damp_cv         : f32,
+    pub in_neg          : f32,
+    pub in_pos          : f32,
+    pub drs_rofs        : f32,
+    pub v_cm            : f32,
     pub drs_bias        : f32,
 }
 
