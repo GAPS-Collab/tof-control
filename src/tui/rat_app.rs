@@ -1,5 +1,5 @@
 use crate::helper::{
-    rb_type::{RBInfo, RBTemp, RBVcp, RBPh, RBMag},
+    rb_type::{RBInfo, RBTemp, RBVcp, RBPh, RBMag, RBDac},
     ltb_type::{LTBTemp, LTBThreshold},
     pb_type::{PBTemp, PBVcp},
     pa_type::{PATemp, PAReadBias},
@@ -86,6 +86,7 @@ pub struct RBData {
     pub vcp: RBVcp,
     pub ph: RBPh,
     pub mag: RBMag,
+    pub dac: RBDac,
 }
 
 impl RBData {
@@ -96,6 +97,7 @@ impl RBData {
             vcp: RBVcp::new(),
             ph: RBPh::new(),
             mag: RBMag::new(),
+            dac: RBDac::new(),
         }
     }
 }

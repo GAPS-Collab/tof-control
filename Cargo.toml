@@ -1,6 +1,6 @@
 [package]
 name = "tof-control"
-version = "1.0.0"
+version = "1.0.2"
 edition = "2021"
 # build = "build.rs"
 
@@ -8,6 +8,10 @@ edition = "2021"
 
 [profile.release]
 opt-level = "z"
+
+[[bin]]
+name = "rat-reset"
+path = "src/bin/rat_reset.rs"
 
 [[bin]]
 name = "rat-tui"
