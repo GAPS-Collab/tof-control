@@ -61,7 +61,7 @@ pub fn read_input_mode() -> Result<String, RBError> {
         rf_input_ports[i as usize] = rf_input_port;
     }
 
-    let input_mode: &str;
+    let mut input_mode: &str;
     match rf_input_ports {
         [0, 0, 0, 0, 0, 0, 0, 0, 0] => {
             input_mode = "SMA";
@@ -77,13 +77,47 @@ pub fn read_input_mode() -> Result<String, RBError> {
         }
     }
 
+    let current_input_dac = rb_dac::read_single_dac(1)?;
+
+    if input_mode == "NOI" && current_input_dac == RB_AD5675_DAC1 {
+        input_mode = "NOI";
+    } else if input_mode == "NOI" && current_input_dac == RB_AD5675_DAC1_VCAL {
+        input_mode = "VCAL";
+    } else if input_mode == "TCAL" && current_input_dac == RB_AD5675_DAC1 {
+        input_mode = "TCAL";
+    } else if input_mode == "SMA" && current_input_dac == RB_AD5675_DAC1 {
+        input_mode = "SMA";
+    } else {
+        return Err(RBError::InvalidInputMode);
+    }
+
     Ok(input_mode.to_string())
 }
 
 pub fn verify_input_mode(mode: &str) -> Result<bool, RBError> {
     let expected_input_mode: String = mode.to_uppercase();
 
-    let current_input_mode = read_input_mode()?;
+    let mut rf_input_ports: [u8; 9] = Default::default();
+    for i in 0..9 {
+        let rf_input_port = rb_gpioe::read_rf_input_port(i+1 as u8)?;
+        rf_input_ports[i as usize] = rf_input_port;
+    }
+    let current_input_mode: &str;
+    match rf_input_ports {
+        [0, 0, 0, 0, 0, 0, 0, 0, 0] => {
+            current_input_mode = "SMA";
+        }
+        [1, 1, 1, 1, 1, 1, 1, 1, 1] => {
+            current_input_mode = "TCAL";
+        }
+        [3, 3, 3, 3, 3, 3, 3, 3, 3] => {
+            current_input_mode = "NOI";
+        }
+        _ => {
+            current_input_mode = "Input Mode Error";
+        }
+    }
+
     let current_input_dac = rb_dac::read_single_dac(1)?;
 
     let mut mode_bool: bool = false;

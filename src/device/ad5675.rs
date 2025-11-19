@@ -1,5 +1,6 @@
 #![allow(unused)]
 use crate::constant::*;
+use crate::rb_control::rb_dac::read_dac;
 
 use i2cdev::core::*;
 use i2cdev::linux::{LinuxI2CDevice, LinuxI2CMessage, LinuxI2CError};
@@ -29,7 +30,7 @@ impl AD5675 {
         Ok(())
     }
 
-    pub fn read_dac(&self, channel: u8) -> Result<u16, LinuxI2CError>{
+    pub fn read_dac(&self, channel: u8) -> Result<u16, LinuxI2CError> {
         let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", self.bus), self.address)?;
         let mut read_data = [0; 2];
         let mut msgs = [
@@ -42,5 +43,12 @@ impl AD5675 {
         let dac_value = ((read_data[0] as u16 & 0xFF) << 8) | (read_data[1] as u16 & 0xFF);
 
         Ok((dac_value))
+    }
+
+    pub fn read_dac_voltage(&self, channel: u8) -> Result<f32, LinuxI2CError> {
+        let dac = Self::read_dac(&self, channel)?;
+        let voltage = ((dac as f32) / 2f32.powf(16.0)) * RB_AD5675_REF_VOLTAGE;
+
+        Ok((voltage))
     }
 }

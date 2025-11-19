@@ -52,21 +52,6 @@ pub fn draw_rb_tab(f: &mut Frame, app: &mut App, area: Rect) {
     draw_rb_vcp(f, app, sub_chunks_1[1]);
 }
 
-// fn draw_rb_info(f: &mut Frame, area: Rect) {
-//     let text = vec![
-//         text::Line::from("RB Info"),
-//         text::Line::from("Text"),
-//     ];
-
-//     let block = Block::default().borders(Borders::ALL).title(Span::styled(
-//         "RB Info",
-//         Style::default().fg(Color::Magenta).add_modifier(Modifier::BOLD),
-//     ));
-
-//     let paragraph = Paragraph::new(text).block(block).wrap(Wrap { trim: true });
-//     f.render_widget(paragraph, area);
-// }
-
 fn draw_rb_info(f: &mut Frame, app: &mut App, area: Rect) {
     let rb_info = &app.rb_data.info;
 
@@ -81,7 +66,6 @@ fn draw_rb_info(f: &mut Frame, app: &mut App, area: Rect) {
     rb_info_list_items.push(ListItem::new(Line::from(Span::styled(format!("Loss-of-Lock:            {}", if rb_info.lol == 0x01 { "Unlocked" } else { "Locked" }), Style::default()))));
     rb_info_list_items.push(ListItem::new(Line::from(Span::styled(format!("Loss-of-Lock (Stable):   {}", if rb_info.lol_stable == 0x01 { "Unlocked Past Second" } else { "Locked Past Second" }), Style::default()))));
     rb_info_list_items.push(ListItem::new(Line::from(Span::styled(format!("Uptime:                  {}[s]", rb_info.uptime), Style::default()))));
-    // rb_info_list_items.push(ListItem::new(Line::from(Span::styled(format!("Input Mode:              {}", rb_info.input_mode), Style::default()))));
     
     let rb_info_list = List::new(rb_info_list_items)
     .block(Block::default().borders(Borders::ALL).title(Span::styled("RB Information", 
@@ -92,9 +76,15 @@ fn draw_rb_info(f: &mut Frame, app: &mut App, area: Rect) {
 
 fn draw_rb_mode(f: &mut Frame, app: &mut App, area: Rect) {
     let rb_mode = &app.rb_data.info.input_mode;
+    let rb_dac = &app.rb_data.dac;
 
     let mut rb_mode_list_items = Vec::<ListItem>::new();
     rb_mode_list_items.push(ListItem::new(Line::from(Span::styled(format!("Input Mode:              {}", rb_mode), Style::default()))));
+    rb_mode_list_items.push(ListItem::new(Line::from(Span::styled(format!("Input (-) Offset:        {:.3}[V]", rb_dac.in_neg), Style::default()))));
+    rb_mode_list_items.push(ListItem::new(Line::from(Span::styled(format!("Input (+) Offset:        {:.3}[V]", rb_dac.in_pos), Style::default()))));
+    rb_mode_list_items.push(ListItem::new(Line::from(Span::styled(format!("DRS ROFS:                {:.3}[V]", rb_dac.drs_rofs), Style::default()))));
+    rb_mode_list_items.push(ListItem::new(Line::from(Span::styled(format!("THS4509 Common Voltage:  {:.3}[V]", rb_dac.v_cm), Style::default()))));
+    rb_mode_list_items.push(ListItem::new(Line::from(Span::styled(format!("DRS Bias Voltage:        {:.3}[V]", rb_dac.drs_bias), Style::default()))));
 
     let rb_mode_list = List::new(rb_mode_list_items)
     .block(Block::default().borders(Borders::ALL).title(Span::styled("RB Input Mode", 

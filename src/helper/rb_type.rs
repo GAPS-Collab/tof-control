@@ -61,6 +61,16 @@ pub struct RBMag {
     pub mag_xyz         : [f32; 3],
 }
 
+// RB DAC Readout Data Type
+#[derive(Debug, Serialize, Deserialize)]
+pub struct RBDac {
+    pub in_neg          : f32,
+    pub in_pos          : f32,
+    pub drs_rofs        : f32,
+    pub v_cm            : f32,
+    pub drs_bias        : f32,
+}
+
 /// RB Error Type
 #[derive(Debug)]
 pub enum RBError {
