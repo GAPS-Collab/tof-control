@@ -1,6 +1,6 @@
 use clap::{Parser, Subcommand, ValueEnum};
 
-use tof_control::rb_control::rb_mode;
+use tof_control::rb_control::{rb_mode, rb_dac};
 
 #[derive(Parser, Debug)]
 #[command(author = "Takeru Hayashi", version, about, long_about = None)]
@@ -24,6 +24,9 @@ enum Commands {
     Verify {
         #[arg(ignore_case = true, value_enum)]
         mode: Mode,
+    },
+    #[clap(short_flag = 't')]
+    Test {
     },
 }
 
@@ -133,6 +136,16 @@ fn main() {
                             eprintln!("Mode verification error: {:?}", e);
                         }
                     }
+                }
+            }
+        }
+        Commands::Test { } => {
+            match rb_dac::set_single_dac(2, 0) {
+                Ok(_) => {
+                    println!("DAC DRS ROFS set to 0V for test mode.");
+                }
+                Err(e) => {
+                    eprintln!("Error setting test mode: {:?}", e);
                 }
             }
         }
