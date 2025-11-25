@@ -50,8 +50,6 @@ jobs:
           echo "Found bin targets: ${bins[*]}"
 
           for bin in "${bins[@]}"; do
-            echo "=== Building bin target: $bin ==="
-            cross build --release --target "$RUST_TARGET" --bin "$bin"
             alt_bin="${bin//_/-}"
             echo "=== Building bin target: $alt_bin ==="
             cross build --release --target "$RUST_TARGET" --bin "$alt_bin"
