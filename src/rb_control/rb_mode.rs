@@ -43,11 +43,14 @@ pub fn select_tcal_mode() -> Result<(), RBError> {
 
 pub fn select_sma_mode() -> Result<(), RBError> {
     rb_dac::dac_sma_mode()?;
+    println!("DAC_SMA_MODE");
     rb_input::enable_sma_input()?;
-
+    println!("RB INPUT SMA MODE");
     while (verify_input_mode("SMA")?) == false {
         sleep(Duration::from_millis(10));
+        println!("SLEEPING");
         select_noi_mode()?;
+        println!("NOI MODE SELECTED");
     }
 
     Ok(())
