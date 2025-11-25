@@ -52,6 +52,10 @@ jobs:
           for bin in "${bins[@]}"; do
             echo "=== Building bin target: $bin ==="
             cross build --release --target "$RUST_TARGET" --bin "$bin"
+            alt_bin="${bin//_/-}"
+            echo "=== Building bin target: $alt_bin ==="
+            cross build --release --target "$RUST_TARGET" --bin "$alt_bin"
+            echo "Successfully built bin '$alt_bin'"
           done
 
       - name: Collect built binaries into artifacts directory
