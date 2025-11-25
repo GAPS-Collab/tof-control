@@ -40,13 +40,13 @@ impl RATMoniData {
         let sub_board = rb_data.rb_info.sub_board;
 
         let mut ltb_data = None;
-        if sub_board == 1 {
+        if sub_board == 1 || sub_board == 3 {
             ltb_data = Some(LTBMoniData::new());
         }
 
         let mut pb_data = None;
         let mut pa_data = None;
-        if sub_board == 2 {
+        if sub_board == 2 || sub_board == 3 {
             pb_data = Some(PBMoniData::new());
             pa_data = Some(PAMoniData::new());
         }

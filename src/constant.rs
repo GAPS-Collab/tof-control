@@ -83,6 +83,7 @@ pub const RB_CY8C9560A_CHANNEL: u8 = 7;
 // PCA9548A_ADDRESS_2
 pub const RB_AD5675_ADDRESS: u16 = 0xC;
 pub const RB_AD5675_CHANNEL: u8 = 2;
+pub const RB_AD5675_REF_VOLTAGE: f32 = 2.048;
 pub const RB_AD5675_DAC0: u16 = 25600; // Vout-
 pub const RB_AD5675_DAC1: u16 = 25600; // Vout+
 pub const RB_AD5675_DAC1_VCAL: u16 = 46400; // Vout+ (for VCAL Mode)
