@@ -1,0 +1,43 @@
+name: Build GAPS Time-of-Flight RB Software
+
+on:
+  push:
+    branches:
+      - main
+      - takeru-dev
+  pull_request:
+
+env:
+  BIN: rat-tui
+  RUST_TARGET: armv7-unknown-linux-musleabi
+  CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS: -C relocation-model=dynamic-no-pic -C target-feature=+crt-static
+
+jobs:
+  build-armv7:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ env.RUST_TARGET }}
+
+      - name: Show rustc version
+        run: rustc -Vv
+
+      - name: Install cross
+        run: cargo install cross --locked
+
+      - name: Build release for ${{ env.RUST_TARGET }} with cross
+        run: cross build --release --bin $BIN --target $RUST_TARGET
+
+      - name: Upload armv7 binaries as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tof-control-${{ env.RUST_TARGET }}-static-binaries
+          path: src/bin/${{ env.BIN }}/target/${{ env.RUST_TARGET }}/release/${{ env.BIN }}
+
+    
