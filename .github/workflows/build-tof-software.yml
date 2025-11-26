@@ -1,0 +1,113 @@
+name: Build GAPS Time-of-Flight Software
+
+on:
+  push:
+    branches:
+      - main
+      - takeru-dev
+  pull_request:
+
+env:
+  SELECTED_BIN_FILES: "rat_control.rs rat_init.rs rat_reset.rs rat_tui.rs"
+  RUST_TARGET: armv7-unknown-linux-musleabi
+  CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS: -C relocation-model=dynamic-no-pic -C target-feature=+crt-static
+
+jobs:
+  build-tof-software:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Get version from Cargo.toml
+        id: get_version
+        shell: bash
+        run: |
+          VERSION=$(grep '^version' Cargo.toml | head -1 | sed -E 's/version = "(.*)"/\1/')
+          VERSION_SAFE="${VERSION//./_}"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "VERSION_SAFE=$VERSION_SAFE" >> $GITHUB_ENV
+          echo "VERSION=$VERSION"
+          echo "VERSION_SAFE=$VERSION_SAFE"
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ env.RUST_TARGET }}
+
+      - name: Install cross
+        run: cargo install cross --locked
+
+      - name: Build selected src/bin files with cross
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ -z "${SELECTED_BIN_FILES:-}" ]; then
+            echo "No SELECTED_BIN_FILES specified; nothing to build."
+            exit 0
+          fi
+
+          echo "Selected src/bin files: ${SELECTED_BIN_FILES}"
+          
+          for relfile in ${SELECTED_BIN_FILES}; do
+            src_path="src/bin/${relfile}"
+
+            if [ ! -f "$src_path" ]; then
+              echo "ERROR: File '$src_path' not found."
+              exit 1
+            fi
+
+            bin="$(basename "$relfile" .rs)"
+            bin_name="${bin//_/-}"
+            echo "=== Building for source: $src_path (bin name: $bin_name) ==="
+            cross build --release --target "$RUST_TARGET" --bin "$bin_name"
+            echo "Successfully built bin '$bin_name'"
+          done
+
+      - name: Collect built binaries into artifacts directory
+        shell: bash
+        run: |
+          OUTDIR="tof-software_v${VERSION_SAFE}"
+          mkdir -p "$OUTDIR"
+
+          find "target/$RUST_TARGET/release" \
+            -maxdepth 1 \
+            -type f \
+            -executable \
+            -exec cp {} "$OUTDIR/" \;
+
+          echo "Placed artifacts in: $OUTDIR"
+
+      - name: Install zip
+        run: sudo apt-get update && sudo apt-get install -y zip
+
+      - name: Create ZIP and SHA-256 checksums
+        run: |
+          OUTDIR="tof-software_v${VERSION_SAFE}"
+          ZIPFILE="${OUTDIR}.zip"
+          SHA_FILE="${OUTDIR}_SHA256SUMS.txt"
+
+          # zip archive
+          zip -r "$ZIPFILE" "$OUTDIR"
+
+          # SHA-256 of binaries
+          sha256sum "$OUTDIR"/* > "$SHA_FILE"
+
+          # SHA-256 of the zip file
+          sha256sum "$ZIPFILE" >> "$SHA_FILE"
+
+          echo "Created:"
+          echo " - $ZIPFILE"
+          echo " - $SHA_FILE"
+
+      - name: Upload binary artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: tof-software_v${{ env.VERSION_SAFE }}
+          path: |
+            tof-software_v${{ env.VERSION_SAFE }}.zip
+            tof-software_v${{ env.VERSION_SAFE }}_SHA256SUMS.txt
+
+    
