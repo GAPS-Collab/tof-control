@@ -80,21 +80,34 @@ jobs:
 
           echo "Placed artifacts in: $OUTDIR"
 
-      - name: Create SHA-256 checksums
+      - name: Install zip
+        run: sudo apt-get update && sudo apt-get install -y zip
+
+      - name: Create ZIP and SHA-256 checksums
         run: |
           OUTDIR="tof-software_v${VERSION_SAFE}"
+          ZIPFILE="${OUTDIR}.zip"
           SHA_FILE="${OUTDIR}_SHA256SUMS.txt"
 
+          # zip archive
+          zip -r "$ZIPFILE" "$OUTDIR"
+
+          # SHA-256 of binaries
           sha256sum "$OUTDIR"/* > "$SHA_FILE"
 
-          echo "Created checksum file: $SHA_FILE"
+          # SHA-256 of the zip file
+          sha256sum "$ZIPFILE" >> "$SHA_FILE"
+
+          echo "Created:"
+          echo " - $ZIPFILE"
+          echo " - $SHA_FILE"
 
       - name: Upload binary artifacts
         uses: actions/upload-artifact@v4
         with:
           name: tof-software_v${{ env.VERSION_SAFE }}
           path: |
-            tof-software_v${{ env.VERSION_SAFE }}
+            tof-software_v${{ env.VERSION_SAFE }}.zip
             tof-software_v${{ env.VERSION_SAFE }}_SHA256SUMS.txt
 
     
