@@ -10,65 +10,100 @@ use crate::rb_control::rb_mode;
 
 impl RBInfo {
     pub fn new() -> Self {
-
-        match Self::read_all_info() {
-            Ok(rb_info) => {
-                rb_info
-            }
-            Err(_) => {
-                Self {
-                    board_id: u8::MAX,
-                    sub_board: u8::MAX,
-                    lol: u8::MAX,
-                    lol_stable: u8::MAX,
-                    trig_rate: u16::MAX,
-                    fw_version: "0.0.0".to_string(),
-                    fw_hash: "XXXXX".to_string(),
-                    uptime: u32::MAX,
-                    sd_usage: u8::MAX,
-                    input_mode: "Input Mode Error".to_string(),
-                    rat_num: u8::MAX,
-                    rat_pos: u8::MAX,
-                    rb_pos: u8::MAX,
-                }
-            }
-        }
-        
+        Self::read_all_info()
     }
-    pub fn read_all_info() -> Result<RBInfo, RBError> {
-        let board_id = Self::read_board_id()?;
-        let sub_board = Self::read_sub_board()?;
-        let lol = Self::read_lol()?;
-        let lol_stable = Self::read_lol_stable()?;
-        let trig_rate = Self::read_trig_rate()?;
+    // pub fn new() -> Self {
+
+    //     match Self::read_all_info() {
+    //         Ok(rb_info) => {
+    //             rb_info
+    //         }
+    //         Err(_) => {
+    //             Self {
+    //                 board_id: u8::MAX,
+    //                 sub_board: u8::MAX,
+    //                 lol: u8::MAX,
+    //                 lol_stable: u8::MAX,
+    //                 trig_rate: u16::MAX,
+    //                 fw_version: "0.0.0".to_string(),
+    //                 fw_hash: "XXXXX".to_string(),
+    //                 uptime: u32::MAX,
+    //                 sd_usage: u8::MAX,
+    //                 input_mode: "Input Mode Error".to_string(),
+    //                 rat_num: u8::MAX,
+    //                 rat_pos: u8::MAX,
+    //                 rb_pos: u8::MAX,
+    //             }
+    //         }
+    //     }
+        
+    // }
+    pub fn read_all_info() -> RBInfo {
+        let board_id = Self::read_board_id().unwrap_or(u8::MAX);
+        let sub_board = Self::read_sub_board().unwrap_or(u8::MAX);
+        let lol = Self::read_lol().unwrap_or(u8::MAX);
+        let lol_stable = Self::read_lol_stable().unwrap_or(u8::MAX);
+        let trig_rate = Self::read_trig_rate().unwrap_or(u16::MAX);
         // Additional Info
-        let fw_version = Self::read_fw_version()?;
-        let fw_hash = Self::read_fw_hash()?;
+        let fw_version = Self::read_fw_version().unwrap_or("0.0.0".to_string());
+        let fw_hash = Self::read_fw_hash().unwrap_or("XXXXX".to_string());
         let uptime = Self::read_uptime();
         let sd_usage = Self::read_sd_usage();
-        let input_mode = Self::read_input_mode()?;
-        let rat_num = Self::read_rat_num()?;
-        let rat_pos = Self::read_rat_pos()?;
-        let rb_pos = Self::read_rb_pos()?;
+        let input_mode = Self::read_input_mode().unwrap_or("Input Mode Error".to_string());
+        let rat_num = Self::read_rat_num().unwrap_or(u8::MAX);
+        let rat_pos = Self::read_rat_pos().unwrap_or(u8::MAX);
+        let rb_pos = Self::read_rb_pos().unwrap_or(u8::MAX);
 
-        Ok(
-            RBInfo {
-                board_id,
-                sub_board,
-                lol,
-                lol_stable,
-                trig_rate,
-                fw_version,
-                fw_hash,
-                uptime,
-                sd_usage,
-                input_mode,
-                rat_num,
-                rat_pos,
-                rb_pos,
-            }
-        )
+        RBInfo {
+            board_id,
+            sub_board,
+            lol,
+            lol_stable,
+            trig_rate,
+            fw_version,
+            fw_hash,
+            uptime,
+            sd_usage,
+            input_mode,
+            rat_num,
+            rat_pos,
+            rb_pos,
+        }
     }
+    // pub fn read_all_info() -> Result<RBInfo, RBError> {
+    //     let board_id = Self::read_board_id()?;
+    //     let sub_board = Self::read_sub_board()?;
+    //     let lol = Self::read_lol()?;
+    //     let lol_stable = Self::read_lol_stable()?;
+    //     let trig_rate = Self::read_trig_rate()?;
+    //     // Additional Info
+    //     let fw_version = Self::read_fw_version()?;
+    //     let fw_hash = Self::read_fw_hash()?;
+    //     let uptime = Self::read_uptime();
+    //     let sd_usage = Self::read_sd_usage();
+    //     let input_mode = Self::read_input_mode()?;
+    //     let rat_num = Self::read_rat_num()?;
+    //     let rat_pos = Self::read_rat_pos()?;
+    //     let rb_pos = Self::read_rb_pos()?;
+
+    //     Ok(
+    //         RBInfo {
+    //             board_id,
+    //             sub_board,
+    //             lol,
+    //             lol_stable,
+    //             trig_rate,
+    //             fw_version,
+    //             fw_hash,
+    //             uptime,
+    //             sd_usage,
+    //             input_mode,
+    //             rat_num,
+    //             rat_pos,
+    //             rb_pos,
+    //         }
+    //     )
+    // }
     pub fn read_board_id() -> Result<u8, RBError> {
         let mut board_id = read_control_reg(BOARD_ID)? as u8;
         if board_id >= u8::MAX {
