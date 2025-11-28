@@ -1,6 +1,7 @@
 use crate::constant::*;
 use crate::helper::rb_type::{RBPh, RBError};
 use crate::device::{bme280, pca9548a};
+use crate::i2c_bus_lock::with_i2c_bus_lock;
 
 impl RBPh {
     pub fn new() -> Self {
@@ -17,33 +18,37 @@ impl RBPh {
         }
     }
     pub fn read_ph() -> Result<RBPh, RBError> {
-        let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_1);
+        with_i2c_bus_lock(|| {
+            let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_1);
 
-        i2c_mux.select(RB_BME280_CHANNEL)?;
-        let bme280 = bme280::BME280::new(I2C_BUS, RB_BME280_ADDRESS);
-        bme280.configure()?;
-        let ph = bme280.read()?;
-        let pressure = ph[0];
-        let humidity = ph[1];
+            i2c_mux.select(RB_BME280_CHANNEL)?;
+            let bme280 = bme280::BME280::new(I2C_BUS, RB_BME280_ADDRESS);
+            bme280.configure()?;
+            let ph = bme280.read()?;
+            let pressure = ph[0];
+            let humidity = ph[1];
 
-        i2c_mux.reset()?;
+            i2c_mux.reset()?;
 
-        Ok(
-            RBPh {
-                pressure,
-                humidity,
-            }
-        )
+            Ok(
+                RBPh {
+                    pressure,
+                    humidity,
+                }
+            )
+        })
     }
 }
 
 pub fn config_ph() -> Result<(), RBError> {
-    let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_1);
-    i2c_mux.select(RB_BME280_CHANNEL)?;
-    let bme280 = bme280::BME280::new(I2C_BUS, RB_BME280_ADDRESS);
-    bme280.configure()?;
+    with_i2c_bus_lock(|| {
+        let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_1);
+        i2c_mux.select(RB_BME280_CHANNEL)?;
+        let bme280 = bme280::BME280::new(I2C_BUS, RB_BME280_ADDRESS);
+        bme280.configure()?;
 
-    i2c_mux.reset()?;
+        i2c_mux.reset()?;
 
-    Ok(())
+        Ok(())
+    })
 }

@@ -85,7 +85,9 @@ pub enum RBError {
     // OsString Error
     OsString,
     // Invalid Input Mode Error
-    InvalidInputMode
+    InvalidInputMode,
+    // IO Error
+    IO(std::io::Error),
 }
 
 impl std::fmt::Display for RBError {
@@ -121,5 +123,11 @@ impl From<std::num::ParseIntError> for RBError {
 impl From<std::ffi::OsString> for RBError {
     fn from(_: std::ffi::OsString) -> Self {
         RBError::OsString
+    }
+}
+
+impl From<std::io::Error> for RBError {
+    fn from(e: std::io::Error) -> Self {
+        RBError::IO(e)
     }
 }

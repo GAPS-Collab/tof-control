@@ -1,6 +1,7 @@
 use crate::constant::*;
 use crate::helper::rb_type::{RBMag, RBError};
 use crate::device::{lis3mdltr, pca9548a};
+use crate::i2c_bus_lock::with_i2c_bus_lock;
 
 impl RBMag {
     pub fn new() -> Self {
@@ -16,30 +17,34 @@ impl RBMag {
         }
     }
     pub fn read_mag() -> Result<RBMag, RBError> {
-        let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_1);
-        i2c_mux.select(RB_LIS3MDLTR_CHANNEL)?;
+        with_i2c_bus_lock(|| {
+            let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_1);
+            i2c_mux.select(RB_LIS3MDLTR_CHANNEL)?;
 
-        let lis3mdltr = lis3mdltr::LIS3MDLTR::new(I2C_BUS, RB_LIS3MDLTR_ADDRESS);
-        lis3mdltr.configure()?;
-        let mag_xyz = lis3mdltr.read_mag()?;
+            let lis3mdltr = lis3mdltr::LIS3MDLTR::new(I2C_BUS, RB_LIS3MDLTR_ADDRESS);
+            lis3mdltr.configure()?;
+            let mag_xyz = lis3mdltr.read_mag()?;
 
-        i2c_mux.reset()?;
+            i2c_mux.reset()?;
 
-        Ok(
-            RBMag {
-                mag_xyz,
-            }
-        )
+            Ok(
+                RBMag {
+                    mag_xyz,
+                }
+            )
+        })
     }
 }
 
 pub fn config_mag() -> Result<(), RBError> {
-    let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_1);
-    i2c_mux.select(RB_LIS3MDLTR_CHANNEL)?;
-    let lis3mdltr = lis3mdltr::LIS3MDLTR::new(I2C_BUS, RB_LIS3MDLTR_ADDRESS);
-    lis3mdltr.configure()?;
+    with_i2c_bus_lock(|| {
+        let i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_1);
+        i2c_mux.select(RB_LIS3MDLTR_CHANNEL)?;
+        let lis3mdltr = lis3mdltr::LIS3MDLTR::new(I2C_BUS, RB_LIS3MDLTR_ADDRESS);
+        lis3mdltr.configure()?;
 
-    i2c_mux.reset()?;
+        i2c_mux.reset()?;
 
-    Ok(())
+        Ok(())
+    })
 }
