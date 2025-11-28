@@ -1,6 +1,7 @@
 use crate::constant::*;
 use crate::helper::ltb_type::{LTBThreshold, LTBError};
 use crate::device::max5815;
+use crate::i2c_bus_lock::with_i2c_bus_lock;
 
 impl LTBThreshold {
     pub fn new() -> Self {
@@ -19,27 +20,31 @@ impl LTBThreshold {
 
     }
     pub fn read_threshold(channel: u8) -> Result<f32, LTBError> {
-        let ltb_dac = max5815::MAX5815::new(I2C_BUS, LTB_MAX5815_ADDRESS);
-        let threshold_raw = ltb_dac.read_dacn(channel)?;
-        let threshold = Self::adc_to_mv(threshold_raw);
+        with_i2c_bus_lock(|| {
+            let ltb_dac = max5815::MAX5815::new(I2C_BUS, LTB_MAX5815_ADDRESS);
+            let threshold_raw = ltb_dac.read_dacn(channel)?;
+            let threshold = Self::adc_to_mv(threshold_raw);
 
-        Ok(threshold)
+            Ok(threshold)
+        })
     }
     pub fn read_thresholds() -> Result<LTBThreshold, LTBError> {
-        let ltb_dac: max5815::MAX5815 = max5815::MAX5815::new(I2C_BUS, LTB_MAX5815_ADDRESS);
-        let mut thresholds: [f32; 3] = Default::default();
-        for i in 0..=2 {
-            let threshold_raw = ltb_dac.read_dacn(i)?;
-            thresholds[i as usize] = Self::adc_to_mv(threshold_raw);
-        }
-
-        Ok(
-            LTBThreshold {
-                thresh_0: thresholds[0],
-                thresh_1: thresholds[1],
-                thresh_2: thresholds[2],
+        with_i2c_bus_lock(|| {
+            let ltb_dac: max5815::MAX5815 = max5815::MAX5815::new(I2C_BUS, LTB_MAX5815_ADDRESS);
+            let mut thresholds: [f32; 3] = Default::default();
+            for i in 0..=2 {
+                let threshold_raw = ltb_dac.read_dacn(i)?;
+                thresholds[i as usize] = Self::adc_to_mv(threshold_raw);
             }
-        )
+
+            Ok(
+                LTBThreshold {
+                    thresh_0: thresholds[0],
+                    thresh_1: thresholds[1],
+                    thresh_2: thresholds[2],
+                }
+            )
+        })
     }
     fn adc_to_mv(adc: u16) -> f32 {
         let voltage = LTB_DAC_REF_VOLTAGE * (adc as f32) / 2f32.powf(12.0);
@@ -49,47 +54,51 @@ impl LTBThreshold {
 }
 
 pub fn set_default_threshold() -> Result<(), LTBError> {
-    let ltb_dac = max5815::MAX5815::new(I2C_BUS, LTB_MAX5815_ADDRESS);
-    ltb_dac.configure()?;
+    with_i2c_bus_lock(|| {
+        let ltb_dac = max5815::MAX5815::new(I2C_BUS, LTB_MAX5815_ADDRESS);
+        ltb_dac.configure()?;
 
-    let default_thresholds = [LTB_DAC_THRESHOLD_0, LTB_DAC_THRESHOLD_1, LTB_DAC_THRESHOLD_2];
+        let default_thresholds = [LTB_DAC_THRESHOLD_0, LTB_DAC_THRESHOLD_1, LTB_DAC_THRESHOLD_2];
 
-    for (i, default_threshold) in default_thresholds.iter().enumerate() {
-        ltb_dac.coden_loadn(i as u8, mv_to_adc(*default_threshold))?;
-    };
+        for (i, default_threshold) in default_thresholds.iter().enumerate() {
+            ltb_dac.coden_loadn(i as u8, mv_to_adc(*default_threshold))?;
+        };
 
-    Ok(())
+        Ok(())
+    })
 }
 
 pub fn set_threshold(channel: u8, threshold: f32) -> Result<(), LTBError> {
+    with_i2c_bus_lock(|| {
+        if !(0..=2).contains(&channel) {
+            return Err(LTBError::SetThreshold)
+        } 
 
-    if !(0..=2).contains(&channel) {
-        return Err(LTBError::SetThreshold)
-    } 
+        let ltb_dac = max5815::MAX5815::new(I2C_BUS, LTB_MAX5815_ADDRESS);
+        ltb_dac.configure()?;
 
-    let ltb_dac = max5815::MAX5815::new(I2C_BUS, LTB_MAX5815_ADDRESS);
-    ltb_dac.configure()?;
+        ltb_dac.coden_loadn(channel, mv_to_adc(threshold))?;
 
-    ltb_dac.coden_loadn(channel, mv_to_adc(threshold))?;
-
-    Ok(())
+        Ok(())
+    })
 }
 
 pub fn set_thresholds(thresholds: [f32; 3]) -> Result<(), LTBError> {
+    with_i2c_bus_lock(|| {
+        let ltb_dac = max5815::MAX5815::new(I2C_BUS, LTB_MAX5815_ADDRESS);
+        ltb_dac.configure()?;
 
-    let ltb_dac = max5815::MAX5815::new(I2C_BUS, LTB_MAX5815_ADDRESS);
-    ltb_dac.configure()?;
+        for (i, threshold) in thresholds.iter().enumerate() {
 
-    for (i, threshold) in thresholds.iter().enumerate() {
-
-        if (*threshold < 0.0) | (*threshold > 1000.0) {
-            return Err(LTBError::SetThreshold)
+            if (*threshold < 0.0) | (*threshold > 1000.0) {
+                return Err(LTBError::SetThreshold)
+            }
+            
+            ltb_dac.coden_loadn(i as u8, mv_to_adc(*threshold))?;
         }
-        
-        ltb_dac.coden_loadn(i as u8, mv_to_adc(*threshold))?;
-    }
 
-    Ok(())
+        Ok(())
+    })
 }
 
 fn mv_to_adc(mv: f32) -> u16 {
@@ -99,8 +108,10 @@ adc as u16
 }
 
 pub fn reset_threshold() -> Result<(), LTBError> {
-    let ltb_dac = max5815::MAX5815::new(I2C_BUS, LTB_MAX5815_ADDRESS);
-    ltb_dac.reset_dac()?;
+    with_i2c_bus_lock(|| {
+        let ltb_dac = max5815::MAX5815::new(I2C_BUS, LTB_MAX5815_ADDRESS);
+        ltb_dac.reset_dac()?;
 
-    Ok(())
+        Ok(())
+    })
 }

@@ -31,6 +31,8 @@ pub struct PBVcp {
 pub enum PBError {
     // I2C Error
     I2C(i2cdev::linux::LinuxI2CError),
+    // IO Error
+    IO(std::io::Error),
 }
 
 impl std::fmt::Display for PBError {
@@ -42,5 +44,11 @@ impl std::fmt::Display for PBError {
 impl From<i2cdev::linux::LinuxI2CError> for PBError {
     fn from(e: i2cdev::linux::LinuxI2CError) -> Self {
         PBError::I2C(e)
+    }
+}
+
+impl From<std::io::Error> for PBError {
+    fn from(e: std::io::Error) -> Self {
+        PBError::IO(e)
     }
 }

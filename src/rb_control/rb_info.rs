@@ -4,9 +4,9 @@ use i2cdev::linux::LinuxI2CDevice;
 
 use crate::constant::*;
 use crate::memory::read_control_reg;
-
 use crate::helper::rb_type::{RBInfo, RBError};
 use crate::rb_control::rb_mode;
+use crate::i2c_bus_lock::with_i2c_bus_lock;
 
 impl RBInfo {
     pub fn new() -> Self {
@@ -53,25 +53,27 @@ impl RBInfo {
         Ok(board_id)
     }
     pub fn read_sub_board() -> Result<u8, RBError> {
-        let sub_board: u8;
+        with_i2c_bus_lock(|| {
+            let sub_board: u8;
 
-        let mut ltb_i2c = LinuxI2CDevice::new(&format!("/dev/i2c-{}", I2C_BUS), LTB_TRENZ_ADDRESS)?;
-        let mut pb_i2c = LinuxI2CDevice::new(&format!("/dev/i2c-{}", I2C_BUS), PB_PCA9548A_ADDRESS)?;
+            let mut ltb_i2c = LinuxI2CDevice::new(&format!("/dev/i2c-{}", I2C_BUS), LTB_TRENZ_ADDRESS)?;
+            let mut pb_i2c = LinuxI2CDevice::new(&format!("/dev/i2c-{}", I2C_BUS), PB_PCA9548A_ADDRESS)?;
 
-        let ltb_on = ltb_i2c.smbus_read_byte().is_ok();
-        let pb_on = pb_i2c.smbus_read_byte().is_ok();
+            let ltb_on = ltb_i2c.smbus_read_byte().is_ok();
+            let pb_on = pb_i2c.smbus_read_byte().is_ok();
 
-        if ltb_on && !pb_on {
-            sub_board = 1;
-        } else if !ltb_on && pb_on {
-            sub_board = 2;
-        } else if ltb_on && pb_on {
-            sub_board = 3;
-        } else {
-            sub_board = 0;
-        }
+            if ltb_on && !pb_on {
+                sub_board = 1;
+            } else if !ltb_on && pb_on {
+                sub_board = 2;
+            } else if ltb_on && pb_on {
+                sub_board = 3;
+            } else {
+                sub_board = 0;
+            }
 
-        Ok(sub_board)
+            Ok(sub_board)
+        })
     }
     pub fn read_lol() -> Result<u8, RBError> {
         let mut lol = read_control_reg(LOSS_OF_LOCK)? as u8;

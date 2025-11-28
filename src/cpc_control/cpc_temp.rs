@@ -1,6 +1,7 @@
 use crate::constant::*;
 use crate::helper::cpc_type::{CPCTemp, CPCError};
 use crate::device::tmp1075;
+use crate::i2c_bus_lock::with_i2c_bus_lock;
 
 impl CPCTemp {
     pub fn new() -> Self {
@@ -16,14 +17,16 @@ impl CPCTemp {
         }
     }
     pub fn read_temp() -> Result<CPCTemp, CPCError> {
-        let cpc_tmp1075 = tmp1075::TMP1075::new(CPC_I2C_BUS, CPC_TMP1075_ADDRESS);
-        cpc_tmp1075.config()?;
-        let cpc_temp = cpc_tmp1075.read()?;
+        with_i2c_bus_lock(|| {
+            let cpc_tmp1075 = tmp1075::TMP1075::new(CPC_I2C_BUS, CPC_TMP1075_ADDRESS);
+            cpc_tmp1075.config()?;
+            let cpc_temp = cpc_tmp1075.read()?;
 
-        Ok(
-            CPCTemp {
-                cpc_temp,
-            }
-        )
+            Ok(
+                CPCTemp {
+                    cpc_temp,
+                }
+            )
+        })
     }
 }
