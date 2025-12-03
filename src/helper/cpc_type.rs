@@ -12,10 +12,18 @@ pub struct CPCVcp {
 pub enum CPCError {
     /// I2C Error
     I2C(i2cdev::linux::LinuxI2CError),
+    // IO Error
+    IO(std::io::Error),
 }
 
 impl From<i2cdev::linux::LinuxI2CError> for CPCError {
     fn from(e: i2cdev::linux::LinuxI2CError) -> Self {
         CPCError::I2C(e)
+    }
+}
+
+impl From<std::io::Error> for CPCError {
+    fn from(e: std::io::Error) -> Self {
+        CPCError::IO(e)
     }
 }

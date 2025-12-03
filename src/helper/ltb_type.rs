@@ -28,6 +28,8 @@ pub enum LTBError {
     I2C(i2cdev::linux::LinuxI2CError),
     // Setting Threshold Error
     SetThreshold,
+    // IO Error
+    IO(std::io::Error),
 }
 
 impl std::fmt::Display for LTBError {
@@ -39,5 +41,11 @@ impl std::fmt::Display for LTBError {
 impl From<i2cdev::linux::LinuxI2CError> for LTBError {
     fn from(e: i2cdev::linux::LinuxI2CError) -> Self {
         LTBError::I2C(e)
+    }
+}
+
+impl From<std::io::Error> for LTBError {
+    fn from(e: std::io::Error) -> Self {
+        LTBError::IO(e)
     }
 }

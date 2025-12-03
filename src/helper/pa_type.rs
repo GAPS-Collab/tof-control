@@ -30,6 +30,8 @@ pub enum PAError {
     I2C(i2cdev::linux::LinuxI2CError),
     // PB Error
     PBError(crate::helper::pb_type::PBError),
+    // IO Error
+    IO(std::io::Error),
 }
 
 impl std::fmt::Display for PAError {
@@ -47,5 +49,11 @@ impl From<i2cdev::linux::LinuxI2CError> for PAError {
 impl From<crate::helper::pb_type::PBError> for PAError {
     fn from(e: crate::helper::pb_type::PBError) -> Self {
         PAError::PBError(e)
+    }
+}
+
+impl From<std::io::Error> for PAError {
+    fn from(e: std::io::Error) -> Self {
+        PAError::IO(e)
     }
 }
