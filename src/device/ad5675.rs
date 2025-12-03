@@ -31,13 +31,6 @@ impl AD5675 {
 
     pub fn read_dac(&self, channel: u8) -> Result<u16, LinuxI2CError> {
         let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", self.bus), self.address)?;
-        // let mut read_data = [0; 2];
-        // let mut msgs = [
-        //     LinuxI2CMessage::write(&[READBACK_ENABLE+channel, 0x00, 0x00]),
-        //     LinuxI2CMessage::read(&mut read_data)
-        // ];
-        
-        // dev.transfer(&mut msgs)?;
 
         let command_byte = READBACK_ENABLE | (channel & 0x0F);
         let frame = [command_byte, 0x00, 0x00];
