@@ -15,8 +15,8 @@ pub struct RBMoniData {
 pub struct RBInfo {
     pub board_id        : u8,
     pub sub_board       : u8,
-    // pub lol             : u8,
-    // pub lol_stable      : u8,
+    pub lol             : u8,
+    pub lol_stable      : u8,
     // pub trig_rate       : u16,
     // pub fw_version      : String,
     // pub fw_hash         : String,

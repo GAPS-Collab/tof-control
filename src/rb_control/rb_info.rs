@@ -15,8 +15,8 @@ impl RBInfo {
     pub fn read_all_info() -> RBInfo {
         let board_id = Self::read_board_id().unwrap_or(u8::MAX);
         let sub_board = Self::read_sub_board().unwrap_or(u8::MAX);
-        // let lol = Self::read_lol().unwrap_or(u8::MAX);
-        // let lol_stable = Self::read_lol_stable().unwrap_or(u8::MAX);
+        let lol = Self::read_lol().unwrap_or(u8::MAX);
+        let lol_stable = Self::read_lol_stable().unwrap_or(u8::MAX);
         // let trig_rate = Self::read_trig_rate().unwrap_or(u16::MAX);
         // // Additional Info
         // let fw_version = Self::read_fw_version().unwrap_or("0.0.0".to_string());
@@ -31,8 +31,8 @@ impl RBInfo {
         RBInfo {
             board_id,
             sub_board,
-            // lol,
-            // lol_stable,
+            lol,
+            lol_stable,
             // trig_rate,
             // fw_version,
             // fw_hash,
