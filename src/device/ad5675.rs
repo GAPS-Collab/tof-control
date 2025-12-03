@@ -1,6 +1,5 @@
 #![allow(unused)]
 use crate::constant::*;
-use crate::rb_control::rb_dac::read_dac;
 
 use i2cdev::core::*;
 use i2cdev::linux::{LinuxI2CDevice, LinuxI2CMessage, LinuxI2CError};
@@ -32,13 +31,13 @@ impl AD5675 {
 
     pub fn read_dac(&self, channel: u8) -> Result<u16, LinuxI2CError> {
         let mut dev = LinuxI2CDevice::new(&format!("/dev/i2c-{}", self.bus), self.address)?;
+
+        let command_byte = READBACK_ENABLE | (channel & 0x0F);
+        let frame = [command_byte, 0x00, 0x00];
+        dev.write(&frame)?;
+
         let mut read_data = [0; 2];
-        let mut msgs = [
-            LinuxI2CMessage::write(&[READBACK_ENABLE+channel, 0x00, 0x00]),
-            LinuxI2CMessage::read(&mut read_data)
-        ];
-        
-        dev.transfer(&mut msgs)?;
+        dev.read(&mut read_data)?;
 
         let dac_value = ((read_data[0] as u16 & 0xFF) << 8) | (read_data[1] as u16 & 0xFF);
 
