@@ -1,12 +1,20 @@
 [package]
 name = "tof-control"
-version = "1.10.0"
+version = "1.10.1"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [profile.release]
 opt-level = "z"
+
+[[bin]]
+name = "liftof-rb-test"
+path = "src/bin/dev/liftof_rb_test.rs"
+
+[[bin]]
+name = "rb-info"
+path = "src/bin/dev/rb_info.rs"
 
 [[bin]]
 name = "calib-simulator"
