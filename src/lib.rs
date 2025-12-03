@@ -11,7 +11,7 @@ pub mod cpc_control;
 pub mod tcpc_control;
 pub mod switch_control;
 pub mod mtb_control;
-pub mod tui;
+// pub mod tui;
 pub mod i2c_bus_lock;
 
 // RATMoniData
