@@ -21,8 +21,8 @@ impl RBInfo {
         // Additional Info
         let fw_version = Self::read_fw_version().unwrap_or("0.0.0".to_string());
         let fw_hash = Self::read_fw_hash().unwrap_or("XXXXX".to_string());
-        // let uptime = Self::read_uptime();
-        // let sd_usage = Self::read_sd_usage();
+        let uptime = Self::read_uptime();
+        let sd_usage = Self::read_sd_usage();
         // let input_mode = Self::read_input_mode().unwrap_or("Input Mode Error".to_string());
         // let rat_num = Self::read_rat_num().unwrap_or(u8::MAX);
         // let rat_pos = Self::read_rat_pos().unwrap_or(u8::MAX);
@@ -36,8 +36,8 @@ impl RBInfo {
             trig_rate,
             fw_version,
             fw_hash,
-            // uptime,
-            // sd_usage,
+            uptime,
+            sd_usage,
             // input_mode,
             // rat_num,
             // rat_pos,
