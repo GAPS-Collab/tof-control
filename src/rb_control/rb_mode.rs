@@ -92,7 +92,7 @@ pub fn read_input_mode() -> Result<String, RBError> {
         }
     }
 
-    // let dac_input_values = rb_dac::read_dac()?;
+    let dac_input_values = rb_dac::read_dac()?;
     // let dac_mode: &str;
     // match dac_input_values {
     //     [RB_AD5675_DAC0, RB_AD5675_DAC1, RB_AD5675_DAC2, RB_AD5675_DAC3, RB_AD5675_DAC4] => {
