@@ -15,17 +15,17 @@ pub struct RBMoniData {
 pub struct RBInfo {
     pub board_id        : u8,
     pub sub_board       : u8,
-    pub lol             : u8,
-    pub lol_stable      : u8,
-    pub trig_rate       : u16,
-    pub fw_version      : String,
-    pub fw_hash         : String,
-    pub uptime          : u32,
-    pub sd_usage        : u8,
-    pub input_mode      : String,
-    pub rat_num         : u8,
-    pub rat_pos         : u8,
-    pub rb_pos          : u8, 
+    // pub lol             : u8,
+    // pub lol_stable      : u8,
+    // pub trig_rate       : u16,
+    // pub fw_version      : String,
+    // pub fw_hash         : String,
+    // pub uptime          : u32,
+    // pub sd_usage        : u8,
+    // pub input_mode      : String,
+    // pub rat_num         : u8,
+    // pub rat_pos         : u8,
+    // pub rb_pos          : u8, 
 }
 // RB Temperature Sensor Data Type
 #[derive(Debug, Serialize, Deserialize)]
