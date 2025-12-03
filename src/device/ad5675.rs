@@ -25,6 +25,7 @@ impl AD5675 {
     }
     
     pub fn write_dac(&self, channel: u8, value: u16) -> Result<(), LinuxI2CError> {
+        println!("AD5675: Writing value {} to channel {}", value, channel);
         let fd = if let Ok(file) = File::open("/dev/i2c-0") {
             file.into_raw_fd()
         } else {
