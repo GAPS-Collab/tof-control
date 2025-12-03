@@ -92,32 +92,32 @@ pub fn read_input_mode() -> Result<String, RBError> {
         }
     }
 
-    let dac_input_values = rb_dac::read_dac()?;
-    let dac_mode: &str;
-    match dac_input_values {
-        [RB_AD5675_DAC0, RB_AD5675_DAC1, RB_AD5675_DAC2, RB_AD5675_DAC3, RB_AD5675_DAC4] => {
-            dac_mode = "NORMAL";
-        }
-        [RB_AD5675_DAC0, RB_AD5675_DAC1_VCAL, RB_AD5675_DAC2, RB_AD5675_DAC3, RB_AD5675_DAC4] => {
-            dac_mode = "VCAL";
-        }
-        _ => {
-            dac_mode = "DAC Mode Error";
-        }
+    // let dac_input_values = rb_dac::read_dac()?;
+    // let dac_mode: &str;
+    // match dac_input_values {
+    //     [RB_AD5675_DAC0, RB_AD5675_DAC1, RB_AD5675_DAC2, RB_AD5675_DAC3, RB_AD5675_DAC4] => {
+    //         dac_mode = "NORMAL";
+    //     }
+    //     [RB_AD5675_DAC0, RB_AD5675_DAC1_VCAL, RB_AD5675_DAC2, RB_AD5675_DAC3, RB_AD5675_DAC4] => {
+    //         dac_mode = "VCAL";
+    //     }
+    //     _ => {
+    //         dac_mode = "DAC Mode Error";
+    //     }
 
-    }
+    // }
 
-    if input_mode == "NOI" && dac_mode == "NORMAL" {
-        input_mode = "NOI";
-    } else if input_mode == "NOI" && dac_mode == "VCAL" {
-        input_mode = "VCAL";
-    } else if input_mode == "TCAL" && dac_mode == "NORMAL" {
-        input_mode = "TCAL";
-    } else if input_mode == "SMA" && dac_mode == "NORMAL" {
-        input_mode = "SMA";
-    } else {
-        return Err(RBError::InvalidInputMode);
-    }
+    // if input_mode == "NOI" && dac_mode == "NORMAL" {
+    //     input_mode = "NOI";
+    // } else if input_mode == "NOI" && dac_mode == "VCAL" {
+    //     input_mode = "VCAL";
+    // } else if input_mode == "TCAL" && dac_mode == "NORMAL" {
+    //     input_mode = "TCAL";
+    // } else if input_mode == "SMA" && dac_mode == "NORMAL" {
+    //     input_mode = "SMA";
+    // } else {
+    //     return Err(RBError::InvalidInputMode);
+    // }
 
     Ok(input_mode.to_string())
 }
