@@ -17,7 +17,7 @@ pub struct RBInfo {
     pub sub_board       : u8,
     pub lol             : u8,
     pub lol_stable      : u8,
-    // pub trig_rate       : u16,
+    pub trig_rate       : u16,
     // pub fw_version      : String,
     // pub fw_hash         : String,
     // pub uptime          : u32,
