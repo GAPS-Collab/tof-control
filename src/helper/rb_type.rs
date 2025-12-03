@@ -22,7 +22,7 @@ pub struct RBInfo {
     pub fw_hash         : String,
     pub uptime          : u32,
     pub sd_usage        : u8,
-    // pub input_mode      : String,
+    pub input_mode      : String,
     // pub rat_num         : u8,
     // pub rat_pos         : u8,
     // pub rb_pos          : u8, 
