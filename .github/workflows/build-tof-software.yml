@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      # - takeru-dev
   pull_request:
 
 env:

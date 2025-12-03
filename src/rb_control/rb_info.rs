@@ -24,9 +24,9 @@ impl RBInfo {
         let uptime = Self::read_uptime();
         let sd_usage = Self::read_sd_usage();
         let input_mode = Self::read_input_mode().unwrap_or("Input Mode Error".to_string());
-        // let rat_num = Self::read_rat_num().unwrap_or(u8::MAX);
-        // let rat_pos = Self::read_rat_pos().unwrap_or(u8::MAX);
-        // let rb_pos = Self::read_rb_pos().unwrap_or(u8::MAX);
+        let rat_num = Self::read_rat_num().unwrap_or(u8::MAX);
+        let rat_pos = Self::read_rat_pos().unwrap_or(u8::MAX);
+        let rb_pos = Self::read_rb_pos().unwrap_or(u8::MAX);
 
         RBInfo {
             board_id,
@@ -39,9 +39,9 @@ impl RBInfo {
             uptime,
             sd_usage,
             input_mode,
-            // rat_num,
-            // rat_pos,
-            // rb_pos,
+            rat_num,
+            rat_pos,
+            rb_pos,
         }
     }
     pub fn read_board_id() -> Result<u8, RBError> {
