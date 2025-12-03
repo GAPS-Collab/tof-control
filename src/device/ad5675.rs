@@ -37,7 +37,7 @@ impl AD5675 {
             LinuxI2CMessage::read(&mut read_data)
         ];
         
-        dev.transfer(&mut msgs)?;
+        // dev.transfer(&mut msgs)?;
 
         let dac_value = ((read_data[0] as u16 & 0xFF) << 8) | (read_data[1] as u16 & 0xFF);
 

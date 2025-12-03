@@ -89,12 +89,10 @@ pub fn read_dac() -> Result<[u16; 5], RBError> {
         let ad5675 = ad5675::AD5675::new(I2C_BUS, RB_AD5675_ADDRESS);
 
         let mut dac_values: [u16; 5] = [u16::max_value(); 5];
-        // for i in 0..=4 {
-        //     let dac = ad5675.read_dac(i)?;
-        //     dac_values[i as usize] = dac;
-        // }
-        let dac = ad5675.read_dac(0)?;
-        dac_values[0] = dac;
+        for i in 0..=4 {
+            let dac = ad5675.read_dac(i)?;
+            dac_values[i as usize] = dac;
+        }
 
         i2c_mux.reset()?;
 
