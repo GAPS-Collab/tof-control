@@ -93,6 +93,8 @@ pub fn read_dac() -> Result<[u16; 5], RBError> {
         //     let dac = ad5675.read_dac(i)?;
         //     dac_values[i as usize] = dac;
         // }
+        let dac = ad5675.read_dac(0)?;
+        dac_values[0] = dac;
 
         i2c_mux.reset()?;
 
